@@ -20,14 +20,7 @@ export default class Users extends BaseSchema {
         .enum('account_type', Object.values(UserRoles))
         .defaultTo(UserRoles.PRODUCTION)
         .notNullable()
-      table
-        .uuid('latest_tracking_session_id')
-        .unsigned()
-        .references('id')
-        .inTable('tracking_sessions')
-      /**
-       * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
-       */
+
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })
