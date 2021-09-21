@@ -9,7 +9,7 @@ deploy:
   script:
     - chmod og= $ID_RSA
     - apt-get update && apt-get install -y openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; ls"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "pwd"
     # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "git -C ~/omnileaf/backend/production pull"
     # - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker-compose -f ~/omnileaf/backend/production/docker-compose.yml build"
