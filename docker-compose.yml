@@ -34,25 +34,7 @@ services:
       - '${DB_PORT}:${DB_PORT}'
     networks:
       - app-network
-  nginx:
-    image: jonasal/nginx-certbot:latest
-    restart: unless-stopped
-    container_name: proxy_reverse-omni
-    environment:
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-      RENEWAL_INTERVAL: ${RENEWAL_INTERVAL}
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - letsencrypt:/etc/letsencrypt
-      - ./Docker/nginx/user_conf.d:/etc/nginx/user_conf.d
-    depends_on:
-      - app
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  letsencrypt:

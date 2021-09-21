@@ -1,0 +1,6 @@
+deploy:
+  script:
+    - docker-compose build
+    - docker-compose up -d
+  only:
+    - main

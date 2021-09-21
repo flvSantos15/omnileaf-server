@@ -103,3 +103,5 @@ COPY yarn.lock ./
 RUN yarn
 
 COPY . .
+
+RUN chmod u+x ./init-app.sh
