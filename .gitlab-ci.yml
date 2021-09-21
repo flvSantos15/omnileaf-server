@@ -1,6 +1,19 @@
+image: docker
+
+services:
+  - docker:dind
+
+stages:
+  - deploy
+
 deploy:
+  stage: deploy
+  environment: production
   script:
+    - chmod u+x init-app.sh 
+    - apk add --no-cache docker-compose
     - docker-compose build
-    - docker-compose up -d
+    - docker-compose up
   only:
     - main
+
