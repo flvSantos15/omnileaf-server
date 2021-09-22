@@ -2,7 +2,7 @@ version: '3.8'
 services:
   development_app:
     build: .
-    container_name: nodejs-omni
+    container_name: nodejs-omni-dev
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV}
