@@ -13,3 +13,8 @@ services:
       - '${PORT}:${PORT}'
     command: >
       bash -c "./init-app.sh"
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
