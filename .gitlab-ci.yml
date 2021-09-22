@@ -13,7 +13,7 @@ production:
     - apt-get update && apt-get install -y openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; git pull"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; chmod u+x ./init-app.sh"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; docker-compose build"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; docker-compose down -v --rmi 'local'"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; docker-compose up -d"
   environment:
     name: production
@@ -30,7 +30,7 @@ development:
     - apt-get update && apt-get install -y openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/development/; git pull"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/development/; chmod u+x ./init-app.sh"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/development/; docker-compose build"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; docker-compose down -v --rmi 'local'"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/development/; docker-compose up -d"
   environment:
     name: development
@@ -47,7 +47,7 @@ staging:
     - apt-get update && apt-get install -y openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; git pull"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; chmod u+x ./init-app.sh"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; docker-compose build"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/production/; docker-compose down -v --rmi 'local'"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; docker-compose up -d"
   environment:
     name: staging
