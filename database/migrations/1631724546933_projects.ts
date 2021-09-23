@@ -16,7 +16,7 @@ export default class Projects extends BaseSchema {
         .inTable('users')
         .notNullable()
       table
-        .uuid('user_assigned')
+        .uuid('user_in_charge_id')
         .notNullable()
         .unsigned()
         .references('id')
