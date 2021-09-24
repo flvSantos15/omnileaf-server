@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeSave,
   column,
   HasMany,
   hasMany,
@@ -17,6 +18,7 @@ import List from './List'
 import Task from './Task'
 import Screenshot from './Screenshot'
 import Organization from './Organization'
+import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -31,7 +33,7 @@ export default class User extends BaseModel {
   @column()
   public email: string
 
-  @column()
+  @column({ serializeAs: null })
   public password: string
 
   @column({ columnName: 'avatar_url' })
@@ -96,4 +98,11 @@ export default class User extends BaseModel {
     pivotTable: 'organization_user',
   })
   public organizations: ManyToMany<typeof Organization>
+
+  @beforeSave()
+  public static async hashPassword(user: User) {
+    if (user.$dirty.password) {
+      user.password = await Hash.make(user.password)
+    }
+  }
 }
