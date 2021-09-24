@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV}
-      DB_HOST: omni-postgres
+      DB_HOST: postgres-omni
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
