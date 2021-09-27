@@ -38,16 +38,18 @@ export default class UsersController {
     response.status(201).json(user.serialize())
   }
 
-  public async update({ request, response }: HttpContextContract) {
+  public async update({ request, response, bouncer }: HttpContextContract) {
     const id = request.param('id')
+
+    const user = await User.findOrFail(id)
+
+    await bouncer.authorize('editAndDeleteUser', id)
     const payload = await request.validate(UpdateUserValidator)
 
     if (payload.email) {
       await UsersExceptions.CheckIfEmailIsDifferentOnUpdate(payload.email, id)
       await UsersExceptions.CheckIfEmailExistsOnUpdate(payload.email, id)
     }
-
-    const user = await User.findOrFail(id)
 
     UsersExceptions.CheckIfUserExists(user)
 
@@ -58,10 +60,12 @@ export default class UsersController {
     response.json(user.serialize())
   }
 
-  public async delete({ request, response }: HttpContextContract) {
+  public async delete({ request, response, bouncer }: HttpContextContract) {
     const id = request.param('id')
 
     const user = await User.findOrFail(id)
+
+    await bouncer.authorize('editAndDeleteUser', id)
 
     UsersExceptions.CheckIfUserExists(user)
 

@@ -14,7 +14,8 @@ export default {
 
   CheckIfEmailIsDifferentOnUpdate: async (email: string, id: string): Promise<void> => {
     const user = await User.find(id)
-    if (user?.email === email) throw new Exception('Email is the same registered for the User.')
+    if (user?.email === email)
+      throw new Exception('Email is the same registered for the User.', 409)
   },
 
   CheckIfEmailExistsOnUpdate: async (email: string, id: string): Promise<void> => {
