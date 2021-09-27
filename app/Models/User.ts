@@ -48,6 +48,9 @@ export default class User extends BaseModel {
   @column({ columnName: 'latest_tracking_session_id' })
   public latestTrackingSessionId: string
 
+  @column({ columnName: 'remember_me_token' })
+  public rememberMeToken: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

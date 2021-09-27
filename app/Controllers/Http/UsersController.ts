@@ -17,13 +17,13 @@ export default class UsersController {
   public async show({ request, response }: HttpContextContract) {
     const id = request.param('id')
 
-    const user = await User.find(id)
+    const user = await User.findOrFail(id)
 
     UsersExceptions.CheckIfUserExists(user)
 
     LogShow(user)
 
-    response.json(user?.serialize())
+    response.json(user.serialize())
   }
 
   public async create({ request, response }: HttpContextContract) {
@@ -47,27 +47,27 @@ export default class UsersController {
       await UsersExceptions.CheckIfEmailExistsOnUpdate(payload.email, id)
     }
 
-    const user = await User.find(id)
+    const user = await User.findOrFail(id)
 
     UsersExceptions.CheckIfUserExists(user)
 
-    await user?.merge(payload).save()
+    await user.merge(payload).save()
 
     LogUpdated(user)
 
-    response.json(user?.serialize())
+    response.json(user.serialize())
   }
 
   public async delete({ request, response }: HttpContextContract) {
     const id = request.param('id')
 
-    const user = await User.find(id)
+    const user = await User.findOrFail(id)
 
     UsersExceptions.CheckIfUserExists(user)
 
     LogDeleted(user)
 
-    await user?.delete()
+    await user.delete()
 
     response.status(204)
   }

@@ -20,6 +20,7 @@ export default class Users extends BaseSchema {
         .enum('account_type', Object.values(UserRoles))
         .defaultTo(UserRoles.PRODUCTION)
         .notNullable()
+      table.string('remember_me_token').nullable()
 
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
