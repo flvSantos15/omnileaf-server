@@ -87,6 +87,8 @@ export default class UsersController {
 
     let token = await ResetPasswordToken.updateOrCreate({ userEmail: email }, { userEmail: email })
 
+    LogCreated(token)
+
     response.json(token)
   }
 
@@ -105,11 +107,15 @@ export default class UsersController {
 
     await user.merge({ password }).save()
 
+    LogUpdated(user)
+
     const rememberMe = true
 
     await auth.use('web').login(user, rememberMe)
 
     await token.delete()
+
+    LogDeleted(token)
 
     response.redirect('/')
   }
