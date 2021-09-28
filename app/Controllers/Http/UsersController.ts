@@ -1,13 +1,15 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import CreateUserValidator from 'App/Validators/User/CreateUserValidator'
 import UsersExceptions from 'App/Exceptions/CustomExceptionsHandlers/UsersExceptions'
-import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
 import UpdateUserValidator from 'App/Validators/User/UpdateUserValidator'
 import ResetPasswordExceptions from 'App/Exceptions/CustomExceptionsHandlers/ResetPasswordExceptions'
 import ResetPasswordToken from 'App/Models/ResetPasswordToken'
 import ForgotPassworValidator from 'App/Validators/User/ForgotPasswordValidator'
 import ResetPassworValidator from 'App/Validators/User/ResetPasswordValidator'
+import ResetPassword from 'App/Mailers/ResetPassword'
+import Env from '@ioc:Adonis/Core/Env'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
 
 export default class UsersController {
   public async list({ response }: HttpContextContract) {
@@ -86,6 +88,10 @@ export default class UsersController {
     await ResetPasswordExceptions.CheckIfEmailExists(email)
 
     let token = await ResetPasswordToken.updateOrCreate({ userEmail: email }, { userEmail: email })
+
+    const resetPasswordUrl = `${Env.get('FRONT_END_URL')}/reset-password/${token.id}`
+
+    await new ResetPassword(token.userEmail, resetPasswordUrl).send()
 
     LogCreated(token)
 
