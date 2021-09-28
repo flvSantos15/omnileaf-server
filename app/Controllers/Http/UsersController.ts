@@ -4,6 +4,10 @@ import CreateUserValidator from 'App/Validators/User/CreateUserValidator'
 import UsersExceptions from 'App/Exceptions/CustomExceptionsHandlers/UsersExceptions'
 import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
 import UpdateUserValidator from 'App/Validators/User/UpdateUserValidator'
+import ResetPasswordExceptions from 'App/Exceptions/CustomExceptionsHandlers/ResetPasswordExceptions'
+import ResetPasswordToken from 'App/Models/ResetPasswordToken'
+import ForgotPassworValidator from 'App/Validators/User/ForgotPasswordValidator'
+import ResetPassworValidator from 'App/Validators/User/ResetPasswordValidator'
 
 export default class UsersController {
   public async list({ response }: HttpContextContract) {
@@ -74,5 +78,39 @@ export default class UsersController {
     await user.delete()
 
     response.status(204)
+  }
+
+  public async forgotPassword({ request, response }: HttpContextContract) {
+    const { email } = await request.validate(ForgotPassworValidator)
+
+    await ResetPasswordExceptions.CheckIfEmailExists(email)
+
+    let token = await ResetPasswordToken.updateOrCreate({ userEmail: email }, { userEmail: email })
+
+    response.json(token)
+  }
+
+  public async resetPassword({ request, response, auth }: HttpContextContract) {
+    const id = request.param('tokenId')
+
+    const token = await ResetPasswordToken.findOrFail(id)
+
+    ResetPasswordExceptions.CheckIfTokenIsExpired(token)
+
+    const { password, passwordConfirmation } = await request.validate(ResetPassworValidator)
+
+    ResetPasswordExceptions.CheckIfPasswordIsCorrect(password, passwordConfirmation)
+
+    const user = await User.findByOrFail('email', token.userEmail)
+
+    await user.merge({ password }).save()
+
+    const rememberMe = true
+
+    await auth.use('web').login(user, rememberMe)
+
+    await token.delete()
+
+    response.redirect('/')
   }
 }
