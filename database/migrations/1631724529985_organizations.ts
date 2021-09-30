@@ -5,10 +5,11 @@ export default class Organizations extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('name').notNullable()
-      table.string('avatar_url').notNullable()
+      table.string('avatar_url')
       table.text('description')
+      table.uuid('creator_id').unsigned().references('id').inTable('users').notNullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

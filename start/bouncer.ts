@@ -6,6 +6,7 @@
  */
 
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
+import Organization from 'App/Models/Organization'
 import User from 'App/Models/User'
 
 /*
@@ -31,9 +32,19 @@ import User from 'App/Models/User'
 |****************************************************************
 */
 export const { actions } = Bouncer.define('editAndDeleteUser', (user: User, id: string) => {
-  console.log(user.id, id)
   return user.id === id
 })
+  .define('deleteOrganization', async (user: User, organization: Organization) => {
+    return organization.creatorId === user.id
+  })
+  .define(
+    'editOrganizationOrAddAndRemoveMember',
+    async (user: User, organization: Organization) => {
+      await organization.load('members')
+      const member = organization.members.filter((member) => member.id === user.id)[0]
+      return member.$extras.pivot_member_type === 'MANAGER'
+    }
+  )
 
 /*
 |--------------------------------------------------------------------------

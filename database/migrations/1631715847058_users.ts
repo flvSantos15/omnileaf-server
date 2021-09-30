@@ -9,7 +9,7 @@ export default class Users extends BaseSchema {
       await this.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
     })
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v1()')).notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('name').notNullable()
       table.string('display_name').notNullable()
       table.string('email').unique().notNullable()

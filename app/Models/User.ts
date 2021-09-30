@@ -99,6 +99,7 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Organization, {
     pivotTable: 'organization_user',
+    pivotColumns: ['member_type'],
   })
   public organizations: ManyToMany<typeof Organization>
 
