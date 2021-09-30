@@ -22,6 +22,13 @@ export default class Projects extends BaseSchema {
         .references('id')
         .inTable('users')
         .notNullable()
+      table
+        .uuid('organization_id')
+        .notNullable()
+        .unsigned()
+        .references('id')
+        .inTable('organizations')
+        .notNullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

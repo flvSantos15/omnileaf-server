@@ -5,7 +5,7 @@ export default class Screenshots extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('url').notNullable()
       table.string('thumbnail_url').notNullable()
       table.integer('height').notNullable()

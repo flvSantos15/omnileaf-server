@@ -6,7 +6,7 @@ export default class TrackingSessions extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table
         .enum('status', Object.values(TrackingSessionStatus))
         .defaultTo(TrackingSessionStatus.IN_PROGRESS)
