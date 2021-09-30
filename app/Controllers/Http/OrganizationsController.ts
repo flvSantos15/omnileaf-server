@@ -57,7 +57,7 @@ export default class OrganizationsController {
 
     const organization = await Organization.findOrFail(id)
 
-    await bouncer.authorize('editOrganizationOrAddAndRemoveMember', organization)
+    await bouncer.authorize('OrganizationManager', organization)
 
     await organization.merge(payload).save()
 
@@ -71,7 +71,7 @@ export default class OrganizationsController {
 
     const organization = await Organization.findOrFail(id)
 
-    await bouncer.authorize('deleteOrganization', organization)
+    await bouncer.authorize('OrganizationCreator', organization)
 
     LogDeleted(organization)
 
@@ -86,7 +86,7 @@ export default class OrganizationsController {
 
     const organization = await Organization.findOrFail(id)
 
-    await bouncer.authorize('editOrganizationOrAddAndRemoveMember', organization)
+    await bouncer.authorize('OrganizationManager', organization)
 
     organization.related('members').attach({
       [userId]: {
@@ -106,7 +106,7 @@ export default class OrganizationsController {
 
     OrganizationExceptions.checkIfUserIsNotCreator(organization.creatorId, userId)
 
-    await bouncer.authorize('editOrganizationOrAddAndRemoveMember', organization)
+    await bouncer.authorize('OrganizationManager', organization)
 
     await organization.related('members').detach([userId])
 
