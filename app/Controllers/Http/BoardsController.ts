@@ -1,5 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
+import { LogCreated, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
 import { LoadBoardRelations } from 'App/Helpers/RelationsLoaders/BoardRelationLoaders'
 import Board from 'App/Models/Board'
 import Project from 'App/Models/Project'
@@ -36,6 +36,8 @@ export default class BoardsController {
     await bouncer.authorize('ProjectManager', project)
 
     const board = await Board.create({ ...payload, creatorId: user.id })
+
+    LogCreated(board)
 
     response.status(201).send(board)
   }

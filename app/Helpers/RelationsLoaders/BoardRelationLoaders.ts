@@ -12,7 +12,7 @@ export const LoadBoardRelations = async (
 
   await board.load('creator')
 
-  await board.load('lists')
+  await board.load('project')
 
   const { lists } = queryString as unknown as QueryStringProps
 

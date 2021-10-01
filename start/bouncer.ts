@@ -53,6 +53,10 @@ export const { actions } = Bouncer.define('editAndDeleteUser', (user: User, id: 
     )[0]
     return userAssigned.$extras.pivot_user_role === 'MANAGER'
   })
+  .define('AssignedToProject', async (user: User, project: Project) => {
+    await project.load('usersAssigned')
+    return project.usersAssigned.map((usrAss) => usrAss.id).includes(user.id)
+  })
 
 /*
 |--------------------------------------------------------------------------
