@@ -28,7 +28,7 @@ export const ValidateAddOrganizationMember = async (id, request) => {
   //Validates if user is already in organization
   await user.load('organizations')
   if (user.organizations.map((org) => org.id).includes(id)) {
-    throw new Exception('User is already assigned to project', 409)
+    throw new Exception('User is already a member', 409)
   }
 
   //Return payload and organization
