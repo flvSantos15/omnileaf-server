@@ -1,17 +1,16 @@
 import Organization from 'App/Models/Organization'
+import { OrganizationRoles } from 'Contracts/enums'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import CreateOrganizationValidator from 'App/Validators/Organization/CreateOrganizationValidator'
 import UpdateOrganizationValidator from 'App/Validators/Organization/UpdateOrganizationValidator'
-import AddOrganizationMemberValidator from 'App/Validators/Organization/AddOrganizationMemberValidator'
-import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
+import { ValidateAddOrganizationMember } from 'App/Validators/Organization/AddOrganizationMemberValidator'
+import { ValidateRemoveOrganizationMember } from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 import {
   ListOrganizationLoader,
   ShowOrganizationLoader,
 } from 'App/Helpers/RelationsLoaders/OrganizationsLoaders'
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
-import { OrganizationRoles } from 'Contracts/enums'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
-import OrganizationExceptions from 'App/Exceptions/CustomExceptionsHandlers/OrganizationExceptions'
 
 export default class OrganizationsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -41,7 +40,7 @@ export default class OrganizationsController {
   }
 
   public async show({ request, response }: HttpContextContract) {
-    const id = request.param('id')
+    const id = validateIdParam(request.param('id'))
 
     const organization = await ShowOrganizationLoader(id, request.qs())
 
@@ -82,15 +81,14 @@ export default class OrganizationsController {
 
   public async addMember({ request, response, bouncer }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
-    const { userId, memberRole } = await request.validate(AddOrganizationMemberValidator)
 
-    const organization = await Organization.findOrFail(id)
+    const { organization, payload } = await ValidateAddOrganizationMember(id, request)
 
     await bouncer.authorize('OrganizationManager', organization)
 
     organization.related('members').attach({
-      [userId]: {
-        member_role: memberRole,
+      [payload.userId]: {
+        member_role: payload.memberRole,
       },
     })
 
@@ -100,11 +98,7 @@ export default class OrganizationsController {
   public async removeMember({ request, response, bouncer }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const { userId } = await request.validate(RemoveOrganizationMemberValidator)
-
-    const organization = await Organization.findOrFail(id)
-
-    OrganizationExceptions.checkIfUserIsNotCreator(organization.creatorId, userId)
+    const { userId, organization } = await ValidateRemoveOrganizationMember(id, request)
 
     await bouncer.authorize('OrganizationManager', organization)
 
