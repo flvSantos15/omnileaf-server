@@ -6,11 +6,8 @@ import CreateOrganizationValidator from 'App/Validators/Organization/CreateOrgan
 import UpdateOrganizationValidator from 'App/Validators/Organization/UpdateOrganizationValidator'
 import { ValidateAddOrganizationMember } from 'App/Validators/Organization/AddOrganizationMemberValidator'
 import { ValidateRemoveOrganizationMember } from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
-import {
-  ListOrganizationLoader,
-  ShowOrganizationLoader,
-} from 'App/Helpers/RelationsLoaders/OrganizationsLoaders'
 import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
+import { LoadProjectRelations } from 'App/Helpers/RelationsLoaders/ProjectRelationsLoader'
 
 export default class OrganizationsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -31,8 +28,8 @@ export default class OrganizationsController {
     response.status(201).json(organization)
   }
 
-  public async list({ request, response }: HttpContextContract) {
-    const organizations = await ListOrganizationLoader(request.qs())
+  public async list({ response }: HttpContextContract) {
+    const organizations = await Organization.all()
 
     LogList(organizations)
 
@@ -42,7 +39,7 @@ export default class OrganizationsController {
   public async show({ request, response }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const organization = await ShowOrganizationLoader(id, request.qs())
+    const organization = await LoadProjectRelations(id, request.qs())
 
     LogShow(organization)
 
