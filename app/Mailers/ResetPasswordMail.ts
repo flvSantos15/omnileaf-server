@@ -1,7 +1,7 @@
 import { BaseMailer, MessageContract } from '@ioc:Adonis/Addons/Mail'
 import View from '@ioc:Adonis/Core/View'
 
-export default class ResetPassword extends BaseMailer {
+export default class ResetPasswordMail extends BaseMailer {
   constructor(private email: string, private url: string) {
     super()
   }
