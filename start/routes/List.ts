@@ -1,13 +1,13 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
-  Route.get('list', 'ListController.list')
+  Route.get('lists', 'ListsController.lists')
 
-  Route.get('list/:id', 'ListController.show')
+  Route.get('lists/:id', 'ListsController.show')
 
-  Route.post('list', 'ListController.create')
+  Route.post('lists', 'ListsController.create')
 
-  Route.put('list/:id', 'ListController.update')
+  Route.put('lists/:id', 'ListsController.update')
 
-  Route.delete('list/:id', 'ListController.delete')
+  Route.delete('lists/:id', 'ListsController.delete')
 }).middleware('auth')
