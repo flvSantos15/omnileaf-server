@@ -4,10 +4,13 @@ import {
   BelongsTo,
   belongsTo,
   column,
+  HasMany,
+  hasMany,
   ManyToMany,
   manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
+import Project from './Project'
 
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
@@ -36,9 +39,14 @@ export default class Organization extends BaseModel {
   })
   public creator: BelongsTo<typeof User>
 
+  @hasMany(() => Project, {
+    foreignKey: 'organizationId',
+  })
+  public projects: HasMany<typeof Project>
+
   @manyToMany(() => User, {
     pivotTable: 'organization_user',
-    pivotColumns: ['member_type'],
+    pivotColumns: ['member_role'],
   })
   public members: ManyToMany<typeof User>
 }

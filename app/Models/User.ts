@@ -69,6 +69,7 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Project, {
     pivotTable: 'project_user',
+    pivotColumns: ['user_role'],
   })
   public assignedProjects: ManyToMany<typeof Project>
 
@@ -99,7 +100,7 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Organization, {
     pivotTable: 'organization_user',
-    pivotColumns: ['member_type'],
+    pivotColumns: ['member_role'],
   })
   public organizations: ManyToMany<typeof Organization>
 
@@ -107,6 +108,13 @@ export default class User extends BaseModel {
   public static async hashPassword(user: User) {
     if (user.$dirty.password) {
       user.password = await Hash.make(user.password)
+    }
+  }
+
+  public serializeExtras() {
+    return {
+      projectRole: this.$extras.pivot_user_role,
+      organizationRole: this.$extras.pivot_member_role,
     }
   }
 }

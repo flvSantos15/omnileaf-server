@@ -23,3 +23,11 @@ export const LogUpdated = (instanciated: any) => {
 export const LogDeleted = (instanciated: any) => {
   Logger.info(`${instanciated.constructor.name} deleted succesfully.`)
 }
+
+export const LogAttached = () => {
+  Logger.info(`New attachment sussesfully created on database`)
+}
+
+export const LogDettached = () => {
+  Logger.info(`New dettachment sussesfully executed on database`)
+}

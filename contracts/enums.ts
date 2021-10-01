@@ -13,3 +13,8 @@ export enum OrganizationRoles {
   MANAGER = 'MANAGER',
   PRODUCTION = 'PRODUCTION',
 }
+
+export enum ProjectRoles {
+  MANAGER = 'MANAGER',
+  PRODUCTION = 'PRODUCTION',
+}

@@ -7,6 +7,7 @@
 
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import Organization from 'App/Models/Organization'
+import Project from 'App/Models/Project'
 import User from 'App/Models/User'
 
 /*
@@ -34,17 +35,24 @@ import User from 'App/Models/User'
 export const { actions } = Bouncer.define('editAndDeleteUser', (user: User, id: string) => {
   return user.id === id
 })
-  .define('deleteOrganization', async (user: User, organization: Organization) => {
+  .define('OrganizationCreator', async (user: User, organization: Organization) => {
     return organization.creatorId === user.id
   })
-  .define(
-    'editOrganizationOrAddAndRemoveMember',
-    async (user: User, organization: Organization) => {
-      await organization.load('members')
-      const member = organization.members.filter((member) => member.id === user.id)[0]
-      return member.$extras.pivot_member_type === 'MANAGER'
-    }
-  )
+  .define('OrganizationManager', async (user: User, organization: Organization) => {
+    await organization.load('members')
+    const member = organization.members.filter((member) => member.id === user.id)[0]
+    return member.$extras.pivot_member_role === 'MANAGER'
+  })
+  .define('ProjectCreator', async (user: User, project: Project) => {
+    return user.id === project.creatorId
+  })
+  .define('ProjectManager', async (user: User, project: Project) => {
+    await project.load('usersAssigned')
+    const userAssigned = project.usersAssigned.filter(
+      (userAssigned) => userAssigned.id === user.id
+    )[0]
+    return userAssigned.$extras.pivot_user_role === 'MANAGER'
+  })
 
 /*
 |--------------------------------------------------------------------------
