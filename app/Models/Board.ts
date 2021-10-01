@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasMany, hasMany, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Project from './Project'
 import List from './List'
@@ -23,15 +23,15 @@ export default class Board extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasOne(() => User, {
-    foreignKey: 'creator_id',
+  @belongsTo(() => User, {
+    foreignKey: 'creatorId',
   })
-  public creator: HasOne<typeof User>
+  public creator: BelongsTo<typeof User>
 
-  @hasOne(() => Project, {
-    foreignKey: 'project_id',
+  @belongsTo(() => Project, {
+    foreignKey: 'projectId',
   })
-  public project: HasOne<typeof Project>
+  public project: BelongsTo<typeof Project>
 
   @hasMany(() => List, {
     foreignKey: 'board_id',
