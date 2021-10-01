@@ -8,6 +8,7 @@ import { ValidateUpdateUser } from 'App/Validators/User/UpdateUserValidator'
 import { ValidateForgotPassword } from 'App/Validators/User/ForgotPasswordValidator'
 import { ValidateResetPassword } from 'App/Validators/User/ResetPasswordValidator'
 import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
+import { LoadUserRelations } from 'App/Helpers/RelationsLoaders/UserRelationsLoader'
 
 export default class UsersController {
   public async list({ response }: HttpContextContract) {
@@ -21,7 +22,7 @@ export default class UsersController {
   public async show({ request, response }: HttpContextContract) {
     const id = request.param('id')
 
-    const user = await User.findOrFail(id)
+    const user = await LoadUserRelations(id, request.qs())
 
     LogShow(user)
 

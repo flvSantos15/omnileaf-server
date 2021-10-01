@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
@@ -26,13 +26,13 @@ export default class TrackingSession extends BaseModel {
   @column.dateTime({ autoCreate: true, columnName: 'stopped_at' })
   public stoppedAt: DateTime
 
-  @hasOne(() => User, {
-    foreignKey: 'user_id',
+  @belongsTo(() => User, {
+    foreignKey: 'userId',
   })
-  public user: HasOne<typeof User>
+  public user: BelongsTo<typeof User>
 
-  @hasOne(() => Task, {
-    foreignKey: 'task_id',
+  @belongsTo(() => Task, {
+    foreignKey: 'taskId',
   })
-  public task: HasOne<typeof Task>
+  public task: BelongsTo<typeof Task>
 }

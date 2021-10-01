@@ -58,7 +58,7 @@ export default class User extends BaseModel {
   public updatedAt: DateTime
 
   @hasOne(() => TrackingSession, {
-    foreignKey: 'latest_tracking_session_id',
+    foreignKey: 'userId',
   })
   public latestTrackingSession: HasOne<typeof TrackingSession>
 

@@ -49,4 +49,10 @@ export default class Organization extends BaseModel {
     pivotColumns: ['member_role'],
   })
   public members: ManyToMany<typeof User>
+
+  public serializeExtras() {
+    return {
+      role: this.$extras.pivot_member_role,
+    }
+  }
 }

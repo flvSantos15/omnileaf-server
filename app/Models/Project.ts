@@ -91,6 +91,8 @@ export default class Project extends BaseModel {
   }
 
   public serializeExtras() {
-    return {}
+    return {
+      role: this.$extras.pivot_user_role,
+    }
   }
 }
