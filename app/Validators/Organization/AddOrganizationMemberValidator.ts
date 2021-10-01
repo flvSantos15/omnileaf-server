@@ -6,6 +6,6 @@ export default class AddOrganizationMemberValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
     userId: schema.string({}, [rules.uuid({ version: 4 })]),
-    memberType: schema.enum(Object.values(OrganizationRoles)),
+    memberRole: schema.enum(Object.values(OrganizationRoles)),
   })
 }

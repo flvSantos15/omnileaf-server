@@ -1,17 +1,17 @@
 import Organization from 'App/Models/Organization'
 import CreateOrganizationValidator from 'App/Validators/Organization/CreateOrganizationValidator'
 import UpdateOrganizationValidator from 'App/Validators/Organization/UpdateOrganizationValidator'
+import AddOrganizationMemberValidator from 'App/Validators/Organization/AddOrganizationMemberValidator'
+import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 import {
   ListOrganizationLoader,
   ShowOrganizationLoader,
-} from 'App/Helpers/ControllerLoaders/OrganizationsLoaders'
+} from 'App/Helpers/RelationsLoaders/OrganizationsLoaders'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
 import { OrganizationRoles } from 'Contracts/enums'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import OrganizationExceptions from 'App/Exceptions/CustomExceptionsHandlers/OrganizationExceptions'
-import AddOrganizationMemberValidator from 'App/Validators/Organization/AddOrganizationMemberValidator'
-import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 
 export default class OrganizationsController {
   public async create({ request, response, auth }: HttpContextContract) {
@@ -23,7 +23,7 @@ export default class OrganizationsController {
 
     await organization.related('members').attach({
       [user.id]: {
-        member_type: OrganizationRoles.MANAGER,
+        member_role: OrganizationRoles.MANAGER,
       },
     })
 
@@ -82,7 +82,7 @@ export default class OrganizationsController {
 
   public async addMember({ request, response, bouncer }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
-    const { userId, memberType } = await request.validate(AddOrganizationMemberValidator)
+    const { userId, memberRole } = await request.validate(AddOrganizationMemberValidator)
 
     const organization = await Organization.findOrFail(id)
 
@@ -90,7 +90,7 @@ export default class OrganizationsController {
 
     organization.related('members').attach({
       [userId]: {
-        member_type: memberType,
+        member_role: memberRole,
       },
     })
 

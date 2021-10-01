@@ -12,12 +12,12 @@ export const ListOrganizationLoader = async (queryString: ListQueryStringProps |
     return await Organization.query()
       .preload('creator')
       .preload('members', (query) => {
-        query.pivotColumns(['member_type'])
+        query.pivotColumns(['member_role'])
       })
   if (creator && !members) return await Organization.query().preload('creator')
   if (members && !creator) {
     return await Organization.query().preload('members', (query) => {
-      query.pivotColumns(['member_type'])
+      query.pivotColumns(['member_role'])
     })
   }
 
@@ -40,3 +40,5 @@ export const ShowOrganizationLoader = async (
 
   return organization
 }
+
+export let RelationsLoader
