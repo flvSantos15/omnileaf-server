@@ -1,8 +1,8 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { OrganizationRoles } from 'Contracts/enums'
-import Organization from 'App/Models/Organization'
 import { Exception } from '@poppinss/utils'
+import User from 'App/Models/User'
 
 type PayloadProps = {
   userId: string
@@ -19,14 +19,18 @@ export default class AddOrganizationMemberValidator {
 
 export const ValidateAddOrganizationMember = async (id, request) => {
   const payload: PayloadProps = await request.validate(AddOrganizationMemberValidator)
+  const { userId } = payload
+
+  //Validates if user exists
+  const user = await User.find(userId)
+  if (!user) throw new Exception('User not found', 404)
 
   //Validates if user is already in organization
-  const organization = await Organization.findOrFail(id)
-  await organization.load('members')
-  if (organization.members.map((member) => member.id).includes(payload.userId)) {
-    throw new Exception('User is already a member', 409)
+  await user.load('organizations')
+  if (user.organizations.map((org) => org.id).includes(id)) {
+    throw new Exception('User is already assigned to project', 409)
   }
 
   //Return payload and organization
-  return { organization, payload }
+  return payload
 }

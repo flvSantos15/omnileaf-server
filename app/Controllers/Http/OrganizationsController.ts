@@ -82,13 +82,15 @@ export default class OrganizationsController {
   public async addMember({ request, response, bouncer }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const { organization, payload } = await ValidateAddOrganizationMember(id, request)
+    const { userId, memberRole } = await ValidateAddOrganizationMember(id, request)
+
+    const organization = await Organization.findOrFail(id)
 
     await bouncer.authorize('OrganizationManager', organization)
 
     organization.related('members').attach({
-      [payload.userId]: {
-        member_role: payload.memberRole,
+      [userId]: {
+        member_role: memberRole,
       },
     })
 

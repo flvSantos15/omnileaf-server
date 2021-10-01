@@ -21,11 +21,16 @@ class AddParticipantValidator {
 export const ValidateAddParticipant = async (request, project: Project): Promise<PayloadProps> => {
   const payload = await request.validate(AddParticipantValidator)
   const { userId } = payload
+
+  //Validates if user exists
   const user = await User.find(userId)
   if (!user) throw new Exception('User not found', 404)
+
+  //Validates if user is already assigned to project
   await user.load('assignedProjects')
   if (user.assignedProjects.map((prj) => prj.id).includes(project.id)) {
     throw new Exception('User is already assigned to project', 409)
   }
+
   return payload
 }
