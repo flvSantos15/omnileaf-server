@@ -1,11 +1,11 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  BelongsTo,
+  belongsTo,
   column,
   HasMany,
   hasMany,
-  HasOne,
-  hasOne,
   ManyToMany,
   manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
@@ -25,8 +25,8 @@ export default class Task extends BaseModel {
   @column()
   public body: string
 
-  @column()
-  public time_estimated: number
+  @column({ columnName: 'time_estimated' })
+  public timeEstimated: number
 
   @column()
   public links: string
@@ -46,28 +46,28 @@ export default class Task extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasOne(() => User, {
-    foreignKey: 'creator_id',
+  @belongsTo(() => User, {
+    foreignKey: 'creatorId',
   })
-  public creator: HasOne<typeof User>
+  public creator: BelongsTo<typeof User>
+
+  @belongsTo(() => Project, {
+    foreignKey: 'projectId',
+  })
+  public project: BelongsTo<typeof Project>
+
+  @belongsTo(() => List, {
+    foreignKey: 'listId',
+  })
+  public list: BelongsTo<typeof List>
 
   @manyToMany(() => User, {
     pivotTable: 'task_user',
   })
   public usersAssigned: ManyToMany<typeof User>
 
-  @hasOne(() => Project, {
-    foreignKey: 'project_id',
-  })
-  public project: HasOne<typeof Project>
-
-  @hasOne(() => List, {
-    foreignKey: 'list_id',
-  })
-  public list: HasOne<typeof List>
-
   @hasMany(() => Screenshot, {
-    foreignKey: 'task_id',
+    foreignKey: 'taskId',
   })
   public screenshots: HasMany<typeof Screenshot>
 

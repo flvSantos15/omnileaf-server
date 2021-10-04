@@ -9,13 +9,17 @@ export const LoadProjectRelations = async (id: string, queryString: Record<strin
 
   await project.load('userInCharge')
 
-  const { usersAssigned, boards, tags, tasks, lists } = queryString
+  const { usersAssigned, boards, tags, tasks } = queryString
 
   if (usersAssigned) await project.load('usersAssigned')
 
-  if (boards) await project.load('boards')
-
-  if (lists) await project.load('lists')
+  if (boards) {
+    await project.load('boards', (projectQuery) => {
+      projectQuery.preload('lists', (boardsQuery) => {
+        boardsQuery.preload('tasks')
+      })
+    })
+  }
 
   if (tasks) await project.load('tasks')
 

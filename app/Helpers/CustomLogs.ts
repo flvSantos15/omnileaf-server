@@ -25,9 +25,9 @@ export const LogDeleted = (instanciated: any) => {
 }
 
 export const LogAttached = () => {
-  Logger.info(`New attachment sussesfully created on database`)
+  Logger.info(`New attachment succesfully created on database`)
 }
 
 export const LogDettached = () => {
-  Logger.info(`New dettachment sussesfully executed on database`)
+  Logger.info(`New dettachment succesfully executed on database`)
 }

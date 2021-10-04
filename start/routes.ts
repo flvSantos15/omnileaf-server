@@ -5,6 +5,7 @@ import './routes/Organizations'
 import './routes/Projects'
 import './routes/Board'
 import './routes/List'
+import './routes/Task'
 
 Route.get('/', async () => {
   return { hello: 'From Development' }
