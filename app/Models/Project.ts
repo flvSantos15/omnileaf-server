@@ -15,7 +15,6 @@ import Board from './Board'
 import Task from './Task'
 import Tag from './Tag'
 import Organization from './Organization'
-import List from './List'
 
 export default class Project extends BaseModel {
   @column({ isPrimary: true })
@@ -64,22 +63,17 @@ export default class Project extends BaseModel {
   public usersAssigned: ManyToMany<typeof User>
 
   @hasMany(() => Board, {
-    foreignKey: 'project_id',
+    foreignKey: 'projectId',
   })
   public boards: HasMany<typeof Board>
 
-  @hasMany(() => List, {
-    foreignKey: 'project_id',
-  })
-  public lists: HasMany<typeof List>
-
   @hasMany(() => Task, {
-    foreignKey: 'project_id',
+    foreignKey: 'projectId',
   })
   public tasks: HasMany<typeof Task>
 
   @hasMany(() => Tag, {
-    foreignKey: 'project_id',
+    foreignKey: 'projectId',
   })
   public tags: HasMany<typeof Tag>
 

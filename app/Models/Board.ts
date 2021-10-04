@@ -34,7 +34,7 @@ export default class Board extends BaseModel {
   public project: BelongsTo<typeof Project>
 
   @hasMany(() => List, {
-    foreignKey: 'board_id',
+    foreignKey: 'boardId',
   })
   public lists: HasMany<typeof List>
 }

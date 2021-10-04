@@ -34,7 +34,7 @@ export default class List extends BaseModel {
   public board: BelongsTo<typeof Board>
 
   @hasMany(() => Task, {
-    foreignKey: 'list_id',
+    foreignKey: 'listId',
   })
   public tasks: HasMany<typeof Task>
 }
