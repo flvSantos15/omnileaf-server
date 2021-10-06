@@ -14,6 +14,7 @@ import Project from './Project'
 import List from './List'
 import Screenshot from './Screenshot'
 import Tag from './Tag'
+import TrackingSession from './TrackingSession'
 
 export default class Task extends BaseModel {
   @column({ isPrimary: true })
@@ -75,4 +76,9 @@ export default class Task extends BaseModel {
     pivotTable: 'task_tag',
   })
   public tags: ManyToMany<typeof Tag>
+
+  @hasMany(() => TrackingSession, {
+    foreignKey: 'taskId',
+  })
+  public trackingSessions: HasMany<typeof TrackingSession>
 }

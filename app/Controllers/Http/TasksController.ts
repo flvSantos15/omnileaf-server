@@ -30,9 +30,15 @@ export default class TasksController {
 
     const task = await LoadTaskRelations(id, request.qs())
 
+    const totalTracked = task.trackingSessions
+      .map((session) => session.trackingTime)
+      .reduce((acc, val) => acc + val, 0)
+
+    const taskWithTotalTracked = { ...task.serialize(), totalTracked }
+
     LogShow(task)
 
-    response.send(task)
+    response.send(taskWithTotalTracked)
   }
 
   // to-do, insert tags on create ?

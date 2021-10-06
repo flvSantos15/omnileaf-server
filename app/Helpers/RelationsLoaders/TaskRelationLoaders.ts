@@ -5,6 +5,7 @@ type QueryStringProps = {
   usersAssigned: string
   screenshots: string
   tags: string
+  trackingSessions: string
 }
 
 export const LoadTaskRelations = async (
@@ -17,7 +18,8 @@ export const LoadTaskRelations = async (
 
   await task.load('project')
 
-  const { list, usersAssigned, screenshots, tags } = queryString as unknown as QueryStringProps
+  const { list, usersAssigned, screenshots, tags, trackingSessions } =
+    queryString as unknown as QueryStringProps
 
   if (list) await task.load('list')
 
@@ -26,6 +28,8 @@ export const LoadTaskRelations = async (
   if (screenshots) await task.load('screenshots')
 
   if (tags) await task.load('tags')
+
+  if (trackingSessions) await task.load('trackingSessions')
 
   return task
 }
