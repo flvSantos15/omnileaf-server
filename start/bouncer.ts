@@ -32,7 +32,7 @@ import User from 'App/Models/User'
 | NOTE: Always export the "actions" const from this file
 |****************************************************************
 */
-export const { actions } = Bouncer.define('editAndDeleteUser', (user: User, id: string) => {
+export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) => {
   return user.id === id
 })
   .define('OrganizationCreator', async (user: User, organization: Organization) => {

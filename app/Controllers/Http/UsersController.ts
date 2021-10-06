@@ -46,7 +46,7 @@ export default class UsersController {
 
     const payload = await ValidateUpdateUser(id, request)
 
-    await bouncer.authorize('editAndDeleteUser', id)
+    await bouncer.authorize('OwnUser', id)
 
     await user.merge(payload).save()
 
@@ -60,7 +60,7 @@ export default class UsersController {
 
     const user = await User.findOrFail(id)
 
-    await bouncer.authorize('editAndDeleteUser', id)
+    await bouncer.authorize('OwnUser', id)
 
     LogDeleted(user)
 
