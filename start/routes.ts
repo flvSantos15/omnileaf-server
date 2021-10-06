@@ -6,6 +6,7 @@ import './routes/Projects'
 import './routes/Board'
 import './routes/List'
 import './routes/Task'
+import './routes/TrackingSession'
 
 Route.get('/', async () => {
   return { hello: 'From Development' }

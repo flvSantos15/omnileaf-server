@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeUpdate, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
@@ -10,6 +10,9 @@ export default class TrackingSession extends BaseModel {
 
   @column()
   public status: TrackingSessionStatus
+
+  @column({ columnName: 'tracking_time' })
+  public trackingTime: number
 
   @column({ columnName: 'user_id' })
   public userId: string
@@ -23,9 +26,10 @@ export default class TrackingSession extends BaseModel {
   @column.dateTime({ autoCreate: true, columnName: 'started_at' })
   public startedAt: DateTime
 
-  @column.dateTime({ autoCreate: true, columnName: 'stopped_at' })
-  public stoppedAt: DateTime
+  @column({ columnName: 'stopped_at' })
+  public stoppedAt: string
 
+  //Relations
   @belongsTo(() => User, {
     foreignKey: 'userId',
   })
@@ -35,4 +39,17 @@ export default class TrackingSession extends BaseModel {
     foreignKey: 'taskId',
   })
   public task: BelongsTo<typeof Task>
+
+  //Hooks
+  @beforeUpdate()
+  public static calculateTrackingTime(trackingSession: TrackingSession) {
+    trackingSession.stoppedAt = new Date().toLocaleString('en-US', {
+      timeZone: 'America/Sao_Paulo',
+    })
+
+    const stoppedAtSeconds = new Date(trackingSession.stoppedAt).getTime() / 1000
+    const startedAtSeconds = trackingSession.startedAt.toSeconds()
+
+    trackingSession.trackingTime = Math.floor(stoppedAtSeconds - startedAtSeconds)
+  }
 }

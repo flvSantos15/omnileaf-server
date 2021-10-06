@@ -11,6 +11,8 @@ export default class TrackingSessions extends BaseSchema {
         .enum('status', Object.values(TrackingSessionStatus))
         .defaultTo(TrackingSessionStatus.IN_PROGRESS)
         .notNullable()
+      table.integer('tracking_time')
+
       table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
       table.uuid('task_id').unsigned().references('id').inTable('tasks').notNullable()
 
