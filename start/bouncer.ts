@@ -8,6 +8,7 @@
 import Bouncer from '@ioc:Adonis/Addons/Bouncer'
 import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
+import TrackingSession from 'App/Models/TrackingSession'
 import User from 'App/Models/User'
 
 /*
@@ -56,6 +57,9 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
   .define('AssignedToProject', async (user: User, project: Project) => {
     await project.load('usersAssigned')
     return project.usersAssigned.map((usrAss) => usrAss.id).includes(user.id)
+  })
+  .define('SessionOwner', async (user: User, trackingSession: TrackingSession) => {
+    return trackingSession.userId === user.id
   })
 
 /*

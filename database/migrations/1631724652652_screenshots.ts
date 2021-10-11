@@ -7,10 +7,7 @@ export default class Screenshots extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('url').notNullable()
-      table.string('thumbnail_url').notNullable()
-      table.integer('height').notNullable()
-      table.integer('width').notNullable()
-      table.string('blurhash')
+      table.string('blurred_url').notNullable()
       table.boolean('deleted').notNullable().defaultTo(false)
       table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
       table.uuid('task_id').unsigned().references('id').inTable('tasks').notNullable()

@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, HasOne, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Task from './Task'
+import TrackingSession from './TrackingSession'
 
 export default class Screenshot extends BaseModel {
   @column({ isPrimary: true })
@@ -10,17 +11,8 @@ export default class Screenshot extends BaseModel {
   @column()
   public url: string
 
-  @column()
-  public height: number
-
-  @column()
-  public widh: number
-
-  @column({ columnName: 'thumbnail_url' })
-  public thumbnailUrl: string
-
-  @column()
-  public blurhash: string
+  @column({ columnName: 'blurred_url' })
+  public blurredUrl: string
 
   @column()
   public deleted: boolean
@@ -40,13 +32,18 @@ export default class Screenshot extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasOne(() => User, {
-    foreignKey: 'user_id',
+  @belongsTo(() => User, {
+    foreignKey: 'userId',
   })
-  public user: HasOne<typeof User>
+  public user: BelongsTo<typeof User>
 
-  @hasOne(() => Task, {
-    foreignKey: 'task_id',
+  @belongsTo(() => Task, {
+    foreignKey: 'taskId',
   })
-  public task: HasOne<typeof Task>
+  public task: BelongsTo<typeof Task>
+
+  @belongsTo(() => TrackingSession, {
+    foreignKey: 'trackingSessionId',
+  })
+  public trackingSession: BelongsTo<typeof TrackingSession>
 }
