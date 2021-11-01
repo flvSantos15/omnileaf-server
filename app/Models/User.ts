@@ -51,6 +51,9 @@ export default class User extends BaseModel {
   @column({ columnName: 'remember_me_token' })
   public rememberMeToken: string
 
+  @column({ columnName: 'gitlab_id' })
+  public gitlabId: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

@@ -24,22 +24,28 @@ export default class Task extends BaseModel {
   public name: string
 
   @column()
-  public body: string
+  public body?: string
 
   @column({ columnName: 'time_estimated' })
   public timeEstimated: number
 
   @column()
-  public links: string
+  public links?: string
 
   @column({ columnName: 'creator_id' })
-  public creatorId: string
+  public creatorId?: string
 
   @column({ columnName: 'project_id' })
   public projectId: string
 
   @column({ columnName: 'list_id' })
-  public listId: string
+  public listId?: string
+
+  @column({ columnName: 'gitlab_id' })
+  public gitlabId?: number
+
+  @column({ columnName: 'gitlab_creator_id' })
+  public gitlabCreatorId?: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

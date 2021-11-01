@@ -21,6 +21,7 @@ export default class Users extends BaseSchema {
         .defaultTo(UserRoles.PRODUCTION)
         .notNullable()
       table.string('remember_me_token').nullable()
+      table.integer('gitlab_id')
 
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

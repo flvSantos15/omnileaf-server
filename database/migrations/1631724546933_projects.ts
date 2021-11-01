@@ -16,19 +16,15 @@ export default class Projects extends BaseSchema {
         .inTable('users')
         .notNullable()
       table
-        .uuid('user_in_charge_id')
-        .notNullable()
-        .unsigned()
-        .references('id')
-        .inTable('users')
-        .notNullable()
-      table
         .uuid('organization_id')
         .notNullable()
         .unsigned()
         .references('id')
         .inTable('organizations')
         .notNullable()
+      table.integer('gitlab_id')
+      table.integer('gitlab_creator_id')
+      table.string('gitlab_avatar_url')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

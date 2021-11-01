@@ -1,7 +1,6 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
-  beforeCreate,
   BelongsTo,
   belongsTo,
   column,
@@ -27,13 +26,19 @@ export default class Project extends BaseModel {
   public description: string
 
   @column({ columnName: 'creator_id' })
-  public creatorId: string
-
-  @column({ columnName: 'user_in_charge_id' })
-  public userInChargeId: string
+  public creatorId?: string
 
   @column({ columnName: 'organization_id' })
   public organizationId: string
+
+  @column({ columnName: 'gitlab_id' })
+  public gitlabId?: number
+
+  @column({ columnName: 'gitlab_creator_id' })
+  public gitlabCreatorId: number
+
+  @column({ columnName: 'gitlab_avatar_url' })
+  public gitlabAvatarUrl?: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -76,13 +81,6 @@ export default class Project extends BaseModel {
     foreignKey: 'projectId',
   })
   public tags: HasMany<typeof Tag>
-
-  @beforeCreate()
-  public static async ifNotUserInCharge(project: Project) {
-    if (!project.userInChargeId) {
-      project.userInChargeId = project.creatorId
-    }
-  }
 
   public serializeExtras() {
     return {

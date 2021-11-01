@@ -9,9 +9,11 @@ export default class Tasks extends BaseSchema {
       table.string('name').notNullable()
       table.string('body')
       table.integer('time_estimated')
-      table.uuid('creator_id').unsigned().references('id').inTable('users').notNullable()
+      table.uuid('creator_id').unsigned().references('id').inTable('users')
       table.uuid('project_id').unsigned().references('id').inTable('projects').notNullable()
-      table.uuid('list_id').unsigned().references('id').inTable('lists').notNullable()
+      table.uuid('list_id').unsigned().references('id').inTable('lists')
+      table.integer('gitlab_id')
+      table.integer('gitlab_creator_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

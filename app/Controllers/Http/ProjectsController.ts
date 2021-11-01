@@ -12,7 +12,7 @@ import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import { ValidateAddParticipant } from 'App/Validators/Project/AddParticipantValidator'
-import { ValidateCreateProject } from 'App/Validators/Project/CreateProjectValidator'
+import { CreateProjectValidator } from 'App/Validators/Project/CreateProjectValidator'
 import { ValidateRemoveParticipant } from 'App/Validators/Project/RemoveParticipantValidator'
 import { ValidateUpdateProject } from 'App/Validators/Project/UpdateProjectValidator'
 import { ProjectRoles } from 'Contracts/enums'
@@ -37,7 +37,7 @@ export default class ProjectsController {
   public async create({ request, response, auth, bouncer }: HttpContextContract) {
     const user = auth.use('web').user!
 
-    const payload = await ValidateCreateProject(request)
+    const payload = await request.validate(CreateProjectValidator)
 
     const organization = await Organization.findOrFail(payload.organizationId)
 
