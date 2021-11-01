@@ -8,6 +8,7 @@ import './routes/List'
 import './routes/Task'
 import './routes/TrackingSession'
 import './routes/Screenshots'
+import './routes/GitlabIntegration'
 
 Route.get('/', async () => {
   return { hello: 'From Development' }
