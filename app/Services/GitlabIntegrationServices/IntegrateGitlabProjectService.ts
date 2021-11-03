@@ -7,6 +7,12 @@ import { AccessLevelProps } from 'App/Interfaces/IGitlabUser'
 import { IgitlabProject } from 'App/Interfaces/IGitlabProject'
 import { Exception } from '@poppinss/utils'
 
+type ImportProjectProps = {
+  project: IgitlabProject
+  organizationId: string
+  token?: string
+}
+
 export default class IntegrateGitlabProjectService {
   private _gitlabClientService: GitlabClientService
   private _logger: typeof Logger
@@ -63,7 +69,7 @@ export default class IntegrateGitlabProjectService {
 
     tasks.forEach(async (task) => {
       const newTask = await Task.create({
-        name: task.name,
+        name: task.title,
         body: task.description,
         timeEstimated: task.time_stats.time_estimate,
         gitlabCreatorId: task.author.id,
@@ -77,7 +83,7 @@ export default class IntegrateGitlabProjectService {
         const userToAssign = await User.findBy('gitlabId', assignee.id)
         if (!userToAssign) {
           return this._logger.warn(
-            `Attempt to assign user ${assignee.name} to task ${task.name} failed, because User doesn't exists or is not connected with Gitlab Account`
+            `Attempt to assign user ${assignee.name} to task ${task.title} failed, because User doesn't exists or is not connected with Gitlab Account`
           )
         }
         await newTask.related('usersAssigned').attach([userToAssign.id])
@@ -85,7 +91,9 @@ export default class IntegrateGitlabProjectService {
     })
   }
 
-  public async import(project: IgitlabProject) {
+  public async import(data: ImportProjectProps) {
+    const { project, organizationId } = data
+
     const projectExists = await Project.findBy('gitlabId', project.id)
 
     if (projectExists) throw new Exception('Project is already imported', 409)
@@ -96,12 +104,11 @@ export default class IntegrateGitlabProjectService {
       gitlabAvatarUrl: project.avatar_url ? project.avatar_url : '',
       gitlabId: project.id,
       gitlabCreatorId: project.creator_id,
+      organizationId,
     })
 
     await this.importProjectUsers(newProject)
 
     await this.importProjectTasks(newProject)
-
-    this._logger.info(`Project ${project.name} imported succesfully.`)
   }
 }

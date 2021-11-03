@@ -6,5 +6,5 @@ export interface IgitlabProject {
   name: string
   created_at: DateTime
   avatar_url?: string
-  creator_id: number
+  creator_id?: number
 }

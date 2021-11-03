@@ -10,7 +10,6 @@ export interface IgitlabTask {
   id: number
   title: string
   iid: number
-  name: string
   description: string
   state: string
   author: {
