@@ -15,6 +15,7 @@ export enum OrganizationRoles {
 }
 
 export enum ProjectRoles {
-  MANAGER = 'MANAGER',
-  PRODUCTION = 'PRODUCTION',
+  PROJECT_VIEWER = 'PV',
+  USER = 'U',
+  PROJECT_MANAGER = 'PM',
 }
