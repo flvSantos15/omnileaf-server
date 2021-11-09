@@ -3,7 +3,7 @@ import { LogShow } from 'App/Helpers/CustomLogs'
 import Organization from 'App/Models/Organization'
 
 export default class ShowOrganizationService {
-  public async execute(id: string) {
+  public async execute(id: string): Promise<Organization> {
     const organization = await Organization.find(id)
 
     if (!organization) {

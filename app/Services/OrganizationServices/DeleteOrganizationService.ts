@@ -10,7 +10,7 @@ interface Irequest {
 }
 
 export default class DeleteOrganizationService {
-  public async execute({ id, bouncer }: Irequest) {
+  public async execute({ id, bouncer }: Irequest): Promise<void> {
     const organization = await Organization.find(id)
 
     if (!organization) {

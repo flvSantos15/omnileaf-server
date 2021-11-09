@@ -15,7 +15,7 @@ interface Irequest {
 }
 
 export default class UpdateOrganizationService {
-  public async execute({ id, payload, bouncer }: Irequest) {
+  public async execute({ id, payload, bouncer }: Irequest): Promise<Organization> {
     const organization = await Organization.find(id)
 
     if (!organization) {

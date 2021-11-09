@@ -3,6 +3,7 @@ import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import CreateOrganizationValidator from 'App/Validators/Organization/CreateOrganizationValidator'
 import UpdateOrganizationValidator from 'App/Validators/Organization/UpdateOrganizationValidator'
 import AddOrganizationMemberValidator from 'App/Validators/Organization/AddOrganizationMemberValidator'
+import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 import ListOrganizationService from 'App/Services/OrganizationServices/ListOrganizationService'
 import CreateOrganizationService from 'App/Services/OrganizationServices/CreateOrganizationService'
 import ShowOrganizationService from 'App/Services/OrganizationServices/ShowOrganizationService'
@@ -10,7 +11,6 @@ import UpdateOrganizationService from 'App/Services/OrganizationServices/UpdateO
 import DeleteOrganizationService from 'App/Services/OrganizationServices/DeleteOrganizationService'
 import AddMemberService from 'App/Services/OrganizationServices/AddMemberService'
 import RemoveMemberService from 'App/Services/OrganizationServices/RemoveMemberService'
-import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 
 export default class OrganizationsController {
   public async create({ request, response, auth }: HttpContextContract) {
