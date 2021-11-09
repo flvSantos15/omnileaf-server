@@ -10,3 +10,11 @@ export const validateIdParam = (uuid: string) => {
   }
   return uuid
 }
+
+export const validateIdParamV1 = (uuid: string) => {
+  if (!(uuidValidate(uuid) && uuidVersion(uuid) === 1)) {
+    Logger.warn('Param id must be uuidv1')
+    throw new Exception('Param id must be uuidv4', 400)
+  }
+  return uuid
+}

@@ -1,106 +1,88 @@
 import User from 'App/Models/User'
-import Env from '@ioc:Adonis/Core/Env'
-import ResetPasswordToken from 'App/Models/ResetPasswordToken'
-import ResetPasswordMail from 'App/Mailers/ResetPasswordMail'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { ValidateCreateUser } from 'App/Validators/User/CreateUserValidator'
-import { ValidateUpdateUser } from 'App/Validators/User/UpdateUserValidator'
-import { ValidateForgotPassword } from 'App/Validators/User/ForgotPasswordValidator'
-import { ValidateResetPassword } from 'App/Validators/User/ResetPasswordValidator'
-import { LogCreated, LogDeleted, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
-import { LoadUserRelations } from 'App/Helpers/RelationsLoaders/UserRelationsLoader'
+import ForgotPassworValidator from 'App/Validators/User/ForgotPasswordValidator'
+import { LogDeleted, LogUpdated } from 'App/Helpers/CustomLogs'
+import ListUsersService from 'App/Services/UserServices/ListUsersService'
+import ShowUserService from 'App/Services/UserServices/ShowUserService'
+import CreateUserService from 'App/Services/UserServices/CreateUserService'
+import CreateUserValidator from 'App/Validators/User/CreateUserValidator'
+import ResetPasswordValidator from 'App/Validators/User/ResetPasswordValidator'
+
+import { validateIdParam, validateIdParamV1 } from 'App/Validators/Global/IdParamValidator'
+import UpdateUserService from 'App/Services/UserServices/UpdateUserService'
+import DeleteUserService from 'App/Services/UserServices/DeleteUserService'
+import ForgotPasswordService from 'App/Services/UserServices/ForgotPasswordService'
+import ResetPasswordService from 'App/Services/UserServices/ResetPasswordService'
 
 export default class UsersController {
   public async list({ response }: HttpContextContract) {
-    const users = await User.all()
+    const listUsers = new ListUsersService()
 
-    LogList(users)
+    const users = await listUsers.execute()
 
-    response.json(users.map((user) => user.serialize()))
+    response.json(users)
   }
 
   public async show({ request, response }: HttpContextContract) {
-    const id = request.param('id')
+    const showUser = new ShowUserService()
 
-    const user = await LoadUserRelations(id, request.qs())
+    const id = validateIdParam(request.param('id'))
 
-    LogShow(user)
+    const user = await showUser.execute({ id })
 
-    response.json(user.serialize())
+    response.json(user)
   }
 
   public async create({ request, response }: HttpContextContract) {
-    const payload = await ValidateCreateUser(request)
+    const createUser = new CreateUserService()
 
-    const user = await User.create(payload)
+    const payload = await request.validate(CreateUserValidator)
 
-    LogCreated(user)
+    const user = await createUser.execute({ payload })
 
-    response.status(201).json(user.serialize())
+    response.status(201).send(user)
   }
 
   public async update({ request, response, bouncer }: HttpContextContract) {
-    const id = request.param('id')
+    const updateUser = new UpdateUserService()
 
-    const user = await User.findOrFail(id)
+    const id = validateIdParam(request.param('id'))
 
-    const payload = await ValidateUpdateUser(id, request)
+    const payload = await request.validate(CreateUserValidator)
 
-    await bouncer.authorize('OwnUser', id)
+    const user = await updateUser.execute({ id, payload, bouncer })
 
-    await user.merge(payload).save()
-
-    LogUpdated(user)
-
-    response.json(user.serialize())
+    response.json(user)
   }
 
   public async delete({ request, response, bouncer }: HttpContextContract) {
-    const id = request.param('id')
+    const deleteUser = new DeleteUserService()
 
-    const user = await User.findOrFail(id)
+    const id = validateIdParam(request.param('id'))
 
-    await bouncer.authorize('OwnUser', id)
-
-    LogDeleted(user)
-
-    await user.delete()
+    await deleteUser.execute({ id, bouncer })
 
     response.status(204)
   }
 
   public async forgotPassword({ request, response }: HttpContextContract) {
-    const { email } = await ValidateForgotPassword(request)
+    const forgotPasswordService = new ForgotPasswordService()
 
-    let token = await ResetPasswordToken.updateOrCreate({ userEmail: email }, { userEmail: email })
+    const payload = await request.validate(ForgotPassworValidator)
 
-    const resetPasswordUrl = `${Env.get('FRONT_END_URL')}/reset-password/${token.id}`
+    const token = await forgotPasswordService.execute({ payload })
 
-    await new ResetPasswordMail(token.userEmail, resetPasswordUrl).send()
-
-    LogCreated(token)
-
-    response.json(token)
+    response.send(token)
   }
 
   public async resetPassword({ request, response, auth }: HttpContextContract) {
-    const id = request.param('tokenId')
+    const resetPasswordService = new ResetPasswordService()
 
-    const { token, password } = await ValidateResetPassword(id, request)
+    const id = validateIdParamV1(request.param('tokenId'))
 
-    const user = await User.findByOrFail('email', token.userEmail)
+    const payload = await request.validate(ResetPasswordValidator)
 
-    await user.merge({ password }).save()
-
-    LogUpdated(user)
-
-    const rememberMe = true
-
-    await auth.use('web').login(user, rememberMe)
-
-    await token.delete()
-
-    LogDeleted(token)
+    await resetPasswordService.execute({ id, payload, auth })
 
     response.redirect('/')
   }
