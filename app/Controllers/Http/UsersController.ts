@@ -1,18 +1,15 @@
-import User from 'App/Models/User'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import ForgotPassworValidator from 'App/Validators/User/ForgotPasswordValidator'
-import { LogDeleted, LogUpdated } from 'App/Helpers/CustomLogs'
+import { validateIdParam, validateIdParamV1 } from 'App/Validators/Global/IdParamValidator'
 import ListUsersService from 'App/Services/UserServices/ListUsersService'
 import ShowUserService from 'App/Services/UserServices/ShowUserService'
 import CreateUserService from 'App/Services/UserServices/CreateUserService'
 import CreateUserValidator from 'App/Validators/User/CreateUserValidator'
-import ResetPasswordValidator from 'App/Validators/User/ResetPasswordValidator'
-
-import { validateIdParam, validateIdParamV1 } from 'App/Validators/Global/IdParamValidator'
 import UpdateUserService from 'App/Services/UserServices/UpdateUserService'
 import DeleteUserService from 'App/Services/UserServices/DeleteUserService'
 import ForgotPasswordService from 'App/Services/UserServices/ForgotPasswordService'
+import ForgotPassworValidator from 'App/Validators/User/ForgotPasswordValidator'
 import ResetPasswordService from 'App/Services/UserServices/ResetPasswordService'
+import ResetPasswordValidator from 'App/Validators/User/ResetPasswordValidator'
 
 export default class UsersController {
   public async list({ response }: HttpContextContract) {
