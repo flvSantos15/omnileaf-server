@@ -19,6 +19,7 @@ import Task from './Task'
 import Screenshot from './Screenshot'
 import Organization from './Organization'
 import Hash from '@ioc:Adonis/Core/Hash'
+import ProjectUser from './ProjectUser'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -90,6 +91,11 @@ export default class User extends BaseModel {
     foreignKey: 'creator_id',
   })
   public ownedTasks: HasMany<typeof Task>
+
+  @hasMany(() => ProjectUser, {
+    foreignKey: 'userId',
+  })
+  public projectsRelations: HasMany<typeof ProjectUser>
 
   @manyToMany(() => Task, {
     pivotTable: 'task_user',
