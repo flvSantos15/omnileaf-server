@@ -48,11 +48,21 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
     return user.id === project.creatorId
   })
   .define('ProjectManager', async (user: User, project: Project) => {
-    await project.load('usersAssigned')
-    const userAssigned = project.usersAssigned.filter(
-      (userAssigned) => userAssigned.id === user.id
-    )[0]
-    return userAssigned.$extras.pivot_user_role === 'MANAGER'
+    await user.load('projectsRelations')
+    const indexOfRelation = user.projectsRelations.findIndex(
+      (relation) => relation.projectId === project.id
+    )
+    await user.projectsRelations[indexOfRelation].load('labels')
+
+    const authorizationRoles = ['Lead']
+
+    const result = authorizationRoles.some((auth) => {
+      return user.projectsRelations[indexOfRelation].labels
+        .map((label) => label.title)
+        .includes(auth)
+    })
+
+    return result
   })
   .define('AssignedToProject', async (user: User, project: Project) => {
     await project.load('usersAssigned')
