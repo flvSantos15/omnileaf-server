@@ -1,17 +1,17 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class LabelProjectusers extends BaseSchema {
-  protected tableName = 'label_projectusers'
+export default class LabelsOrganizationUser extends BaseSchema {
+  protected tableName = 'label_organization_user'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.uuid('label_id').unsigned().references('id').inTable('labels').notNullable()
       table
-        .uuid('project_user_id')
+        .uuid('organization_user_id')
         .unsigned()
         .references('id')
-        .inTable('project_user')
+        .inTable('organization_user')
         .notNullable()
 
       /**

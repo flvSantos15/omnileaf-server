@@ -1,13 +1,18 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class ProjectUsers extends BaseSchema {
-  protected tableName = 'project_user'
+export default class LabelProjectusers extends BaseSchema {
+  protected tableName = 'label_project_user'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
-      table.uuid('project_id').unsigned().references('id').inTable('projects').notNullable()
-      table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
+      table.uuid('label_id').unsigned().references('id').inTable('labels').notNullable()
+      table
+        .uuid('project_user_id')
+        .unsigned()
+        .references('id')
+        .inTable('project_user')
+        .notNullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

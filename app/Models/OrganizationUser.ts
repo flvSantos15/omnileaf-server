@@ -1,14 +1,15 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
-import ProjectUser from './ProjectUser'
-import OrganizationUser from './OrganizationUser'
+import Label from './Label'
 
-export default class Label extends BaseModel {
+export default class OrganizationUser extends BaseModel {
+  public static table = 'organization_user'
+
   @column({ isPrimary: true })
   public id: string
 
-  @column()
-  public title: string
+  @column({ columnName: 'user_id' })
+  public userId: string
 
   @column({ columnName: 'organization_id' })
   public organizationId: string
@@ -19,13 +20,8 @@ export default class Label extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @manyToMany(() => ProjectUser, {
-    pivotTable: 'label_project_user',
-  })
-  public projectUser: ManyToMany<typeof ProjectUser>
-
-  @manyToMany(() => OrganizationUser, {
+  @manyToMany(() => Label, {
     pivotTable: 'label_organization_user',
   })
-  public organizationUser: ManyToMany<typeof OrganizationUser>
+  public labels: ManyToMany<typeof Label>
 }

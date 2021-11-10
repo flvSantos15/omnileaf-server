@@ -1,5 +1,4 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
-import { OrganizationRoles } from 'Contracts/enums'
 
 export default class OrganizationUsers extends BaseSchema {
   protected tableName = 'organization_user'
@@ -14,7 +13,6 @@ export default class OrganizationUsers extends BaseSchema {
         .inTable('organizations')
         .notNullable()
       table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
-      table.enum('member_role', Object.values(OrganizationRoles)).notNullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

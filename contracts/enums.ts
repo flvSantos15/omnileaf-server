@@ -10,12 +10,9 @@ export enum TrackingSessionStatus {
 }
 
 export enum OrganizationRoles {
-  MANAGER = 'MANAGER',
-  PRODUCTION = 'PRODUCTION',
-}
-
-export enum ProjectRoles {
-  PROJECT_VIEWER = 'PV',
+  OWNER = 'A',
+  ORGANIZATION_MANAGER = 'OM',
   USER = 'U',
+  PROJECT_VIEWER = 'PV',
   PROJECT_MANAGER = 'PM',
 }

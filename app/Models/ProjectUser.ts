@@ -21,7 +21,7 @@ export default class ProjectUser extends BaseModel {
   public updatedAt: DateTime
 
   @manyToMany(() => Label, {
-    pivotTable: 'label_projectusers',
+    pivotTable: 'label_project_user',
   })
   public labels: ManyToMany<typeof Label>
 }
