@@ -10,7 +10,7 @@ import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
 import TrackingSession from 'App/Models/TrackingSession'
 import User from 'App/Models/User'
-import { OrganizationRoles } from 'Contracts/enums'
+import { OrganizationLabels } from 'Contracts/enums'
 
 /*
 |--------------------------------------------------------------------------
@@ -46,7 +46,7 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
     if (orgRelation) {
       await orgRelation.load('labels')
 
-      return orgRelation.labels.map((label) => label.title).includes(OrganizationRoles.OWNER)
+      return orgRelation.labels.map((label) => label.title).includes(OrganizationLabels.OWNER)
     }
 
     return false
@@ -60,34 +60,51 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
     if (orgRelation) {
       await orgRelation.load('labels')
 
-      const allowedRoles = [OrganizationRoles.OWNER, OrganizationRoles.ORGANIZATION_MANAGER]
+      const allowedRoles = [OrganizationLabels.OWNER, OrganizationLabels.ORGANIZATION_MANAGER]
 
       return allowedRoles.some((role) => {
-        orgRelation.labels.map((label) => label.title).includes(role)
+        return orgRelation.labels.map((label) => label.title).includes(role)
       })
     }
 
     return false
   })
-  .define('ProjectCreator', async (user: User, project: Project) => {
-    return user.id === project.creatorId
-  })
   .define('ProjectManager', async (user: User, project: Project) => {
-    await user.load('projectsRelations')
-    const indexOfRelation = user.projectsRelations.findIndex(
-      (relation) => relation.projectId === project.id
+    await project.load('organization')
+
+    const organization = project.organization
+
+    await user.load('organizationRelations')
+    const [orgRelation] = user.organizationRelations.filter(
+      async (relation) => relation.organizationId === organization.id
     )
-    await user.projectsRelations[indexOfRelation].load('labels')
 
-    const authorizationRoles = ['Lead']
+    if (orgRelation) {
+      await orgRelation.load('labels')
 
-    const result = authorizationRoles.some((auth) => {
-      return user.projectsRelations[indexOfRelation].labels
-        .map((label) => label.title)
-        .includes(auth)
-    })
+      // Check if Project Manager user is Assigned to project
+      if (
+        orgRelation.labels.map((label) => label.title).includes(OrganizationLabels.PROJECT_MANAGER)
+      ) {
+        await user.load('assignedProjects')
 
-    return result
+        if (!user.assignedProjects.map((prj) => prj.id).includes(project.id)) {
+          return false
+        }
+      }
+
+      const allowedRoles = [
+        OrganizationLabels.OWNER,
+        OrganizationLabels.ORGANIZATION_MANAGER,
+        OrganizationLabels.PROJECT_MANAGER,
+      ]
+
+      return allowedRoles.some((role) => {
+        return orgRelation.labels.map((label) => label.title).includes(role)
+      })
+    }
+
+    return false
   })
   .define('AssignedToProject', async (user: User, project: Project) => {
     await project.load('usersAssigned')

@@ -2,13 +2,14 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import ProjectUser from './ProjectUser'
 import OrganizationUser from './OrganizationUser'
+import { OrganizationLabels } from 'Contracts/enums'
 
 export default class Label extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
   @column()
-  public title: string
+  public title: OrganizationLabels
 
   @column({ columnName: 'organization_id' })
   public organizationId: string

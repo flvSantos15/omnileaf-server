@@ -51,11 +51,6 @@ export default class Project extends BaseModel {
   })
   public owner: BelongsTo<typeof User>
 
-  @belongsTo(() => User, {
-    foreignKey: 'userInChargeId',
-  })
-  public userInCharge: BelongsTo<typeof User>
-
   @belongsTo(() => Organization, {
     foreignKey: 'organizationId',
   })
@@ -63,7 +58,6 @@ export default class Project extends BaseModel {
 
   @manyToMany(() => User, {
     pivotTable: 'project_user',
-    pivotColumns: ['user_role'],
   })
   public usersAssigned: ManyToMany<typeof User>
 

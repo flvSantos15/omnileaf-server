@@ -74,7 +74,6 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Project, {
     pivotTable: 'project_user',
-    pivotColumns: ['user_role'],
   })
   public assignedProjects: ManyToMany<typeof Project>
 
@@ -115,7 +114,6 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Organization, {
     pivotTable: 'organization_user',
-    pivotColumns: ['member_role'],
   })
   public organizations: ManyToMany<typeof Organization>
 

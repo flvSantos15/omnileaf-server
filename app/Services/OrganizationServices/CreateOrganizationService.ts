@@ -2,7 +2,7 @@ import Label from 'App/Models/Label'
 import Organization from 'App/Models/Organization'
 import User from 'App/Models/User'
 import { LogCreated } from 'App/Helpers/CustomLogs'
-import { OrganizationRoles } from 'Contracts/enums'
+import { OrganizationLabels } from 'Contracts/enums'
 
 interface Irequest {
   user: User
@@ -18,7 +18,7 @@ export default class CreateOrganizationService {
     orgId: string
   }) {
     await Promise.all(
-      Object.values(OrganizationRoles).map(async (role) => {
+      Object.values(OrganizationLabels).map(async (role) => {
         const label = await Label.create({ title: role, organizationId: orgId })
 
         if (role === 'A') {

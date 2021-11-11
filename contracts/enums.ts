@@ -9,7 +9,7 @@ export enum TrackingSessionStatus {
   FINISHED = 'FINISHED',
 }
 
-export enum OrganizationRoles {
+export enum OrganizationLabels {
   OWNER = 'A',
   ORGANIZATION_MANAGER = 'OM',
   USER = 'U',

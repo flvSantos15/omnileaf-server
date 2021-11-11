@@ -11,6 +11,7 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Project from './Project'
+import Label from './Label'
 
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
@@ -46,13 +47,11 @@ export default class Organization extends BaseModel {
 
   @manyToMany(() => User, {
     pivotTable: 'organization_user',
-    pivotColumns: ['member_role'],
   })
   public members: ManyToMany<typeof User>
 
-  public serializeExtras() {
-    return {
-      role: this.$extras.pivot_member_role,
-    }
-  }
+  @hasMany(() => Label, {
+    foreignKey: 'organizationId',
+  })
+  public labels: HasMany<typeof Label>
 }
