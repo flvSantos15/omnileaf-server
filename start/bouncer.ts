@@ -10,6 +10,7 @@ import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
 import TrackingSession from 'App/Models/TrackingSession'
 import User from 'App/Models/User'
+import { OrganizationRoles } from 'Contracts/enums'
 
 /*
 |--------------------------------------------------------------------------
@@ -37,12 +38,36 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
   return user.id === id
 })
   .define('OrganizationCreator', async (user: User, organization: Organization) => {
-    return organization.creatorId === user.id
+    await user.load('organizationRelations')
+    const [orgRelation] = user.organizationRelations.filter(
+      async (relation) => relation.organizationId === organization.id
+    )
+
+    if (orgRelation) {
+      await orgRelation.load('labels')
+
+      return orgRelation.labels.map((label) => label.title).includes(OrganizationRoles.OWNER)
+    }
+
+    return false
   })
   .define('OrganizationManager', async (user: User, organization: Organization) => {
-    await organization.load('members')
-    const member = organization.members.filter((member) => member.id === user.id)[0]
-    return member.$extras.pivot_member_role === 'MANAGER'
+    await user.load('organizationRelations')
+    const [orgRelation] = user.organizationRelations.filter(
+      async (relation) => relation.organizationId === organization.id
+    )
+
+    if (orgRelation) {
+      await orgRelation.load('labels')
+
+      const allowedRoles = [OrganizationRoles.OWNER, OrganizationRoles.ORGANIZATION_MANAGER]
+
+      return allowedRoles.some((role) => {
+        orgRelation.labels.map((label) => label.title).includes(role)
+      })
+    }
+
+    return false
   })
   .define('ProjectCreator', async (user: User, project: Project) => {
     return user.id === project.creatorId

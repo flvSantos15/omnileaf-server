@@ -13,6 +13,7 @@ export default class Labels extends BaseSchema {
         .references('id')
         .inTable('organizations')
         .notNullable()
+        .onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

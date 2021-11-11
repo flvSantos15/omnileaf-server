@@ -9,14 +9,27 @@ export default class Screenshots extends BaseSchema {
       table.string('url').notNullable()
       table.string('blurred_url').notNullable()
       table.boolean('deleted').notNullable().defaultTo(false)
-      table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
-      table.uuid('task_id').unsigned().references('id').inTable('tasks').notNullable()
+      table
+        .uuid('user_id')
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .notNullable()
+        .onDelete('CASCADE')
+      table
+        .uuid('task_id')
+        .unsigned()
+        .references('id')
+        .inTable('tasks')
+        .notNullable()
+        .onDelete('CASCADE')
       table
         .uuid('tracking_session_id')
         .unsigned()
         .references('id')
         .inTable('tracking_sessions')
         .notNullable()
+        .onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

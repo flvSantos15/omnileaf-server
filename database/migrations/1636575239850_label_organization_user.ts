@@ -6,13 +6,20 @@ export default class LabelsOrganizationUser extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
-      table.uuid('label_id').unsigned().references('id').inTable('labels').notNullable()
+      table
+        .uuid('label_id')
+        .unsigned()
+        .references('id')
+        .inTable('labels')
+        .notNullable()
+        .onDelete('CASCADE')
       table
         .uuid('organization_user_id')
         .unsigned()
         .references('id')
         .inTable('organization_user')
         .notNullable()
+        .onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

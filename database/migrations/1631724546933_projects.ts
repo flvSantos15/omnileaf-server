@@ -16,6 +16,7 @@ export default class Projects extends BaseSchema {
         .references('id')
         .inTable('organizations')
         .notNullable()
+        .onDelete('CASCADE')
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')
       table.string('gitlab_avatar_url')

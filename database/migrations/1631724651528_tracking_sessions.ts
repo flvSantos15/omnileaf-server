@@ -14,7 +14,13 @@ export default class TrackingSessions extends BaseSchema {
       table.integer('tracking_time')
 
       table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
-      table.uuid('task_id').unsigned().references('id').inTable('tasks').notNullable()
+      table
+        .uuid('task_id')
+        .unsigned()
+        .references('id')
+        .inTable('tasks')
+        .notNullable()
+        .onDelete('CASCADE')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
