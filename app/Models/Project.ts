@@ -58,6 +58,7 @@ export default class Project extends BaseModel {
 
   @manyToMany(() => User, {
     pivotTable: 'project_user',
+    pivotColumns: ['role'],
   })
   public usersAssigned: ManyToMany<typeof User>
 
@@ -78,7 +79,7 @@ export default class Project extends BaseModel {
 
   public serializeExtras() {
     return {
-      role: this.$extras.pivot_user_role,
+      role: this.$extras.pivot_role,
     }
   }
 }

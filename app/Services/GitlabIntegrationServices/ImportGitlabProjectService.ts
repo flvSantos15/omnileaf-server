@@ -29,7 +29,7 @@ export default class ImportGitlabProjectService {
   // it's token.
   constructor() {}
 
-  private getUserRole(access_level: AccessLevelProps) {
+  private _getUserRole(access_level: AccessLevelProps) {
     switch (access_level) {
       case 0:
         return 'PV'
@@ -57,7 +57,9 @@ export default class ImportGitlabProjectService {
       if (!existingUser) {
         return Logger.warn(`Could not find User '${user.name}' on import.`)
       }
-      await project.related('usersAssigned').attach([existingUser.id])
+
+      const userRole = this._getUserRole(user.access_level)
+      await project.related('usersAssigned').attach({ [existingUser.id]: { role: userRole } })
     })
   }
 

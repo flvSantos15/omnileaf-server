@@ -3,12 +3,13 @@ import { Exception } from '@poppinss/utils'
 import { LogAttached } from 'App/Helpers/CustomLogs'
 import Project from 'App/Models/Project'
 import User from 'App/Models/User'
+import { ProjectRoles } from 'Contracts/enums'
 
-interface Irequest {
+interface IRequest {
   id: string
   payload: {
     userId: string
-    label?: string
+    role: ProjectRoles
   }
   bouncer: ActionsAuthorizerContract<User>
 }
@@ -38,8 +39,8 @@ export default class AddParticipantService {
     }
   }
 
-  public async execute({ id, payload, bouncer }: Irequest): Promise<void> {
-    const { userId } = payload
+  public async execute({ id, payload, bouncer }: IRequest): Promise<void> {
+    const { userId, role } = payload
 
     const project = await Project.find(id)
 
@@ -51,7 +52,7 @@ export default class AddParticipantService {
 
     await bouncer.authorize('ProjectManager', project)
 
-    await project.related('usersAssigned').attach([userId])
+    await project.related('usersAssigned').attach({ [userId]: { role } })
 
     LogAttached()
   }

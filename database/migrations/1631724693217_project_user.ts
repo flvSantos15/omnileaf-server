@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import { ProjectRoles } from 'Contracts/enums'
 
 export default class ProjectUsers extends BaseSchema {
   protected tableName = 'project_user'
@@ -20,6 +21,7 @@ export default class ProjectUsers extends BaseSchema {
         .inTable('users')
         .notNullable()
         .onDelete('CASCADE')
+      table.enum('role', Object.values(ProjectRoles)).notNullable()
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

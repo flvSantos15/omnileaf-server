@@ -10,6 +10,7 @@ import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
 import TrackingSession from 'App/Models/TrackingSession'
 import User from 'App/Models/User'
+import { ProjectRoles } from '../contracts/enums'
 import { OrganizationLabels } from 'Contracts/enums'
 
 /*
@@ -70,41 +71,15 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
     return false
   })
   .define('ProjectManager', async (user: User, project: Project) => {
-    await project.load('organization')
+    await project.load('usersAssigned')
 
-    const organization = project.organization
+    const userAssigned = project.usersAssigned.filter(
+      (projectUser) => projectUser.id === user.id
+    )[0]
 
-    await user.load('organizationRelations')
-    const [orgRelation] = user.organizationRelations.filter(
-      async (relation) => relation.organizationId === organization.id
-    )
+    if (!userAssigned) return false
 
-    if (orgRelation) {
-      await orgRelation.load('labels')
-
-      // Check if Project Manager user is Assigned to project
-      if (
-        orgRelation.labels.map((label) => label.title).includes(OrganizationLabels.PROJECT_MANAGER)
-      ) {
-        await user.load('assignedProjects')
-
-        if (!user.assignedProjects.map((prj) => prj.id).includes(project.id)) {
-          return false
-        }
-      }
-
-      const allowedRoles = [
-        OrganizationLabels.OWNER,
-        OrganizationLabels.ORGANIZATION_MANAGER,
-        OrganizationLabels.PROJECT_MANAGER,
-      ]
-
-      return allowedRoles.some((role) => {
-        return orgRelation.labels.map((label) => label.title).includes(role)
-      })
-    }
-
-    return false
+    return userAssigned.serialize()['projectRole'] === ProjectRoles.MANAGER
   })
   .define('AssignedToProject', async (user: User, project: Project) => {
     await project.load('usersAssigned')

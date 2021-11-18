@@ -16,3 +16,9 @@ export enum OrganizationLabels {
   PROJECT_VIEWER = 'PV',
   PROJECT_MANAGER = 'PM',
 }
+
+export enum ProjectRoles {
+  VIEWER = 'PV',
+  USER = 'U',
+  MANAGER = 'PM',
+}

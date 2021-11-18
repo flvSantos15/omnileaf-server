@@ -19,7 +19,6 @@ import Task from './Task'
 import Screenshot from './Screenshot'
 import Organization from './Organization'
 import Hash from '@ioc:Adonis/Core/Hash'
-import ProjectUser from './ProjectUser'
 import OrganizationUser from './OrganizationUser'
 
 export default class User extends BaseModel {
@@ -92,11 +91,6 @@ export default class User extends BaseModel {
   })
   public ownedTasks: HasMany<typeof Task>
 
-  @hasMany(() => ProjectUser, {
-    foreignKey: 'userId',
-  })
-  public projectsRelations: HasMany<typeof ProjectUser>
-
   @hasMany(() => OrganizationUser, {
     foreignKey: 'userId',
   })
@@ -126,8 +120,7 @@ export default class User extends BaseModel {
 
   public serializeExtras() {
     return {
-      projectRole: this.$extras.pivot_user_role,
-      organizationRole: this.$extras.pivot_member_role,
+      projectRole: this.$extras.pivot_role,
     }
   }
 }

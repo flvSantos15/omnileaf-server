@@ -4,6 +4,7 @@ import { LogCreated } from 'App/Helpers/CustomLogs'
 import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
 import User from 'App/Models/User'
+import { ProjectRoles } from 'Contracts/enums'
 
 interface Irequest {
   user: User
@@ -31,7 +32,7 @@ export default class CreateProjectService {
 
     LogCreated(project)
 
-    await project.related('usersAssigned').attach([user.id])
+    await project.related('usersAssigned').attach({ [user.id]: { role: ProjectRoles.MANAGER } })
 
     return project
   }
