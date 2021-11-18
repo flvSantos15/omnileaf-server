@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 
-export interface IgitlabProject {
+export interface IGitlabProject {
   id: number
   description?: string
   name: string

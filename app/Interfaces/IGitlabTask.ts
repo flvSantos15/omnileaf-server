@@ -1,12 +1,12 @@
 import { DateTime } from 'luxon'
 
-export interface IgitlabAssignee {
+export interface IGitlabAssignee {
   id: number
   name: string
   avatar_url: string
 }
 
-export interface IgitlabTask {
+export interface IGitlabTask {
   id: number
   title: string
   iid: number
@@ -18,7 +18,7 @@ export interface IgitlabTask {
   created_at: DateTime
   updated_at: DateTime
   closed_at: DateTime
-  assignees: IgitlabAssignee[]
+  assignees: IGitlabAssignee[]
   time_stats: {
     time_estimate: number
     total_time_spent: number

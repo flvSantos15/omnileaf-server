@@ -1,18 +1,31 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import IntegrateGitlabProjectService from 'App/Services/GitlabIntegrationServices/IntegrateGitlabProjectService'
+import ConnectOrganizationToGitlabService from 'App/Services/GitlabIntegrationServices/ConnectOrganizationToGitlabService'
+import GetOrganizationTokenService from 'App/Services/GitlabIntegrationServices/GetOrganizationTokenService'
+import ImportGitlabProjectService from 'App/Services/GitlabIntegrationServices/ImportGitlabProjectService'
+import ConnectOrganizationToGitlabValidator from 'App/Validators/GitlabIntegration/ConnectOrganizationToGitlabValidator'
 import ImportGitlabProjectValidator from 'App/Validators/GitlabIntegration/ImportGitlabProjectValidator'
 
 export default class GitlabIntegrationsController {
-  private integrateGiltabProjectService: IntegrateGitlabProjectService
+  public async connectOrganizationToGitlab({ request, response, bouncer }: HttpContextContract) {
+    const connectOrganizationToGitlabService = new ConnectOrganizationToGitlabService()
 
-  constructor() {
-    this.integrateGiltabProjectService = new IntegrateGitlabProjectService()
+    const payload = await request.validate(ConnectOrganizationToGitlabValidator)
+
+    await connectOrganizationToGitlabService.execute({ payload, bouncer })
+
+    response.status(200)
   }
 
   public async importProject({ request, response }: HttpContextContract) {
-    const payload = await request.validate(ImportGitlabProjectValidator)
+    const importGitlabProject = new ImportGitlabProjectService()
+    const getOrganizationToken = new GetOrganizationTokenService()
 
-    await this.integrateGiltabProjectService.import(payload)
+    const payload = await request.validate(ImportGitlabProjectValidator)
+    const { project, organizationId } = payload
+
+    const token = await getOrganizationToken.execute(organizationId)
+
+    await importGitlabProject.execute({ project, organizationId, token })
 
     response.status(201)
   }

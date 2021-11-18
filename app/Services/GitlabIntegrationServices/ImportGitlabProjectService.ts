@@ -1,26 +1,33 @@
 import User from 'App/Models/User'
-import GitlabClientService from './GitlabClientService'
+import GitlabHttpClientService from './GitlabHttpClientService'
 import Logger from '@ioc:Adonis/Core/Logger'
 import Project from 'App/Models/Project'
 import Task from 'App/Models/Task'
-import { AccessLevelProps } from 'App/Interfaces/IGitlabUser'
-import { IgitlabProject } from 'App/Interfaces/IGitlabProject'
+import { AccessLevelProps, IGitlabUser } from 'App/Interfaces/IGitlabUser'
+import { IGitlabProject } from 'App/Interfaces/IGitlabProject'
 import { Exception } from '@poppinss/utils'
+import { IGitlabTask } from 'App/Interfaces/IGitlabTask'
 
-type ImportProjectProps = {
-  project: IgitlabProject
+interface IImportProjectProps {
+  project: IGitlabProject
   organizationId: string
-  token?: string
+  token: string
 }
 
-export default class IntegrateGitlabProjectService {
-  private _gitlabClientService: GitlabClientService
-  private _logger: typeof Logger
+interface IImportProjectUserProps {
+  users: IGitlabUser[]
+  project: Project
+}
 
-  constructor() {
-    this._gitlabClientService = new GitlabClientService()
-    this._logger = Logger
-  }
+interface IImportProjectTaskProps {
+  tasks: IGitlabTask[]
+  project: Project
+}
+
+export default class ImportGitlabProjectService {
+  // For this Service on constructor, we should get the organization Id to get
+  // it's token.
+  constructor() {}
 
   private getUserRole(access_level: AccessLevelProps) {
     switch (access_level) {
@@ -41,31 +48,21 @@ export default class IntegrateGitlabProjectService {
     }
   }
 
-  private async importProjectUsers(project: Project) {
+  private async importProjectUsers({ users, project }: IImportProjectUserProps) {
     // Find project Users and assign them
-    const users = await this._gitlabClientService.getProjectUsers(
-      project.gitlabId!,
-      'kFkzRgKKTor5ZSsp3zse'
-    )
+    // const users = await this._gitlabHttpClientService.getProjectUsers(project.gitlabId!)
 
     users.forEach(async (user) => {
       const existingUser = await User.findBy('gitlabId', user.id)
       if (!existingUser) {
-        return this._logger.warn(`Could not find User '${user.name}' on import.`)
+        return Logger.warn(`Could not find User '${user.name}' on import.`)
       }
-      await project.related('usersAssigned').attach({
-        [existingUser.id]: {
-          user_role: this.getUserRole(user.access_level),
-        },
-      })
+      await project.related('usersAssigned').attach([existingUser.id])
     })
   }
 
-  private async importProjectTasks(project: Project) {
-    const tasks = await this._gitlabClientService.getProjectTasks(
-      project.gitlabId!,
-      'kFkzRgKKTor5ZSsp3zse'
-    )
+  private async importProjectTasks({ tasks, project }: IImportProjectTaskProps) {
+    // const tasks = await this._gitlabHttpClientService.getProjectTasks(project.gitlabId!)
 
     tasks.forEach(async (task) => {
       const newTask = await Task.create({
@@ -82,7 +79,7 @@ export default class IntegrateGitlabProjectService {
       task.assignees.forEach(async (assignee) => {
         const userToAssign = await User.findBy('gitlabId', assignee.id)
         if (!userToAssign) {
-          return this._logger.warn(
+          return Logger.warn(
             `Attempt to assign user ${assignee.name} to task ${task.title} failed, because User doesn't exists or is not connected with Gitlab Account`
           )
         }
@@ -91,8 +88,10 @@ export default class IntegrateGitlabProjectService {
     })
   }
 
-  public async import(data: ImportProjectProps) {
-    const { project, organizationId } = data
+  public async execute(payload: IImportProjectProps) {
+    const gitlabHttpClient = new GitlabHttpClientService()
+
+    const { project, organizationId, token } = payload
 
     const projectExists = await Project.findBy('gitlabId', project.id)
 
@@ -107,8 +106,11 @@ export default class IntegrateGitlabProjectService {
       organizationId,
     })
 
-    await this.importProjectUsers(newProject)
+    const users = await gitlabHttpClient.getProjectUsers({ id: newProject.gitlabId!, token })
+    const tasks = await gitlabHttpClient.getProjectTasks({ id: newProject.gitlabId!, token })
 
-    await this.importProjectTasks(newProject)
+    await this.importProjectUsers({ users, project: newProject })
+
+    await this.importProjectTasks({ tasks, project: newProject })
   }
 }

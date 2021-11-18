@@ -6,12 +6,15 @@ import {
   column,
   HasMany,
   hasMany,
+  HasOne,
+  hasOne,
   ManyToMany,
   manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Project from './Project'
 import Label from './Label'
+import GitlabToken from './GitlabToken'
 
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
@@ -29,6 +32,9 @@ export default class Organization extends BaseModel {
   @column({ columnName: 'creator_id' })
   public creatorId: string
 
+  @column()
+  public gitlabId: number
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
@@ -39,6 +45,11 @@ export default class Organization extends BaseModel {
     foreignKey: 'creatorId',
   })
   public creator: BelongsTo<typeof User>
+
+  @hasOne(() => GitlabToken, {
+    foreignKey: 'gitlabId',
+  })
+  public gitlabToken: HasOne<typeof GitlabToken>
 
   @hasMany(() => Project, {
     foreignKey: 'organizationId',
