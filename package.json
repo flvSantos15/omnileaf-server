@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "node ace serve --watch",
     "build": "node ace build --production",
-    "start": "node server.js",
+    "start": "node ace scheduler:run && node server.js",
     "lint": "eslint . --ext=.ts",
     "format": "prettier --write ."
   },
@@ -38,6 +38,7 @@
     "@adonisjs/repl": "^3.1.0",
     "@adonisjs/session": "^6.1.2",
     "@adonisjs/view": "^6.1.1",
+    "adonis5-scheduler": "^2.0.2",
     "aws-sdk": "^2.1003.0",
     "axios": "^0.24.0",
     "date-fns": "^2.24.0",
