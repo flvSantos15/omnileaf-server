@@ -3,7 +3,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class GitlabIntegrationCronJob extends BaseTask {
   public static get schedule() {
-    return '*/5 * * * * *'
+    return '*/5 * * * *'
   }
   /**
    * Set enable use .lock file for block run retry task
