@@ -47,7 +47,7 @@ export default class Organization extends BaseModel {
   public creator: BelongsTo<typeof User>
 
   @hasOne(() => GitlabToken, {
-    foreignKey: 'gitlabId',
+    foreignKey: 'organizationId',
   })
   public gitlabToken: HasOne<typeof GitlabToken>
 

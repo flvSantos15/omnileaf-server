@@ -10,6 +10,8 @@ import ForgotPasswordService from 'App/Services/UserServices/ForgotPasswordServi
 import ForgotPassworValidator from 'App/Validators/User/ForgotPasswordValidator'
 import ResetPasswordService from 'App/Services/UserServices/ResetPasswordService'
 import ResetPasswordValidator from 'App/Validators/User/ResetPasswordValidator'
+import PatchUserService from 'App/Services/UserServices/PatchUserService'
+import PatchGitlabIdValidator from 'App/Validators/User/PatchGitlabIdValidator'
 
 export default class UsersController {
   public async list({ response }: HttpContextContract) {
@@ -82,5 +84,19 @@ export default class UsersController {
     await resetPasswordService.execute({ id, payload, auth })
 
     response.redirect('/')
+  }
+
+  public async editGitlabId({ request, response, bouncer, logger }: HttpContextContract) {
+    const patchUser = new PatchUserService()
+
+    const id = validateIdParam(request.param('id'))
+
+    const payload = await request.validate(PatchGitlabIdValidator)
+
+    const user = await patchUser.gitalbId({ id, payload, bouncer })
+
+    logger.info('Gitlab Id succesfully edited.')
+
+    response.send(user)
   }
 }

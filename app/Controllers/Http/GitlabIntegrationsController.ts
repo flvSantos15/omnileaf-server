@@ -1,32 +1,42 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import ConnectOrganizationToGitlabService from 'App/Services/GitlabIntegrationServices/ConnectOrganizationToGitlabService'
-import GetOrganizationTokenService from 'App/Services/GitlabIntegrationServices/GetOrganizationTokenService'
-import ImportGitlabProjectService from 'App/Services/GitlabIntegrationServices/ImportGitlabProjectService'
+import GitlabIntegrationService from 'App/Services/GitlabIntegrationServices/GitlabIntegrationService'
 import ConnectOrganizationToGitlabValidator from 'App/Validators/GitlabIntegration/ConnectOrganizationToGitlabValidator'
 import ImportGitlabProjectValidator from 'App/Validators/GitlabIntegration/ImportGitlabProjectValidator'
+import ImportGitlabUserValidator from 'App/Validators/GitlabIntegration/ImportGitlabUserValidator'
 
 export default class GitlabIntegrationsController {
-  public async connectOrganizationToGitlab({ request, response, bouncer }: HttpContextContract) {
-    const connectOrganizationToGitlabService = new ConnectOrganizationToGitlabService()
-
+  public async importOrganization({ request, response, bouncer }: HttpContextContract) {
     const payload = await request.validate(ConnectOrganizationToGitlabValidator)
 
-    await connectOrganizationToGitlabService.execute({ payload, bouncer })
+    await GitlabIntegrationService.importOrganization({ payload, bouncer })
 
     response.status(200)
   }
 
   public async importProject({ request, response }: HttpContextContract) {
-    const importGitlabProject = new ImportGitlabProjectService()
-    const getOrganizationToken = new GetOrganizationTokenService()
-
     const payload = await request.validate(ImportGitlabProjectValidator)
     const { project, organizationId } = payload
 
-    const token = await getOrganizationToken.execute(organizationId)
+    await GitlabIntegrationService.importProject({ project, organizationId })
 
-    await importGitlabProject.execute({ project, organizationId, token })
+    response.status(200)
+  }
 
-    response.status(201)
+  public async importUser({ request, response, auth, bouncer }: HttpContextContract) {
+    const payload = await request.validate(ImportGitlabUserValidator)
+
+    const user = auth.use('web').user
+
+    await GitlabIntegrationService.importUser({ payload, user, bouncer })
+
+    response.status(200)
+  }
+
+  public async updateUser({ auth, response }: HttpContextContract) {
+    const user = auth.use('web').user
+
+    await GitlabIntegrationService.updateUser(user)
+
+    response.status(200)
   }
 }

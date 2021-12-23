@@ -20,6 +20,7 @@ import Screenshot from './Screenshot'
 import Organization from './Organization'
 import Hash from '@ioc:Adonis/Core/Hash'
 import OrganizationUser from './OrganizationUser'
+import GitlabToken from './GitlabToken'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -110,6 +111,11 @@ export default class User extends BaseModel {
     pivotTable: 'organization_user',
   })
   public organizations: ManyToMany<typeof Organization>
+
+  @hasOne(() => GitlabToken, {
+    foreignKey: 'owner_id',
+  })
+  public gitlabToken: HasOne<typeof GitlabToken>
 
   @beforeSave()
   public static async hashPassword(user: User) {

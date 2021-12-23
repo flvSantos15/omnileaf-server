@@ -13,5 +13,7 @@ Route.group(() => {
 
   Route.put('users/:id', 'UsersController.update')
 
+  Route.patch('users/:id/gitlabId', 'UsersController.editGitlabId')
+
   Route.delete('users/:id', 'UsersController.delete')
 }).middleware('auth')

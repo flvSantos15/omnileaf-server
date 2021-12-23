@@ -4,7 +4,7 @@ import { Exception } from '@poppinss/utils'
 import { LogUpdated } from 'App/Helpers/CustomLogs'
 import User from 'App/Models/User'
 
-interface Irequest {
+interface IRequest {
   id: string
   payload: {
     name: string | undefined
@@ -18,7 +18,10 @@ interface Irequest {
 }
 
 export default class UpdateUserService {
-  private async treatExceptions({ user, email }: { user: User | null; email: string | undefined }) {
+  public async execute({ id, payload, bouncer }: IRequest): Promise<ModelObject> {
+    const { email } = payload
+    const user = await User.find(id)
+
     if (!user) {
       throw new Exception('User Id does not exists.', 404)
     }
@@ -29,17 +32,10 @@ export default class UpdateUserService {
         throw new Exception('Email is already registered for another user.', 409)
       }
     }
-  }
-
-  public async execute({ id, payload, bouncer }: Irequest): Promise<ModelObject> {
-    const { email } = payload
-    const user = await User.find(id)
-
-    await this.treatExceptions({ user, email })
 
     await bouncer.authorize('OwnUser', id)
 
-    await user!.merge(payload).save()
+    await user.merge(payload).save()
 
     LogUpdated(user)
 
