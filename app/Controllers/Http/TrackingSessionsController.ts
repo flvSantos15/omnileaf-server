@@ -38,7 +38,7 @@ export default class TrackingSessionsController {
 
     LogCreated(trackingSession)
 
-    response.status(201)
+    response.status(201).send(trackingSession)
   }
 
   public async closeSession({ request, response, bouncer }: HttpContextContract) {

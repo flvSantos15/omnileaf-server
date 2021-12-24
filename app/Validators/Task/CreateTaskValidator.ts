@@ -17,7 +17,7 @@ export default class CreateTaskValidator {
     name: schema.string(),
     body: schema.string.optional(),
     projectId: schema.string({}, [rules.uuid({ version: 4 })]),
-    listId: schema.string({}, [rules.uuid({ version: 4 })]),
+    listId: schema.string.optional({}, [rules.uuid({ version: 4 })]),
   })
 }
 
@@ -31,9 +31,11 @@ export const ValidateCreateTask = async (request) => {
   }
 
   //Check if list exists
-  const list = await List.find(payload.listId)
-  if (!list) {
-    throw new Exception('List not found.', 404)
+  if (payload.listId) {
+    const list = await List.find(payload.listId)
+    if (!list) {
+      throw new Exception('List not found.', 404)
+    }
   }
 
   //Return payload and project

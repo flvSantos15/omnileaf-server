@@ -14,8 +14,8 @@ export default class Screenshot extends BaseModel {
   @column({ columnName: 'blurred_url' })
   public blurredUrl: string
 
-  @column()
-  public deleted: boolean
+  @column({ columnName: 'deleted' })
+  public isDeleted: boolean
 
   @column({ columnName: 'user_id' })
   public userId: string

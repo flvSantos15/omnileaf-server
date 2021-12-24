@@ -1,69 +1,57 @@
-import Application from '@ioc:Adonis/Core/Application'
+import { Exception } from '@adonisjs/core/build/standalone'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { ValidateCreateScreenshot } from 'App/Validators/Screenshots/CreateScreenshotValidator'
-import ScreenshotUploadService from 'App/Services/UploadService/ScreenshotUploadService'
-import Screenshot from 'App/Models/Screenshot'
-import { LogCreated, LogDeleted } from 'App/Helpers/CustomLogs'
+import Application from '@ioc:Adonis/Core/Application'
+import ScreenshotService from 'App/Services/ScreenshotService'
+import CreateScreenshotValidator from 'App/Validators/Screenshots/CreateScreenshotValidator'
+import UploadScreenshotValidator from 'App/Validators/Screenshots/UploadScreenshotValidator'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
-import Task from 'App/Models/Task'
-import RemoveImageService from 'App/Services/UploadService/RemoveImageService'
+import Screenshot from 'App/Models/Screenshot'
+import path from 'path'
 
 export default class ScreenshotsController {
-  private screenshotUploadService: ScreenshotUploadService
-  private removeImageService: RemoveImageService
-  private originalImagesDir: string
+  constructor() {}
 
-  constructor() {
-    this.screenshotUploadService = new ScreenshotUploadService()
-    this.originalImagesDir = Application.tmpPath('uploads/images/original')
-    this.removeImageService = new RemoveImageService()
-  }
-
-  public async create({ request, response, logger, auth, bouncer }: HttpContextContract) {
+  public async register({ request, response, logger, auth, bouncer }: HttpContextContract) {
     const user = auth.use('web').user!
-    const { trackingSession, screenshotMultiPart } = await ValidateCreateScreenshot(request)
+    const payload = await request.validate(CreateScreenshotValidator)
 
-    //Authorize user Session Owner
-    await bouncer.authorize('SessionOwner', trackingSession)
+    const screenshot = await ScreenshotService.register({ payload, user, bouncer })
 
-    await screenshotMultiPart.move(this.originalImagesDir)
-
-    const [url, blurredUrl] = await this.screenshotUploadService.execute(
-      screenshotMultiPart.fileName!
-    )
-
-    logger.info('Image uploaded succesfully')
-
-    const screenshot = await Screenshot.create({
-      userId: user.id,
-      url,
-      blurredUrl,
-      taskId: trackingSession.taskId,
-      trackingSessionId: trackingSession.id,
-    })
-
-    LogCreated(screenshot)
+    logger.info('Screenshot succesfully registered on database.')
 
     response.send(screenshot)
   }
 
-  public async delete({ request, response, bouncer }: HttpContextContract) {
+  public async upload({ request, response, logger }: HttpContextContract) {
+    const { screenshot } = await request.validate(UploadScreenshotValidator)
+
+    const filename = screenshot.fileName || screenshot.clientName
+
+    if (!filename) {
+      throw new Exception('Filename can not be null.', 400)
+    }
+
+    const imagesDir = Application.tmpPath('uploads/images')
+
+    screenshot.move(imagesDir)
+
+    const imgPath = path.join(imagesDir, filename)
+
+    const uploadUrls = await ScreenshotService.upload(imgPath)
+
+    logger.info('Screenshot uploaded succesfully')
+
+    response.send(uploadUrls)
+  }
+
+  public async delete({ request, response, bouncer, logger }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const screenshot = await Screenshot.findOrFail(id)
+    const screenshot = await Screenshot.find(id)
 
-    //Authorize project Manager
-    const task = await Task.findOrFail(screenshot.taskId)
-    await task.load('project')
-    await bouncer.authorize('ProjectManager', task.project)
+    await ScreenshotService.delete({ screenshot, bouncer })
 
-    //Delete image from bucket
-    await this.removeImageService.execute(screenshot.url)
-    await this.removeImageService.execute(screenshot.blurredUrl)
-
-    LogDeleted(screenshot)
-
-    await screenshot.delete()
+    logger.info('Screenshot deleted succesfully')
 
     response.status(204)
   }
