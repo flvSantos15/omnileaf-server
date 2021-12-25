@@ -13,3 +13,6 @@ import './routes/GitlabIntegration'
 Route.get('/', async () => {
   return { hello: 'From Development' }
 })
+
+Route.post('/test', 'TestsController.test').middleware('auth')
+Route.get('/showUsers', 'TestsController.showUsers')
