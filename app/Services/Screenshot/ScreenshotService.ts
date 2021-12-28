@@ -1,13 +1,13 @@
 import fs from 'fs'
 import sharp from 'sharp'
 import Logger from '@ioc:Adonis/Core/Logger'
-import SpacesService from '../SpacesService'
 import User from 'App/Models/User'
 import Screenshot from 'App/Models/Screenshot'
 import Task from 'App/Models/Task'
 import TrackingSession from 'App/Models/TrackingSession'
 import { Exception } from '@adonisjs/core/build/standalone'
 import { ActionsAuthorizerContract } from '@ioc:Adonis/Addons/Bouncer'
+import S3Service from '@ioc:Omnileaf/S3Service'
 
 interface RegisterRequest {
   payload: {
@@ -77,8 +77,8 @@ class ScreenShotService {
 
     const blurredImgBuffer = await this._blurImage(buffer)
 
-    const url = await SpacesService.uploadImage(minifiedImgBuffer)
-    const blurredUrl = await SpacesService.uploadImage(blurredImgBuffer)
+    const url = await S3Service.uploadImage(minifiedImgBuffer)
+    const blurredUrl = await S3Service.uploadImage(blurredImgBuffer)
 
     console.log(url, blurredUrl)
 
@@ -95,8 +95,8 @@ class ScreenShotService {
     await task.load('project')
     await bouncer.authorize('ProjectManager', task.project)
 
-    await SpacesService.deleteImage(screenshot.url)
-    await SpacesService.deleteImage(screenshot.blurredUrl)
+    await S3Service.deleteImage(screenshot.url)
+    await S3Service.deleteImage(screenshot.blurredUrl)
 
     await screenshot.merge({ isDeleted: true }).save()
   }

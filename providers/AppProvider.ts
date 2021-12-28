@@ -1,10 +1,12 @@
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import S3Service from 'App/Bindings/S3Service'
 
 export default class AppProvider {
   constructor(protected app: ApplicationContract) {}
 
   public register() {
     // Register your own bindings
+    this.app.container.singleton('Omnileaf/S3Service', () => new S3Service())
   }
 
   public async boot() {

@@ -2,11 +2,11 @@ import AWS from 'aws-sdk'
 import Env from '@ioc:Adonis/Core/Env'
 import { PutObjectRequest } from 'aws-sdk/clients/s3'
 import { createString } from 'App/Utils/CreateRandomString'
+import S3ServiceInterface from 'Contracts/interfaces/S3Service.interface'
 
-class SpacesService {
-  protected originalImageLocation: string
-  protected s3: AWS.S3
-  protected uploadImageParams: PutObjectRequest
+export default class S3Service implements S3ServiceInterface {
+  private s3: AWS.S3
+  private uploadImageParams: PutObjectRequest
 
   constructor() {
     this.s3 = new AWS.S3({
@@ -46,5 +46,3 @@ class SpacesService {
     await this.s3.deleteObject(params).promise()
   }
 }
-
-export default new SpacesService()
