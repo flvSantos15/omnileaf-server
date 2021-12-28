@@ -1,7 +1,8 @@
 import { Exception } from '@adonisjs/core/build/standalone'
 import Application from '@ioc:Adonis/Core/Application'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import ScreenshotService from 'App/Services/ScreenshotService'
+import S3Service from '@ioc:Omnileaf/S3Service'
+import fs from 'fs'
 
 export default class TestsController {
   public async test({ request, response, logger }: HttpContextContract) {
@@ -19,7 +20,11 @@ export default class TestsController {
 
     await screenshotMultiPart!.move(Application.tmpPath('uploads/images/original'))
 
-    await ScreenshotService.upload(imgPath)
+    const buffer = fs.readFileSync(imgPath)
+
+    await S3Service.uploadImage(buffer)
+
+    // await ScreenshotService.upload(imgPath)
 
     logger.info('Image uploaded succesfully')
 
