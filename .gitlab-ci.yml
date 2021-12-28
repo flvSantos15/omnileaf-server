@@ -68,20 +68,3 @@ development:
     name: development
   only:
     - development
-
-staging:
-  image: alpine:latest
-  stage: staging
-  tags:
-    - deployment
-  script:
-    - chmod og= $ID_RSA
-    - apt-get update && apt-get install -y openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; git pull"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; chmod u+x ./init-app.sh"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; docker-compose down --rmi 'local'"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "cd ~/omnileaf/backend/staging/; docker-compose up -d"
-  environment:
-    name: staging
-  only:
-    - staging
