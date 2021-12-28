@@ -1,5 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import GitlabIntegrationService from 'App/Services/GitlabIntegrationServices/GitlabIntegrationService'
+import GitlabIntegrationService from 'App/Services/GitlabIntegration/GitlabIntegrationService'
 import ConnectOrganizationToGitlabValidator from 'App/Validators/GitlabIntegration/ConnectOrganizationToGitlabValidator'
 import ImportGitlabProjectValidator from 'App/Validators/GitlabIntegration/ImportGitlabProjectValidator'
 import ImportGitlabUserValidator from 'App/Validators/GitlabIntegration/ImportGitlabUserValidator'

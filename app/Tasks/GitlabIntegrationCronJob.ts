@@ -1,7 +1,7 @@
 import { BaseTask } from 'adonis5-scheduler/build'
 import Logger from '@ioc:Adonis/Core/Logger'
 import Organization from 'App/Models/Organization'
-import GitlabIntegrationService from 'App/Services/GitlabIntegrationServices/GitlabIntegrationService'
+import GitlabIntegrationService from 'App/Services/GitlabIntegration/GitlabIntegrationService'
 
 export default class GitlabIntegrationCronJob extends BaseTask {
   public static get schedule() {

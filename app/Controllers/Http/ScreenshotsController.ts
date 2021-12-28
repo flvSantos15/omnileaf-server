@@ -1,7 +1,7 @@
 import { Exception } from '@adonisjs/core/build/standalone'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Application from '@ioc:Adonis/Core/Application'
-import ScreenshotService from 'App/Services/ScreenshotService'
+import ScreenshotService from 'App/Services/Screenshot/ScreenshotService'
 import CreateScreenshotValidator from 'App/Validators/Screenshots/CreateScreenshotValidator'
 import UploadScreenshotValidator from 'App/Validators/Screenshots/UploadScreenshotValidator'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'

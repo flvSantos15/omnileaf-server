@@ -1,8 +1,8 @@
 import { schema, rules } from '@ioc:Adonis/Core/Validator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Hash from '@ioc:Adonis/Core/Hash'
 import { Exception } from '@poppinss/utils'
 import User from 'App/Models/User'
+import Hash from '@ioc:Adonis/Core/Hash'
 
 type PayloadProps = {
   email: string
