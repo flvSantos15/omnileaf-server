@@ -14,6 +14,10 @@ publish-dev:
   stage: publish-prod
   services:
     - docker:dind
+  before_script:
+    - apk add --update python py-pip python-dev && pip install docker-compose
+    - docker version
+    - docker-compose version
   script:
     - docker-compose -f docker-compose.dev.yml build
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
