@@ -17,7 +17,7 @@ export default class DeleteProjectService {
       throw new Exception('Project Id does not exists.', 404)
     }
 
-    await bouncer.authorize('ProjectCreator', project)
+    await bouncer.authorize('ProjectManager', project)
 
     LogDeleted(project)
 

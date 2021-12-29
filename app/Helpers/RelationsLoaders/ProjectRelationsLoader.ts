@@ -7,8 +7,6 @@ export const LoadProjectRelations = async (id: string, queryString: Record<strin
 
   await project.load('owner')
 
-  await project.load('userInCharge')
-
   const { usersAssigned, boards, tags, tasks } = queryString
 
   if (usersAssigned) await project.load('usersAssigned')

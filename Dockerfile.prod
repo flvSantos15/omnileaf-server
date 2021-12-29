@@ -1,5 +1,7 @@
 FROM alpine:3.14
 
+ARG entrypoint
+
 ENV NODE_VERSION 14.17.5
 
 RUN addgroup -g 1000 node \
@@ -94,14 +96,26 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 
 RUN apk update && apk add bash
 
+ENV NODE_OPTIONS=”–max_old_space_size=2048″
+
 WORKDIR /usr/src/app
 
-
-COPY ./*package.json ./
-COPY yarn.lock ./
-
-RUN yarn
+VOLUME ["usr/src/app/node_modules"]
 
 COPY . .
 
-RUN chmod u+x ./init-app.sh
+COPY .env.prod .env 
+
+RUN yarn
+
+# TO-DO: MIGRATIONS SHOULD RUN IN THIS STEP
+
+RUN yarn build \
+    && yarn --cwd ./build install \
+    && cp .env ./build/.env
+
+RUN echo cwd
+
+EXPOSE 3333
+
+ENTRYPOINT [ "yarn", "start" ]

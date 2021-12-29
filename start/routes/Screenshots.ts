@@ -1,9 +1,9 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
-  Route.post('screenshots', 'ScreenShotsController.register')
+  Route.post('screenshots', 'ScreenshotsController.register')
 
-  Route.post('screenshots/upload', 'ScreenShotsController.upload')
+  Route.post('screenshots/upload', 'ScreenshotsController.upload')
 
-  Route.delete('screenshots/:id', 'ScreenShotsController.delete')
+  Route.delete('screenshots/:id', 'ScreenshotsController.delete')
 }).middleware('auth')

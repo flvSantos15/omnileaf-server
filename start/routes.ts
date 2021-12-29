@@ -10,6 +10,15 @@ import './routes/TrackingSession'
 import './routes/Screenshots'
 import './routes/GitlabIntegration'
 
+import Env from '@ioc:Adonis/Core/Env'
+
+const enviroment = Env.get('NODE_ENV')
+const helloMessage =
+  enviroment === 'production' ? 'Hello from Production' : 'Hello from Development'
+
 Route.get('/', async () => {
-  return { hello: 'From Development' }
+  return helloMessage
 })
+
+Route.post('/test', 'TestsController.test').middleware('auth')
+Route.get('/showUsers', 'TestsController.showUsers')
