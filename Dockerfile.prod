@@ -96,21 +96,15 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 
 RUN apk update && apk add bash argon2
 
-COPY docker-entrypoint.prod.sh /bin/docker-entrypoint.prod.sh
-
 WORKDIR /usr/src/app
 
 VOLUME ["usr/src/app/node_modules"]
 
-COPY ./*package.json ./
-
-COPY yarn.lock ./
-
-RUN yarn
-
 COPY . .
 
-RUN cp .env.prod .env 
+COPY .env.prod .env 
+
+RUN yarn
 
 # TO-DO: MIGRATIONS SHOULD RUN IN THIS STEP
 

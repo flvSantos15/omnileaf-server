@@ -98,14 +98,9 @@ VOLUME ["usr/src/app/node_modules"]
 
 WORKDIR /usr/src/app
 
-
-COPY ./*package.json ./
-
-COPY yarn.lock ./
+COPY . .
 
 RUN yarn
-
-COPY . .
 
 # TO-DO: MIGRATIONS SHOULD RUN IN THIS STEP
 
