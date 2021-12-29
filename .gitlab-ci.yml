@@ -7,7 +7,7 @@ stages:
 
 variables:
   TAG_LATEST_PROD: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest-prod
-  TAG_LATEST_DEV: $CI_REGISTRY_IMAGE/othername
+  TAG_LATEST_DEV: $CI_REGISTRY_IMAGE/development
 
 publish-dev:
   image: docker:latest
@@ -15,7 +15,7 @@ publish-dev:
   services:
     - docker:dind
   script:
-    - docker build -t $TAG_LATEST_DEV -f Dockerfile.dev .
+    - docker-compose -f docker-compose.dev.yml build
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
     - docker push $TAG_LATEST_DEV
   only:
@@ -45,7 +45,7 @@ test:
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $TAG_LATEST_DEV || true"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST_DEV"
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v omnileaf_dev || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name omnileaf_dev -p 8080:3333 -v ":usr/src/app" -v "/usr/src/app/node_modules" -d $TAG_LATEST_DEV"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name omnileaf_dev -p 8080:3333 -d $TAG_LATEST_DEV"
 
   environment:
     name: test

@@ -94,8 +94,6 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 
 RUN apk update && apk add bash
 
-VOLUME ["usr/src/app/node_modules"]
-
 WORKDIR /usr/src/app
 
 COPY . .
