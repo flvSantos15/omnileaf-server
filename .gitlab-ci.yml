@@ -56,7 +56,6 @@ development:
   image: alpine:latest
   stage: test
   tags:
-    - develop
     - deployment
   script:
     - chmod og= $ID_RSA
