@@ -94,6 +94,8 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 
 RUN apk update && apk add bash
 
+ENV NODE_OPTIONS=”–max_old_space_size=2048″
+
 WORKDIR /usr/src/app
 
 COPY . .

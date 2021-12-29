@@ -94,7 +94,9 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
     # smoke test
     && yarn --version
 
-RUN apk update && apk add bash argon2
+RUN apk update && apk add bash
+
+ENV NODE_OPTIONS=”–max_old_space_size=2048″
 
 WORKDIR /usr/src/app
 
