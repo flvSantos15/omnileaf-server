@@ -72,6 +72,7 @@ const databaseConfig: CustomDatabaseConfig = {
         (Env.get('NODE_ENV') === 'production' && prodConnection),
       migrations: {
         naturalSort: true,
+        tableName: 'adonis_schema',
       },
       healthCheck: true,
       debug: false,

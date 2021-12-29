@@ -9,17 +9,19 @@ export default class Users extends BaseSchema {
       await this.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
     })
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('name').notNullable()
-      table.string('displayName').notNullable()
+      table.string('display_name').notNullable()
       table.string('email').unique().notNullable()
+      table.string('password').unique().notNullable()
       table.string('avatar_url')
       table.string('phone')
-      table.string('time_zone')
       table
         .enum('account_type', Object.values(UserRoles))
         .defaultTo(UserRoles.PRODUCTION)
         .notNullable()
+      table.string('remember_me_token').nullable()
+      table.integer('gitlab_id')
 
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })

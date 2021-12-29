@@ -5,7 +5,7 @@ export default class TaskTags extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.uuid('task_id').unsigned().references('id').inTable('tasks').notNullable()
       table.uuid('tag_id').unsigned().references('id').inTable('tags').notNullable()
 

@@ -1,7 +1,8 @@
 {
   "extends": "./node_modules/adonis-preset-ts/tsconfig",
   "include": [
-    "**/*"
+    "**/*",
+    "decs.d.ts"
   ],
   "exclude": [
     "node_modules",
@@ -28,7 +29,13 @@
     "types": [
       "@adonisjs/core",
       "@adonisjs/repl",
-      "@adonisjs/lucid"
+      "@adonisjs/lucid",
+      "@adonisjs/auth",
+      "@adonisjs/session",
+      "@adonisjs/bouncer",
+      "@adonisjs/mail",
+      "@adonisjs/view",
+      "adonis5-scheduler"
     ]
   }
 }

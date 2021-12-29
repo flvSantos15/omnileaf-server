@@ -5,23 +5,21 @@ export default class Projects extends BaseSchema {
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.uuid('id').primary().unique().notNullable()
+      table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('name').notNullable()
       table.string('description')
+      table.uuid('creator_id').unsigned().references('id').inTable('users')
       table
-        .uuid('creator_id')
+        .uuid('organization_id')
         .notNullable()
         .unsigned()
         .references('id')
-        .inTable('users')
+        .inTable('organizations')
         .notNullable()
-      table
-        .uuid('user_assigned')
-        .notNullable()
-        .unsigned()
-        .references('id')
-        .inTable('users')
-        .notNullable()
+        .onDelete('CASCADE')
+      table.integer('gitlab_id')
+      table.integer('gitlab_creator_id')
+      table.string('gitlab_avatar_url')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
