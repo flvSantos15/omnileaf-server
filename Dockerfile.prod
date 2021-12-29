@@ -1,5 +1,7 @@
 FROM alpine:3.14
 
+ARG entrypoint
+
 ENV NODE_VERSION 14.17.5
 
 RUN addgroup -g 1000 node \
@@ -92,16 +94,32 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
     # smoke test
     && yarn --version
 
-RUN apk update && apk add bash
+RUN apk update && apk add bash argon2
+
+COPY docker-entrypoint.prod.sh /bin/docker-entrypoint.prod.sh
 
 WORKDIR /usr/src/app
 
+VOLUME ["usr/src/app/node_modules"]
 
 COPY ./*package.json ./
+
 COPY yarn.lock ./
 
 RUN yarn
 
 COPY . .
 
-RUN chmod u+x ./init-app.sh
+RUN cp .env.prod .env 
+
+# TO-DO: MIGRATIONS SHOULD RUN IN THIS STEP
+
+RUN yarn build \
+    && yarn --cwd ./build install \
+    && cp .env ./build/.env
+
+RUN echo cwd
+
+EXPOSE 3333
+
+ENTRYPOINT [ "yarn", "start" ]
