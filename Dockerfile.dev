@@ -94,16 +94,16 @@ RUN apk add --no-cache --virtual .build-deps-yarn curl gnupg tar \
 
 RUN apk update && apk add bash
 
-ENV NODE_OPTIONS=”–max_old_space_size=2048″
-
 WORKDIR /usr/src/app
 
 COPY . .
 
 RUN yarn
 
-# TO-DO: MIGRATIONS SHOULD RUN IN THIS STEP
+RUN yarn build \
+    && yarn --cwd ./build install \
+    && cp .env ./build/.env
 
 EXPOSE 3333
 
-CMD ["yarn", "dev"]
+CMD ["yarn", "start"]
