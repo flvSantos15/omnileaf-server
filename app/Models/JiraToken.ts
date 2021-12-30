@@ -11,7 +11,7 @@ export default class JiraToken extends BaseModel {
   @column({ columnName: 'organization_id' })
   public organizationId: string
 
-  @column()
+  @column({ columnName: 'access_token' })
   public token: string
 
   @column({ columnName: 'refresh_token' })

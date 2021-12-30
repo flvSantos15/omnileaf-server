@@ -3,7 +3,7 @@ import Project from 'App/Models/Project'
 import { GitlabTask } from './gitlab-task.interface'
 import { GitlabUser } from './gitlab-user.interface'
 
-export interface ApiRequest {
+export interface GitlabApiRequest {
   id?: number
   token?: string
 }

@@ -1,6 +1,6 @@
 import Env from '@ioc:Adonis/Core/Env'
 import axios, { AxiosInstance } from 'axios'
-import { ApiRequest } from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
+import { GitlabApiRequest } from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
 import { GitlabTask } from 'App/Interfaces/Gitlab/gitlab-task.interface'
 import { GitlabUser } from 'App/Interfaces/Gitlab/gitlab-user.interface'
 import { RefreshToken } from 'App/Interfaces/Gitlab/refresh-token.interface'
@@ -14,7 +14,7 @@ class GitlabApiServce {
     this.client = axios.create({ baseURL: 'https://gitlab.com/api/v4' })
   }
 
-  public async getProjectUsers({ id, token }: ApiRequest): Promise<GitlabUser[]> {
+  public async getProjectUsers({ id, token }: GitlabApiRequest): Promise<GitlabUser[]> {
     const { data } = await this.client({
       method: 'GET',
       url: `/projects/${id}/members`,
@@ -23,7 +23,7 @@ class GitlabApiServce {
     return data
   }
 
-  public async getProjectTasks({ id, token }: ApiRequest): Promise<GitlabTask[]> {
+  public async getProjectTasks({ id, token }: GitlabApiRequest): Promise<GitlabTask[]> {
     const { data } = await this.client({
       method: 'GET',
       url: `/projects/${id}/issues`,
@@ -32,7 +32,7 @@ class GitlabApiServce {
     return data
   }
 
-  public async getUserOrganizations({ token }: ApiRequest): Promise<GitlabOrganization[]> {
+  public async getUserOrganizations({ token }: GitlabApiRequest): Promise<GitlabOrganization[]> {
     const { data } = await this.client({
       method: 'GET',
       url: `/groups`,
@@ -41,7 +41,7 @@ class GitlabApiServce {
     return data
   }
 
-  public async getUserProjects({ token }: ApiRequest): Promise<GitlabProject[]> {
+  public async getUserProjects({ token }: GitlabApiRequest): Promise<GitlabProject[]> {
     const { data } = await this.client({
       method: 'GET',
       url: `/projects`,
@@ -53,7 +53,7 @@ class GitlabApiServce {
     return data
   }
 
-  public async getUserTasks({ token }: ApiRequest): Promise<GitlabTask[]> {
+  public async getUserTasks({ token }: GitlabApiRequest): Promise<GitlabTask[]> {
     const { data } = await this.client({
       method: 'GET',
       url: `/projects`,

@@ -21,6 +21,7 @@ import Organization from './Organization'
 import Hash from '@ioc:Adonis/Core/Hash'
 import OrganizationUser from './OrganizationUser'
 import GitlabToken from './GitlabToken'
+import JiraToken from './JiraToken'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -119,6 +120,11 @@ export default class User extends BaseModel {
     foreignKey: 'owner_id',
   })
   public gitlabToken: HasOne<typeof GitlabToken>
+
+  @hasOne(() => JiraToken, {
+    foreignKey: 'owner_id',
+  })
+  public jiraToken: HasOne<typeof JiraToken>
 
   @beforeSave()
   public static async hashPassword(user: User) {
