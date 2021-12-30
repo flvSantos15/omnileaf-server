@@ -1,4 +1,4 @@
-export interface IGitlabOrganization {
+export interface GitlabOrganization {
   id: number
   name: string
   avatar_url: string

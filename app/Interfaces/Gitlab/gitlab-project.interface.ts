@@ -1,7 +1,7 @@
 import { GitlabAccessLevels } from 'Contracts/enums/gitlab-access-levels'
 import { DateTime } from 'luxon'
 
-export interface IGitlabProject {
+export interface GitlabProject {
   id: number
   description?: string
   name: string
