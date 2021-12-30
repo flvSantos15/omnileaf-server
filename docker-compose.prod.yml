@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  app:
+    image: registry.gitlab.com/mlgroup/omni-leaf-backend/main
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
