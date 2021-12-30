@@ -76,6 +76,11 @@ const databaseConfig: CustomDatabaseConfig = {
       },
       healthCheck: true,
       debug: false,
+      pool: {
+        acquireTimeoutMillis: 60 * 2000,
+        min: 2,
+        max: 20,
+      },
     },
   },
 }
