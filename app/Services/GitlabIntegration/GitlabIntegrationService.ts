@@ -1,5 +1,4 @@
 import { Exception } from '@adonisjs/core/build/standalone'
-import { ActionsAuthorizerContract } from '@ioc:Adonis/Addons/Bouncer'
 import {
   RefreshProjectTasksRequest,
   RefreshProjectUsersRequest,
@@ -11,43 +10,14 @@ import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
 import Task from 'App/Models/Task'
 import User from 'App/Models/User'
-import { GitlabAccessLevels } from 'Contracts/enums/gitlab-access-levels'
-import GitlabApiService from './GitlabApiService'
 import Logger from '@ioc:Adonis/Core/Logger'
-import { GitlabProject } from 'App/Interfaces/Gitlab/gitlab-project.interface'
-
-export interface ImportProjectRequest {
-  project: GitlabProject
-  organizationId: string
-}
-
-export interface ImportOrganizationRequest {
-  payload: {
-    organizationId: string
-    gitlabId: number
-    token: {
-      access_token: string
-      refresh_token: string
-      expires_in: number
-      created_at: number
-    }
-  }
-  bouncer: ActionsAuthorizerContract<User>
-}
-
-export interface ImportUserRequest {
-  payload: {
-    gitlabId: number
-    token: {
-      access_token: string
-      refresh_token: string
-      expires_in: number
-      created_at: number
-    }
-  }
-  user?: User
-  bouncer: ActionsAuthorizerContract<User>
-}
+import GitlabApiService from './GitlabApiService'
+import { GitlabAccessLevels } from 'Contracts/enums/gitlab-access-levels'
+import {
+  ImportOrganizationRequest,
+  ImportProjectRequest,
+  ImportUserRequest,
+} from 'App/Interfaces/Gitlab/gitlab-integration-service.interfaces'
 
 class GitlabIntegrationService {
   public async importOrganization({ payload, bouncer }: ImportOrganizationRequest): Promise<void> {
@@ -73,6 +43,13 @@ class GitlabIntegrationService {
     })
   }
 
+  private _validateToken({ expiresIn, createdAt }: ValidateTokenRequest) {
+    const expirationTime = (createdAt + expiresIn) * 1000
+    const currentTime = new Date().getTime()
+
+    return currentTime < expirationTime
+  }
+
   private async _updateToken({ existingToken }: UpdateTokenRequest) {
     const token = await GitlabApiService.refreshToken(existingToken.refreshToken)
 
@@ -86,13 +63,6 @@ class GitlabIntegrationService {
       .save()
 
     return existingToken
-  }
-
-  private _validateToken({ expiresIn, createdAt }: ValidateTokenRequest) {
-    const expirationTime = (createdAt + expiresIn) * 1000
-    const currentTime = new Date().getTime()
-
-    return currentTime < expirationTime
   }
 
   private async _getOrgToken(organizationId: string): Promise<string> {
