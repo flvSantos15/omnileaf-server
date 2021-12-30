@@ -35,6 +35,9 @@ export default class Organization extends BaseModel {
   @column()
   public gitlabId: number
 
+  @column({ columnName: 'jira_id' })
+  public jiraId: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

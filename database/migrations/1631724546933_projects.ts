@@ -20,6 +20,7 @@ export default class Projects extends BaseSchema {
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')
       table.string('gitlab_avatar_url')
+      table.uuid('jira_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

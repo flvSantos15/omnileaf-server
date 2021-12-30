@@ -22,7 +22,7 @@ export default class Users extends BaseSchema {
         .notNullable()
       table.string('remember_me_token').nullable()
       table.integer('gitlab_id')
-
+      table.uuid('jira_id')
       table.timestamp('created_at', { useTz: true })
       table.timestamp('updated_at', { useTz: true })
     })

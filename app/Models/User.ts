@@ -56,6 +56,9 @@ export default class User extends BaseModel {
   @column({ columnName: 'gitlab_id' })
   public gitlabId: number
 
+  @column({ columnName: 'jira_id' })
+  public jiraId: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

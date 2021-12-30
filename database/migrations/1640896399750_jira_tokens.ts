@@ -1,7 +1,7 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
-export default class GitlabTokens extends BaseSchema {
-  protected tableName = 'gitlab_tokens'
+export default class JiraTokens extends BaseSchema {
+  protected tableName = 'jira_tokens'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
@@ -11,8 +11,7 @@ export default class GitlabTokens extends BaseSchema {
       table.string('token').notNullable()
       table.string('refresh_token').notNullable()
       table.integer('expires_in').notNullable()
-      table.integer('created_time').notNullable()
-
+      table.string('scope').notNullable()
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
