@@ -13,3 +13,12 @@ export interface ImportJiraUserRequest {
   user?: User
   bouncer: ActionsAuthorizerContract<User>
 }
+
+export interface ImportJiraOrganizationRequest {
+  id: string
+  user: User
+  payload: {
+    jiraSiteId: string
+  }
+  bouncer: ActionsAuthorizerContract<User>
+}

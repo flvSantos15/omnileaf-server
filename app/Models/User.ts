@@ -122,7 +122,7 @@ export default class User extends BaseModel {
   public gitlabToken: HasOne<typeof GitlabToken>
 
   @hasOne(() => JiraToken, {
-    foreignKey: 'owner_id',
+    foreignKey: 'ownerId',
   })
   public jiraToken: HasOne<typeof JiraToken>
 

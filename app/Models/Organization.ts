@@ -15,6 +15,7 @@ import User from './User'
 import Project from './Project'
 import Label from './Label'
 import GitlabToken from './GitlabToken'
+import JiraToken from './JiraToken'
 
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
@@ -49,11 +50,6 @@ export default class Organization extends BaseModel {
   })
   public creator: BelongsTo<typeof User>
 
-  @hasOne(() => GitlabToken, {
-    foreignKey: 'organizationId',
-  })
-  public gitlabToken: HasOne<typeof GitlabToken>
-
   @hasMany(() => Project, {
     foreignKey: 'organizationId',
   })
@@ -68,4 +64,14 @@ export default class Organization extends BaseModel {
     foreignKey: 'organizationId',
   })
   public labels: HasMany<typeof Label>
+
+  @hasOne(() => GitlabToken, {
+    foreignKey: 'organizationId',
+  })
+  public gitlabToken: HasOne<typeof GitlabToken>
+
+  @hasOne(() => JiraToken, {
+    foreignKey: 'organizationId',
+  })
+  public jiraToken: HasOne<typeof JiraToken>
 }
