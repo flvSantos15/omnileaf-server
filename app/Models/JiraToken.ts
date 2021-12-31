@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { afterFind, BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import Encryption from '@ioc:Adonis/Core/Encryption'
 
 export default class JiraToken extends BaseModel {
   @column({ isPrimary: true })
@@ -11,10 +12,20 @@ export default class JiraToken extends BaseModel {
   @column({ columnName: 'organization_id' })
   public organizationId: string
 
-  @column({ columnName: 'access_token' })
+  @column({
+    columnName: 'access_token',
+    serialize: (value: string) => {
+      return Encryption.decrypt(value)
+    },
+  })
   public token: string
 
-  @column({ columnName: 'refresh_token' })
+  @column({
+    columnName: 'refresh_token',
+    serialize: (value: string) => {
+      return Encryption.decrypt(value)
+    },
+  })
   public refreshToken: string
 
   @column({ columnName: 'expires_in' })
@@ -31,4 +42,15 @@ export default class JiraToken extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @beforeSave()
+  public static async hashPassword(token: JiraToken) {
+    token.token = Encryption.encrypt(token.token)
+    token.refreshToken = Encryption.encrypt(token.refreshToken)
+  }
+
+  @afterFind()
+  public static serializeToken(token: JiraToken) {
+    return token.serialize()
+  }
 }

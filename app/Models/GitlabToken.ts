@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import Encryption from '@ioc:Adonis/Core/Encryption'
 
 export default class GitlabToken extends BaseModel {
   @column({ isPrimary: true })
@@ -11,10 +12,19 @@ export default class GitlabToken extends BaseModel {
   @column({ columnName: 'organization_id' })
   public organizationId: string
 
-  @column()
+  @column({
+    serialize: (value: string) => {
+      return Encryption.decrypt(value)
+    },
+  })
   public token: string
 
-  @column({ columnName: 'refresh_token' })
+  @column({
+    columnName: 'refresh_token',
+    serialize: (value: string) => {
+      return Encryption.decrypt(value)
+    },
+  })
   public refreshToken: string
 
   @column({ columnName: 'expires_in' })
@@ -28,4 +38,10 @@ export default class GitlabToken extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @beforeSave()
+  public static async hashPassword(token: GitlabToken) {
+    token.token = Encryption.encrypt(token.token)
+    token.refreshToken = Encryption.encrypt(token.refreshToken)
+  }
 }

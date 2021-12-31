@@ -18,6 +18,7 @@ import {
   ImportProjectRequest,
   ImportUserRequest,
 } from 'App/Interfaces/Gitlab/gitlab-integration-service.interfaces'
+import Encryption from '@ioc:Adonis/Core/Encryption'
 
 class GitlabIntegrationService {
   public async importOrganization({ payload, bouncer }: ImportOrganizationRequest): Promise<void> {
@@ -51,7 +52,9 @@ class GitlabIntegrationService {
   }
 
   private async _updateToken({ existingToken }: UpdateTokenRequest) {
-    const token = await GitlabApiService.refreshToken(existingToken.refreshToken)
+    const token = await GitlabApiService.refreshToken(
+      Encryption.decrypt(existingToken.refreshToken)!
+    )
 
     await existingToken
       .merge({
@@ -85,10 +88,10 @@ class GitlabIntegrationService {
 
     if (!tokenIsValid) {
       const updatedToken = await this._updateToken({ existingToken: organization.gitlabToken })
-      return updatedToken.token
+      return Encryption.decrypt(updatedToken.token)!
     }
 
-    return organization.gitlabToken.token
+    return Encryption.decrypt(organization.gitlabToken.token)!
   }
 
   protected getUserRole(access_level: GitlabAccessLevels) {
@@ -241,10 +244,10 @@ class GitlabIntegrationService {
 
     if (!tokenIsValid) {
       const updatedToken = await this._updateToken({ existingToken: user.gitlabToken })
-      return updatedToken.token
+      return Encryption.decrypt(updatedToken.token)!
     }
 
-    return user.gitlabToken.token
+    return Encryption.decrypt(user.gitlabToken.token)!
   }
 
   public async updateUser(user?: User): Promise<void> {
