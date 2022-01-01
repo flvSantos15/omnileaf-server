@@ -8,7 +8,7 @@ type PayloadProps = {
   name: string
   body: string | undefined
   projectId: string
-  listId: string
+  listId?: string
 }
 
 export default class CreateTaskValidator {
