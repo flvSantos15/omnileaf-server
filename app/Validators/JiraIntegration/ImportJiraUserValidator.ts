@@ -5,7 +5,7 @@ export default class ImportJiraUserValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
     token: schema.object().members({
-      token: schema.string(),
+      access_token: schema.string(),
       refresh_token: schema.string(),
       scope: schema.string(),
       expires_in: schema.number(),

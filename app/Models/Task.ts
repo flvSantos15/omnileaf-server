@@ -47,6 +47,9 @@ export default class Task extends BaseModel {
   @column({ columnName: 'gitlab_creator_id' })
   public gitlabCreatorId?: number
 
+  @column({ columnName: 'jira_id' })
+  public jiraId: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 

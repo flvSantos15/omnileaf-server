@@ -41,7 +41,11 @@ export default class GitlabToken extends BaseModel {
 
   @beforeSave()
   public static async hashPassword(token: GitlabToken) {
-    token.token = Encryption.encrypt(token.token)
-    token.refreshToken = Encryption.encrypt(token.refreshToken)
+    if (token.$dirty.token) {
+      token.token = Encryption.encrypt(token.token)
+    }
+    if (token.$dirty.refreshToken) {
+      token.refreshToken = Encryption.encrypt(token.refreshToken)
+    }
   }
 }

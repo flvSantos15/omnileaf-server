@@ -23,7 +23,7 @@ export default class Project extends BaseModel {
   public name: string
 
   @column()
-  public description: string
+  public description?: string
 
   @column({ columnName: 'creator_id' })
   public creatorId?: string
@@ -39,6 +39,9 @@ export default class Project extends BaseModel {
 
   @column({ columnName: 'gitlab_avatar_url' })
   public gitlabAvatarUrl?: string
+
+  @column({ columnName: 'jira_id' })
+  public jiraId: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

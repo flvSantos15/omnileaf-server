@@ -44,9 +44,13 @@ export default class JiraToken extends BaseModel {
   public updatedAt: DateTime
 
   @beforeSave()
-  public static async hashPassword(token: JiraToken) {
-    token.token = Encryption.encrypt(token.token)
-    token.refreshToken = Encryption.encrypt(token.refreshToken)
+  public static async encryptToken(token: JiraToken) {
+    if (token.$dirty.token) {
+      token.token = Encryption.encrypt(token.token)
+    }
+    if (token.$dirty.refreshToken) {
+      token.refreshToken = Encryption.encrypt(token.refreshToken)
+    }
   }
 
   @afterFind()

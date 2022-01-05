@@ -9,9 +9,10 @@ export default class JiraTokens extends BaseSchema {
       table.uuid('owner_id').unsigned().references('id').inTable('users').onDelete('CASCADE')
       table.uuid('organization_id').unsigned().references('id').inTable('organizations')
       table.text('access_token').notNullable()
-      table.string('refresh_token').notNullable()
+      table.text('refresh_token').notNullable()
       table.integer('expires_in').notNullable()
       table.string('scope').notNullable()
+      table.integer('created_time').notNullable()
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

@@ -20,7 +20,7 @@ export default class Tasks extends BaseSchema {
       table.uuid('list_id').unsigned().references('id').inTable('lists')
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')
-      table.uuid('jira_id')
+      table.string('jira_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
