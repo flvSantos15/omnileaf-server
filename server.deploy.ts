@@ -13,16 +13,7 @@
 import 'reflect-metadata'
 import sourceMapSupport from 'source-map-support'
 import { Ignitor } from '@adonisjs/core/build/standalone'
-import { createServer } from 'https'
-import { join } from 'path'
-import { readFileSync } from 'fs'
 
 sourceMapSupport.install({ handleUncaughtExceptions: false })
 
-const privateKey = readFileSync(join(__dirname + '/sslCert/server.key'), 'utf8')
-const certificate = readFileSync(join(__dirname + '/sslCert/server.crt'), 'utf8')
-const credentials = { key: privateKey, cert: certificate }
-
-new Ignitor(__dirname).httpServer().start((handle) => {
-  return createServer(credentials, handle)
-})
+new Ignitor(__dirname).httpServer().start()

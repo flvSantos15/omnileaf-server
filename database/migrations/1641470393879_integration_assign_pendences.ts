@@ -6,9 +6,9 @@ export default class IntegrationAssignPendences extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
-      table.uuid('id').unsigned().references('id').inTable('tasks').onDelete('CASCADE')
-      table.string('jiraId')
-      table.string('gitlabId')
+      table.uuid('task_id').unsigned().references('id').inTable('tasks').onDelete('CASCADE')
+      table.string('jira_id')
+      table.string('gitlab_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

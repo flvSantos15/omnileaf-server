@@ -3,7 +3,6 @@ import Project from 'App/Models/Project'
 import User from 'App/Models/User'
 import { ProjectRoles } from 'Contracts/enums'
 import { JiraIssue } from './jira-issue.interface'
-import { JiraProject } from './jira-project.interface'
 import { JiraTokenView } from './jira-token.interface'
 
 export interface ImportJiraUserRequest {
@@ -24,10 +23,9 @@ export interface ImportJiraOrganizationRequest {
 }
 
 export interface ImportJiraProjectRequest {
-  user: User
   payload: {
-    project: JiraProject
-    organizationId: string
+    projectId: string
+    jiraId: string
   }
   bouncer: ActionsAuthorizerContract<User>
 }

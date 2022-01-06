@@ -31,4 +31,10 @@ export default class JiraIntegrationsController {
 
     response.status(204)
   }
+
+  public async handleWebhook({ request, response }: HttpContextContract) {
+    console.log(request.body)
+
+    response.status(200)
+  }
 }

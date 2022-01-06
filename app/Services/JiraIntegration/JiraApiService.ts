@@ -21,6 +21,7 @@ import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
 import { ProjectRoles } from 'Contracts/enums'
 import Env from '@ioc:Adonis/Core/Env'
 import { JiraTokenView } from 'App/Interfaces/Jira/jira-token.interface'
+import { WebhookCreatedView } from 'App/Interfaces/Jira/webhook-created.interface'
 
 class JiraApiService {
   private client: AxiosInstance
@@ -240,6 +241,33 @@ class JiraApiService {
     }
 
     return users
+  }
+
+  public async registerProjectWebhook({ id, cloudId, token }: JiraApiRequest) {
+    const endpoint = `ex/jira/${cloudId}/rest/api/3/webhook`
+    const body = {
+      webhooks: [
+        {
+          jqlFilter: `project = PT`,
+          events: ['jira:issue_created', 'jira:issue_updated', 'jira:issue_deleted'],
+        },
+      ],
+      url: 'https://dev-api.omnileaf.ml',
+    }
+
+    const response = await this.client.post<WebhookCreatedView>(endpoint, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    console.log(response.data.webhookRegistrationResult)
+
+    if (response?.status !== 200) {
+      throw new Exception('Failed to register project Webhook', 400)
+    }
+
+    return response.data
   }
 }
 
