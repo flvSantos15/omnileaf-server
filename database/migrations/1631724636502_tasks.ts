@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import { TaskStatus } from 'Contracts/enums'
 
 export default class Tasks extends BaseSchema {
   protected tableName = 'tasks'
@@ -17,6 +18,11 @@ export default class Tasks extends BaseSchema {
         .inTable('projects')
         .notNullable()
         .onDelete('CASCADE')
+      table
+        .enum('status', Object.values(TaskStatus))
+        .notNullable()
+        .defaultTo(TaskStatus.IN_PROGRESS)
+      table.boolean('is_deleted').defaultTo(false)
       table.uuid('list_id').unsigned().references('id').inTable('lists')
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')

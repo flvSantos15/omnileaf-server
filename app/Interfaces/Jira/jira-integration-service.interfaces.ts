@@ -1,5 +1,6 @@
 import { ActionsAuthorizerContract } from '@ioc:Adonis/Addons/Bouncer'
 import Project from 'App/Models/Project'
+import Task from 'App/Models/Task'
 import User from 'App/Models/User'
 import { ProjectRoles } from 'Contracts/enums'
 import { JiraIssue } from './jira-issue.interface'
@@ -23,8 +24,8 @@ export interface ImportJiraOrganizationRequest {
 }
 
 export interface ImportJiraProjectRequest {
+  id: string
   payload: {
-    projectId: string
     jiraId: string
   }
   bouncer: ActionsAuthorizerContract<User>
@@ -47,5 +48,28 @@ export interface UpdateProjectUsersProps {
 
 export interface UpdateProjectTaskProps {
   project: Project
-  tasks: JiraIssue[]
+  issues: JiraIssue[]
+}
+
+export interface UpdateOrCreateTaskFromJiraIssueProps {
+  issue: JiraIssue
+  projectId: string
+}
+
+export interface JiraIssueWebhook {
+  webhookEvent: JiraIssueWebhookEvent
+  issue: JiraIssue
+}
+
+export enum JiraIssueWebhookEvent {
+  CREATED = 'jira:issue_created',
+  UPDATED = 'jira:issue_updated',
+  DELETED = 'jira:issue_deleted',
+}
+
+export interface AssignUserFromJiraToTaskProps {
+  task: Task
+  issueAssignee: {
+    accountId: string
+  }
 }

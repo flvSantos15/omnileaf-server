@@ -1,8 +1,10 @@
 import { Exception } from '@adonisjs/core/build/standalone'
 import {
+  AssignUserFromJiraToTaskProps,
   ImportJiraOrganizationRequest,
   ImportJiraProjectRequest,
   ImportJiraUserRequest,
+  UpdateOrCreateTaskFromJiraIssueProps,
   UpdateProjectTaskProps,
   ValidateTokenProps,
 } from 'App/Interfaces/Jira/jira-integration-service.interfaces'
@@ -15,6 +17,8 @@ import Task from 'App/Models/Task'
 import Encryption from '@ioc:Adonis/Core/Encryption'
 import Logger from '@ioc:Adonis/Core/Logger'
 import IntegrationAssignPendences from 'App/Models/IntegrationAssignPendences'
+import { JiraIssue } from 'App/Interfaces/Jira/jira-issue.interface'
+import { TaskStatus } from 'Contracts/enums'
 
 class JiraIntegrationService {
   private async _validateUserAssignPendences(user: User) {
@@ -138,27 +142,48 @@ class JiraIntegrationService {
    *
    * Handle Update Project
    */
-  private async _updateProjectTasks({ project, tasks }: UpdateProjectTaskProps) {
+
+  private _getTaskStatusFromJiraIssue(jiraStatus: string) {
+    const status = jiraStatus.toLowerCase()
+    if (status === 'closed' || status === 'done') {
+      return TaskStatus.CLOSED
+    }
+    return TaskStatus.IN_PROGRESS
+  }
+
+  private async _updateOrCreateTaskFromJiraIssue({
+    issue,
+    projectId,
+  }: UpdateOrCreateTaskFromJiraIssueProps) {
+    const searchPayload = { jiraId: issue.id }
+    const persistancePayload = {
+      name: issue.fields.summary,
+      projectId,
+      status: this._getTaskStatusFromJiraIssue(issue.fields.status.name),
+      jiraId: issue.id,
+      createdAt: issue.fields.created,
+      timeEstimated: issue.fields.timeestimate && issue.fields.timeestimate,
+    }
+    const taskPayload = await Task.updateOrCreate(searchPayload, persistancePayload)
+    return taskPayload
+  }
+
+  private async _updateProjectTasks({ project, issues }: UpdateProjectTaskProps) {
     await project.load('tasks')
     // Update or create found tasks.
-    tasks.forEach(async (task) => {
-      const searchPayload = { jiraId: task.id }
-      const persistancePayload = {
-        name: task.fields.summary,
+    issues.forEach(async (issue) => {
+      const taskPayload = await this._updateOrCreateTaskFromJiraIssue({
+        issue,
         projectId: project.id,
-        jiraId: task.id,
-        createdAt: task.fields.created,
-        timeEstimated: task.fields.timeestimate && task.fields.timeestimate,
-      }
-      const taskPayload = await Task.updateOrCreate(searchPayload, persistancePayload)
+      })
 
       // Assign user to task
-      if (task.fields.assignee) {
-        const userToAssign = await User.findBy('jiraId', task.fields.assignee.accountId)
+      if (issue.fields.assignee) {
+        const userToAssign = await User.findBy('jiraId', issue.fields.assignee.accountId)
         if (!userToAssign) {
           await IntegrationAssignPendences.create({
             taskId: taskPayload.id,
-            jiraId: task.fields.assignee.accountId,
+            jiraId: issue.fields.assignee.accountId,
           })
           return
         }
@@ -172,7 +197,7 @@ class JiraIntegrationService {
     // Check if existing tasks are still in Jira project, and if not, delete.
     project.tasks.forEach(async (existingTask) => {
       if (!existingTask.jiraId) return
-      if (!tasks.map((task) => task.id).includes(existingTask.jiraId)) {
+      if (!issues.map((issue) => issue.id).includes(existingTask.jiraId)) {
         await existingTask.delete()
       }
     })
@@ -186,20 +211,21 @@ class JiraIntegrationService {
 
     const cloudId = project.organization.jiraId
 
-    const tasks = await JiraApiService.getProjectIssues({
+    const issues = await JiraApiService.getProjectIssues({
       id: project.jiraId,
       cloudId,
       token: token,
     })
-    await this._updateProjectTasks({ project, tasks })
+    await this._updateProjectTasks({ project, issues })
   }
 
   /**
    *
    * Handle Import Project
    */
-  public async importProject({ payload, bouncer }: ImportJiraProjectRequest) {
-    const { projectId, jiraId } = payload
+
+  public async importProject({ id, payload, bouncer }: ImportJiraProjectRequest) {
+    const { jiraId } = payload
 
     const projectIsImported = await Project.findBy('jiraId', jiraId)
 
@@ -207,7 +233,7 @@ class JiraIntegrationService {
       throw new Exception('Project is already integrated with Jira', 409)
     }
 
-    let project = await Project.find(projectId)
+    let project = await Project.find(id)
 
     if (!project) {
       throw new Exception('Project not found', 404)
@@ -230,12 +256,68 @@ class JiraIntegrationService {
     project = await project.merge({ jiraId }).save()
 
     await JiraApiService.registerProjectWebhook({
-      id: project.id,
+      id: project.jiraId,
       cloudId: organization.jiraId,
       token,
     })
 
     await this.updateProject(project, token)
+  }
+
+  /**
+   *
+   * Handle Project Changes From Webhook
+   */
+
+  private async _updateTaskAssignmentsOnWebhook({
+    task,
+    issueAssignee,
+  }: AssignUserFromJiraToTaskProps) {
+    if (!issueAssignee) {
+      await task.related('usersAssigned').detach()
+      return
+    }
+
+    const { accountId } = issueAssignee
+
+    const user = await User.findBy('jiraId', accountId)
+
+    if (!user) {
+      return Logger.info('User to assign not found')
+    }
+
+    await task.load('usersAssigned')
+
+    if (task.usersAssigned.length) {
+      await task.related('usersAssigned').detach([task.usersAssigned[0].id])
+    }
+
+    await task.related('usersAssigned').attach([user.id])
+  }
+
+  public async createOrUpdateIssueByWebHook(issue: JiraIssue) {
+    const project = await Project.findBy('jiraId', issue.fields.project.id)
+
+    if (!project) {
+      return Logger.info('Project not found')
+    }
+
+    const taskPayload = await this._updateOrCreateTaskFromJiraIssue({
+      issue,
+      projectId: project.id,
+    })
+
+    await this._updateTaskAssignmentsOnWebhook({
+      task: taskPayload,
+      issueAssignee: issue.fields.assignee,
+    })
+  }
+
+  public async deleteIssueByWebhook(jiraId: string) {
+    const task = await Task.findBy('jiraId', jiraId)
+    if (task) {
+      await task.merge({ isDeleted: true }).save()
+    }
   }
 }
 

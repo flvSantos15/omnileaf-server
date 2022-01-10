@@ -15,8 +15,9 @@ export default class AppProvider {
 
   public async ready() {
     // App is ready
-    const scheduler = this.app.container.use('Adonis/Addons/Scheduler')
-    scheduler.run()
+    // Enable next lines to run scheduled tasks
+    // const scheduler = this.app.container.use('Adonis/Addons/Scheduler')
+    // scheduler.run()
     if (this.app.environment === 'web') {
       await import('../start/socket')
     }

@@ -25,6 +25,9 @@ export default class Project extends BaseModel {
   @column()
   public description?: string
 
+  @column()
+  public isDeleted: boolean
+
   @column({ columnName: 'creator_id' })
   public creatorId?: string
 

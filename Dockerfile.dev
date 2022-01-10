@@ -102,7 +102,7 @@ RUN yarn
 
 RUN yarn build \
     && yarn --cwd ./build install \
-    && cp .env ./build/.env
+    && cp .env.dev ./build/.env
 
 EXPOSE 3333
 

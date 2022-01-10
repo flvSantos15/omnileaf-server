@@ -15,6 +15,7 @@ import List from './List'
 import Screenshot from './Screenshot'
 import Tag from './Tag'
 import TrackingSession from './TrackingSession'
+import { TaskStatus } from 'Contracts/enums'
 
 export default class Task extends BaseModel {
   @column({ isPrimary: true })
@@ -37,6 +38,12 @@ export default class Task extends BaseModel {
 
   @column({ columnName: 'project_id' })
   public projectId: string
+
+  @column()
+  public status: TaskStatus
+
+  @column()
+  public isDeleted: boolean
 
   @column({ columnName: 'list_id' })
   public listId?: string

@@ -4,6 +4,11 @@ import ImportJiraUserValidator from 'App/Validators/JiraIntegration/ImportJiraUs
 import ImportJiraOrganizationValidator from 'App/Validators/JiraIntegration/ImportOrganizationValidator'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
+import {
+  JiraIssueWebhook,
+  JiraIssueWebhookEvent,
+} from 'App/Interfaces/Jira/jira-integration-service.interfaces'
+import ImportJiraProjectValidator from 'App/Validators/JiraIntegration/ImportProjectValidator'
 
 export default class JiraIntegrationsController {
   public async importUser({ request, response, auth, bouncer }: HttpContextContract) {
@@ -32,8 +37,39 @@ export default class JiraIntegrationsController {
     response.status(204)
   }
 
+  public async importProject({ request, response, bouncer }: HttpContextContract) {
+    const id = validateIdParam(request.param('id'))
+
+    const payload = await request.validate(ImportJiraProjectValidator)
+
+    await JiraIntegrationService.importProject({ id, payload, bouncer })
+
+    response.status(204)
+  }
+
   public async handleWebhook({ request, response }: HttpContextContract) {
-    console.log(request.body)
+    const { webhookEvent, issue } = request.only([
+      'webhookEvent',
+      'issue',
+    ]) as unknown as JiraIssueWebhook
+
+    console.log(webhookEvent)
+
+    console.log(issue)
+
+    switch (webhookEvent) {
+      case JiraIssueWebhookEvent.CREATED:
+        await JiraIntegrationService.createOrUpdateIssueByWebHook(issue)
+        break
+      case JiraIssueWebhookEvent.UPDATED:
+        await JiraIntegrationService.createOrUpdateIssueByWebHook(issue)
+        break
+      case JiraIssueWebhookEvent.DELETED:
+        await JiraIntegrationService.deleteIssueByWebhook(issue.id)
+        break
+      default:
+        Logger.info('Webhook event not recognized.')
+    }
 
     response.status(200)
   }

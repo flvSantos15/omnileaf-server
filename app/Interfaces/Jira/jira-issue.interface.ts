@@ -18,8 +18,12 @@ export interface JiraIssue {
     description: {
       content: content[]
     }
-
-    //TO-DO: insert task status, this is what defines which tasks will be showed for user to track
+    project: {
+      id: string
+    }
+    status: {
+      name: string
+    }
   }
 }
 interface content {

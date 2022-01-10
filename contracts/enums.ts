@@ -9,6 +9,11 @@ export enum TrackingSessionStatus {
   FINISHED = 'FINISHED',
 }
 
+export enum TaskStatus {
+  IN_PROGRESS,
+  CLOSED,
+}
+
 export enum OrganizationLabels {
   OWNER = 'A',
   ORGANIZATION_MANAGER = 'OM',

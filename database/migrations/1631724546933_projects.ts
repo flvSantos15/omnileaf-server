@@ -8,6 +8,7 @@ export default class Projects extends BaseSchema {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('name').notNullable()
       table.string('description')
+      table.boolean('is_deleted').defaultTo(false)
       table.uuid('creator_id').unsigned().references('id').inTable('users')
       table
         .uuid('organization_id')
