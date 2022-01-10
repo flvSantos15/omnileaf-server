@@ -7,7 +7,7 @@ stages:
 
 variables:
   TAG_LATEST_PROD: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
-  TAG_LATEST_DEV: $CI_REGISTRY_IMAGE/development
+  TAG_LATEST_DEV: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
 
 publish-dev:
   image: docker:latest
@@ -70,4 +70,4 @@ development:
   environment:
     name: development
   only:
-    - development
+    - develop
