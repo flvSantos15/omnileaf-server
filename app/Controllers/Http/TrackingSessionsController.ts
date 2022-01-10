@@ -1,16 +1,14 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { LogCreated, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
-import { LoadTrackingSessionRelations } from 'App/Helpers/RelationsLoaders/TrackingSessionLoaders'
-import TrackingSession from 'App/Models/TrackingSession'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
-import { ValidateCreateTrackingSession } from 'App/Validators/TrackingSession/CreateTrackingSessionValidator'
-import { TrackingSessionStatus } from 'Contracts/enums'
+import CreateTrackingSessionValidator from 'App/Validators/TrackingSession/CreateTrackingSessionValidator'
+import TrackingSessionService from 'App/Services/TrackingSession/TrackingSessionService'
+import Logger from '@ioc:Adonis/Core/Logger'
 
 export default class TrackingSessionsController {
   public async list({ response }: HttpContextContract) {
-    const trackingSessions = await TrackingSession.all()
+    const trackingSessions = await TrackingSessionService.getAll()
 
-    LogList(trackingSessions)
+    Logger.info('Succesfully retrieved Tracking Sessions list')
 
     response.send(trackingSessions)
   }
@@ -18,9 +16,9 @@ export default class TrackingSessionsController {
   public async show({ request, response }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const trackingSession = await LoadTrackingSessionRelations(id)
+    const trackingSession = await TrackingSessionService.getOne(id)
 
-    LogShow(trackingSession)
+    Logger.info('Succesfully retrieved Tracking Session')
 
     response.send(trackingSession)
   }
@@ -28,15 +26,11 @@ export default class TrackingSessionsController {
   public async create({ request, response, auth, bouncer }: HttpContextContract) {
     const user = auth.use('web').user!
 
-    const task = await ValidateCreateTrackingSession(request)
+    const payload = await request.validate(CreateTrackingSessionValidator)
 
-    //Authorize user assigned to project
-    await task.load('project')
-    await bouncer.authorize('AssignedToProject', task.project)
+    const trackingSession = await TrackingSessionService.register({ payload, user, bouncer })
 
-    const trackingSession = await TrackingSession.create({ taskId: task.id, userId: user.id })
-
-    LogCreated(trackingSession)
+    Logger.info('Succesfully created Tracking Session')
 
     response.status(201).send(trackingSession)
   }
@@ -44,13 +38,9 @@ export default class TrackingSessionsController {
   public async closeSession({ request, response, bouncer }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const trackingSession = await TrackingSession.findOrFail(id)
+    await TrackingSessionService.closeSession({ id, bouncer })
 
-    await bouncer.authorize('OwnUser', trackingSession.userId)
-
-    await trackingSession.merge({ status: TrackingSessionStatus.FINISHED }).save()
-
-    LogUpdated(trackingSession)
+    Logger.info('Succesfully closed Tracking Session')
 
     response.status(200)
   }
