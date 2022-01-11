@@ -1,6 +1,9 @@
 import Env from '@ioc:Adonis/Core/Env'
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
-import { GitlabApiRequest } from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
+import {
+  DeleteWebhookRequest,
+  GitlabApiRequest,
+} from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
 import { GitlabIssue } from 'App/Interfaces/Gitlab/gitlab-issue.interface'
 import { RefreshToken } from 'App/Interfaces/Gitlab/refresh-token.interface'
 import { Exception } from '@adonisjs/core/build/standalone'
@@ -70,17 +73,35 @@ class GitlabApiServce {
       url,
     }
 
-    const response = await this.client.post<GitlabWebhook>(endpoint, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    try {
+      const response = await this.client.post<GitlabWebhook>(endpoint, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-    if (response?.status !== 201) {
-      throw new Exception('Failed to register project Webhook', 400)
+      if (response?.status !== 201) {
+        throw new Exception('Failed to register project Webhook', 400)
+      }
+
+      return response.data
+    } catch (err) {
+      throw new Exception(`Failed to register webhook: ${err.message}`, 400)
     }
+  }
 
-    return response.data
+  public async deleteWebhook({ projectId, hookId, token }: DeleteWebhookRequest) {
+    const endpoint = `/projects/${projectId}/hooks/${hookId}`
+
+    try {
+      await this.client.delete(endpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    } catch (err) {
+      throw new Exception(`Failed to delete webhook: ${err.message}`, 400)
+    }
   }
 }
 

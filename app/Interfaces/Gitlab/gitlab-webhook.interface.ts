@@ -1,4 +1,6 @@
+import { DateTime } from 'luxon'
+
 export interface GitlabWebhook {
   id: number
-  created_at: Date
+  created_at: DateTime
 }

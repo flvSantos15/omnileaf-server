@@ -26,3 +26,9 @@ export interface RefreshProjectTasksRequest {
   project: Project
   issues: GitlabIssue[]
 }
+
+export interface DeleteWebhookRequest {
+  projectId: number
+  hookId: number
+  token: string
+}

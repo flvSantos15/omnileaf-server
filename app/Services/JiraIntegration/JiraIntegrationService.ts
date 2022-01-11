@@ -19,6 +19,7 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import IntegrationAssignPendences from 'App/Models/IntegrationAssignPendences'
 import { JiraIssue } from 'App/Interfaces/Jira/jira-issue.interface'
 import { TaskStatus } from 'Contracts/enums'
+import Webhook from 'App/Models/Webhook'
 
 class JiraIntegrationService {
   private async _validateUserAssignPendences(user: User) {
@@ -255,10 +256,15 @@ class JiraIntegrationService {
 
     project = await project.merge({ jiraId }).save()
 
-    await JiraApiService.registerProjectWebhook({
+    const webhook = await JiraApiService.registerProjectWebhook({
       id: project.jiraId,
       cloudId: organization.jiraId,
       token,
+    })
+
+    await Webhook.create({
+      projectId: project.id,
+      jiraId: webhook.webhookRegistrationResult[0].createdWebhookId,
     })
 
     await this.updateProject(project, token)
@@ -318,6 +324,22 @@ class JiraIntegrationService {
     if (task) {
       await task.merge({ isDeleted: true }).save()
     }
+  }
+
+  public async deleteProjectWebhooks(project: Project) {
+    await project.load('organization')
+
+    const token = await this._getOrgToken(project.organizationId)
+
+    const webhooks = await Webhook.query().where('projectId', project.id)
+
+    const webhookIds = webhooks.map((webhook) => webhook.jiraId)
+
+    const cloudId = project.organization.jiraId
+
+    await JiraApiService.deleteWebhook({ webhookIds, cloudId, token })
+
+    await Webhook.query().where('projectId', project.id).delete()
   }
 }
 

@@ -3,5 +3,5 @@ export interface WebhookCreatedView {
 }
 
 interface WebhookCreated {
-  createdWebhookId: number
+  createdWebhookId: string
 }

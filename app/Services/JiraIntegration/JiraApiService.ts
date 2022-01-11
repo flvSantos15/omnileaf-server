@@ -1,6 +1,9 @@
 import Env from '@ioc:Adonis/Core/Env'
 import { Exception } from '@adonisjs/core/build/standalone'
-import { JiraApiRequest } from 'App/Interfaces/Jira/jira-api-service.interfaces'
+import {
+  DeleteWebhookRequest,
+  JiraApiRequest,
+} from 'App/Interfaces/Jira/jira-api-service.interfaces'
 import { JiraIssue, JiraPaginatedIssues } from 'App/Interfaces/Jira/jira-issue.interface'
 import { JiraUser } from 'App/Interfaces/Jira/jira-user.interface'
 import { JiraTokenView } from 'App/Interfaces/Jira/jira-token.interface'
@@ -112,19 +115,38 @@ class JiraApiService {
       url,
     }
 
-    const response = await this.client.post<WebhookCreatedView>(endpoint, body, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    try {
+      const response = await this.client.post<WebhookCreatedView>(endpoint, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-    console.log(response.data.webhookRegistrationResult)
+      if (response?.status !== 200) {
+        throw new Exception('Failed to register project Webhook', 400)
+      }
 
-    if (response?.status !== 200) {
-      throw new Exception('Failed to register project Webhook', 400)
+      return response.data
+    } catch (err) {
+      throw new Exception(`Failed to register webhook: ${err.message}`, 400)
     }
+  }
 
-    return response.data
+  public async deleteWebhook({ webhookIds, cloudId, token }: DeleteWebhookRequest) {
+    const endpoint = `ex/jira/${cloudId}/rest/api/3/webhook`
+
+    const data = { webhookIds }
+
+    try {
+      await this.client.delete(endpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data,
+      })
+    } catch (err) {
+      throw new Exception(`Failed to delete webhook: ${err.message}`, 400)
+    }
   }
 }
 

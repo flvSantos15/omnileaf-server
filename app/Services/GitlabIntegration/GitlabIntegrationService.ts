@@ -22,6 +22,7 @@ import { TaskStatus } from 'Contracts/enums'
 import IntegrationAssignPendences from 'App/Models/IntegrationAssignPendences'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { GitlabIssue } from 'App/Interfaces/Gitlab/gitlab-issue.interface'
+import Webhook from 'App/Models/Webhook'
 
 class GitlabIntegrationService {
   /**
@@ -323,7 +324,13 @@ class GitlabIntegrationService {
 
     project = await project.merge({ gitlabId }).save()
 
-    await GitlabApiService.registerProjectWebhook({ id: gitlabId, token })
+    const webhook = await GitlabApiService.registerProjectWebhook({ id: gitlabId, token })
+
+    await Webhook.create({
+      projectId: project.id,
+      gitlabId: webhook.id,
+      createdAt: webhook.created_at,
+    })
 
     await this.updateProject(project, token)
   }
@@ -414,6 +421,20 @@ class GitlabIntegrationService {
       task: taskPayload,
       issueAssignee: { id: issue.assignee_id },
     })
+  }
+
+  public async deleteProjectWebhooks(project: Project) {
+    const token = await this._getOrgToken(project.organizationId)
+
+    const webhooks = await Webhook.query().where('projectId', project.id)
+
+    const webhookIds = webhooks.map((webhook) => webhook.gitlabId)
+
+    webhookIds.forEach(async (hookId) => {
+      await GitlabApiService.deleteWebhook({ hookId, projectId: project.gitlabId!, token })
+    })
+
+    await Webhook.query().where('projectId', project.id).delete()
   }
 }
 
