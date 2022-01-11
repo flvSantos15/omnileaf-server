@@ -79,7 +79,7 @@ class JiraIntegrationService {
       throw new Exception('User is not integrated with Jira', 400)
     }
 
-    await bouncer.authorize('OrganizationManager', organization)
+    await bouncer.authorize('OrganizationCreator', organization)
 
     await organization.merge({ jiraId: jiraSiteId }).save()
 
@@ -246,7 +246,7 @@ class JiraIntegrationService {
     await organization.load('jiraToken')
 
     if (!organization.jiraId || !organization.jiraToken) {
-      throw new Exception('Organization is not integrated with Gitlab.', 400)
+      throw new Exception('Organization is not integrated with Jira.', 400)
     }
 
     await bouncer.authorize('OrganizationManager', organization)
