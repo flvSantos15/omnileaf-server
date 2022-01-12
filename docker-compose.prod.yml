@@ -8,6 +8,8 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    restart: unless-stopped
+
 networks:
   default:
     external: true

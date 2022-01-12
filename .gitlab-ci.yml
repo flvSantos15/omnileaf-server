@@ -1,73 +1,51 @@
 stages:
-  - publish-prod
   - publish-dev
-  - production
-  - development
-  - test
+  - publish-prod
+  - deploy
 
 variables:
-  TAG_LATEST_PROD: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
-  TAG_LATEST_DEV: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  CONTAINER_NAME: backend_$CI_COMMIT_REF_NAME
 
 publish-dev:
-  image: docker:latest
-  stage: publish-prod
-  services:
-    - docker:dind
-  script:
-    - apk add --no-cache docker-compose
-    - docker-compose -f docker-compose.dev.yml build
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker push $TAG_LATEST_DEV
-  only:
-    - develop
-
-publish-prod:
   image: docker:latest
   stage: publish-dev
   services:
     - docker:dind
   script:
     - apk add --no-cache docker-compose
-    - docker-compose -f docker-compose.prod.yml build
+    - docker-compose -f docker-compose.dev.yml build
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker push $TAG_LATEST_PROD
-  only:
-    - main
-
-production:
-  image: alpine:latest
-  stage: production
-  tags:
-    - deployment
-  script:
-    - chmod og= $ID_RSA
-    - apt-get update && apt-get install -y openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $TAG_LATEST_PROD || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST_PROD"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v omnileaf_prod || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name omnileaf_prod --memory="2g" -p 3000:3333 -d $TAG_LATEST_PROD"
-  environment:
-    name: production
-  only:
-    - main
-
-development:
-  image: alpine:latest
-  stage: test
-  tags:
-    - deployment
-  script:
-    - chmod og= $ID_RSA
-    - apt-get update && apt-get install -y openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $TAG_LATEST_DEV || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST_DEV"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v omnileaf_dev || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name omnileaf_dev --memory="2g" -p 3333:3333 -d $TAG_LATEST_DEV"
-
-  environment:
-    name: development
+    - docker push $TAG_LATEST
   only:
     - develop
+
+publish-prod:
+  image: docker:latest
+  stage: publish-prod
+  services:
+    - docker:dind
+  script:
+    - apk add --no-cache docker-compose
+    - docker-compose -f docker-compose.prod.yml build
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker push $TAG_LATEST
+  only:
+    - main
+
+deploy:
+  image: alpine:latest
+  stage: deploy
+  tags:
+    - deployment
+  script:
+    - chmod og= $ID_RSA
+    - apt-get update && apt-get install -y openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $TAG_LATEST || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $CONTAINER_NAME || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name omnileaf_prod --memory="2g" --net backend-network -d $TAG_LATEST"
+  only:
+    - develop
+    - main
