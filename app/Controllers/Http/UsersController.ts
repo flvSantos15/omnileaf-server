@@ -18,7 +18,31 @@ export default class UsersController {
   public async show({ request, response }: HttpContextContract) {
     const id = validateIdParam(request.param('id'))
 
-    const user = await UserService.getOne({ id })
+    const user = await UserService.getOne({ id, params: request.qs() })
+
+    response.json(user)
+  }
+
+  public async showUserOrganizations({ request, response }: HttpContextContract) {
+    const id = validateIdParam(request.param('id'))
+
+    const user = await UserService.getUserOrganizations({ id, params: request.qs() })
+
+    response.json(user)
+  }
+
+  public async showUserProjects({ request, response }: HttpContextContract) {
+    const id = validateIdParam(request.param('id'))
+
+    const user = await UserService.getUserProjects({ id, params: request.qs() })
+
+    response.json(user)
+  }
+
+  public async showUserTasks({ request, response }: HttpContextContract) {
+    const id = validateIdParam(request.param('id'))
+
+    const user = await UserService.getUserTasks({ id, params: request.qs() })
 
     response.json(user)
   }

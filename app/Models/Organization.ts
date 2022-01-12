@@ -16,6 +16,7 @@ import Project from './Project'
 import Label from './Label'
 import GitlabToken from './GitlabToken'
 import JiraToken from './JiraToken'
+import OrganizationUser from './OrganizationUser'
 
 export default class Organization extends BaseModel {
   @column({ isPrimary: true })
@@ -74,4 +75,11 @@ export default class Organization extends BaseModel {
     foreignKey: 'organizationId',
   })
   public jiraToken: HasOne<typeof JiraToken>
+
+  @hasMany(() => OrganizationUser, {
+    foreignKey: 'organizationId',
+  })
+  public memberRelations: HasMany<typeof OrganizationUser>
+
+  public userLabels: string[]
 }

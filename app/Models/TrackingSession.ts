@@ -1,8 +1,17 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeUpdate, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  beforeUpdate,
+  BelongsTo,
+  belongsTo,
+  column,
+  HasMany,
+  hasMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
+import Screenshot from './Screenshot'
 
 export default class TrackingSession extends BaseModel {
   @column({ isPrimary: true })
@@ -39,6 +48,11 @@ export default class TrackingSession extends BaseModel {
     foreignKey: 'taskId',
   })
   public task: BelongsTo<typeof Task>
+
+  @hasMany(() => Screenshot, {
+    foreignKey: 'trackingSessionId',
+  })
+  public screenshots: HasMany<typeof Screenshot>
 
   //Hooks
   @beforeUpdate()

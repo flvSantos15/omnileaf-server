@@ -9,6 +9,7 @@ import {
   hasMany,
   ManyToMany,
   manyToMany,
+  ModelObject,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Board from './Board'

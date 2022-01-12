@@ -13,8 +13,9 @@ export interface RegisterUserResquest {
   }
 }
 
-export interface ShowUserRequest {
+export interface GetUserRequest {
   id: string
+  params: any
 }
 
 export interface UpdateUserRequest {

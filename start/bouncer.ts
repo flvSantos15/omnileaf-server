@@ -79,7 +79,7 @@ export const { actions } = Bouncer.define('OwnUser', (user: User, id: string) =>
 
     if (!userAssigned) return false
 
-    return userAssigned.serialize()['projectRole'] === ProjectRoles.MANAGER
+    return userAssigned.serialize()['role'] === ProjectRoles.MANAGER
   })
   .define('AssignedToProject', async (user: User, project: Project) => {
     await project.load('usersAssigned')
