@@ -101,10 +101,13 @@ class JiraApiService {
 
   public async registerProjectWebhook({ id, cloudId, token }: JiraApiRequest) {
     const endpoint = `ex/jira/${cloudId}/rest/api/3/webhook`
+
+    const urlRoute = '/jira/webhook/issue'
+
     const url =
       Env.get('NODE_ENV') === 'production'
-        ? 'https://backend.omnileaf.ml/jira/webhook/issue'
-        : 'https://webhook.omnileaf.ml/jira/webhook/issue'
+        ? Env.get('PROD_API_URL') + urlRoute
+        : Env.get('DEV_API_URL') + urlRoute
     const body = {
       webhooks: [
         {

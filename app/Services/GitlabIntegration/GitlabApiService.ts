@@ -62,11 +62,13 @@ class GitlabApiServce {
 
   public async registerProjectWebhook({ id, token }: GitlabApiRequest) {
     const endpoint = `projects/${id}/hooks`
-    //TO-DO: Change webhook to dev-backend url
+
+    const urlRoute = '/gitlab/webhook/issue'
+
     const url =
       Env.get('NODE_ENV') === 'production'
-        ? 'https://backend.omnileaf.ml/gitlab/webhook/issue'
-        : 'https://webhook.omnileaf.ml/gitlab/webhook/issue'
+        ? Env.get('PROD_API_URL') + urlRoute
+        : Env.get('DEV_API_URL') + urlRoute
     const body = {
       push_events: false,
       issues_events: true,
