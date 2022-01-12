@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeSave,
   BelongsTo,
   belongsTo,
   column,
@@ -14,6 +15,8 @@ import Board from './Board'
 import Task from './Task'
 import Tag from './Tag'
 import Organization from './Organization'
+import GitlabIntegrationService from 'App/Services/GitlabIntegration/GitlabIntegrationService'
+import JiraIntegrationService from 'App/Services/JiraIntegration/JiraIntegrationService'
 
 export default class Project extends BaseModel {
   @column({ isPrimary: true })
@@ -87,5 +90,19 @@ export default class Project extends BaseModel {
     return {
       role: this.$extras.pivot_role,
     }
+  }
+
+  @beforeSave()
+  public static async handleDeleteProject(project: Project) {
+    if (!project.$dirty.isDeleted) return
+    if (project.gitlabId) {
+      await GitlabIntegrationService.deleteProjectWebhooks(project)
+    }
+
+    if (project.jiraId) {
+      await JiraIntegrationService.deleteProjectWebhooks(project)
+    }
+
+    await Task.query().where('projectId', project.id).update({ isDeleted: true })
   }
 }

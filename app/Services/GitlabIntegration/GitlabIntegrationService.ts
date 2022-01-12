@@ -1,7 +1,7 @@
 import { Exception } from '@adonisjs/core/build/standalone'
 import {
   RefreshProjectTasksRequest,
-  UpdateTokenRequest,
+  RefreshTokenRequest,
   ValidateTokenRequest,
 } from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
 import GitlabToken from 'App/Models/GitlabToken'
@@ -26,9 +26,7 @@ import Webhook from 'App/Models/Webhook'
 
 class GitlabIntegrationService {
   /**
-   *
    * Get user Gitlab token
-   *
    */
   //TO-DO: Validates if getUserToken will be necessary
   public async _getUserToken(user?: User): Promise<string> {
@@ -48,7 +46,7 @@ class GitlabIntegrationService {
     })
 
     if (!tokenIsValid) {
-      const updatedToken = await this._updateToken({ existingToken: user.gitlabToken })
+      const updatedToken = await this._refreshToken({ existingToken: user.gitlabToken })
       return Encryption.decrypt(updatedToken.token)!
     }
 
@@ -56,9 +54,8 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Check if there is any assignments to do when user is integrated with Gitlab
-   *  if so, assign.
+   * if so, assign.
    */
   private async _validateUserAssignPendences(user: User) {
     const tasksToAssign = await IntegrationAssignPendences.query().where('gitlabId', user.gitlabId)
@@ -73,7 +70,6 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Integrate user with Gitlab
    */
   public async importUser({ payload, user, bouncer }: ImportUserRequest): Promise<void> {
@@ -99,7 +95,6 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Integrate Organization with Gitlab
    */
   public async importOrganization({
@@ -130,9 +125,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Check if token is not expired
-   *
    */
   private _tokenIsValid({ expiresIn, createdAt }: ValidateTokenRequest) {
     const expirationTime = (createdAt + expiresIn) * 1000
@@ -142,11 +135,9 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
-   * Update token
-   *
+   * Refresh token
    */
-  private async _updateToken({ existingToken }: UpdateTokenRequest) {
+  private async _refreshToken({ existingToken }: RefreshTokenRequest) {
     const token = await GitlabApiService.refreshToken(
       Encryption.decrypt(existingToken.refreshToken)!
     )
@@ -164,11 +155,9 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
-   * Load valid Organization token
-   *
+   * Get valid Organization token
    */
-  private async _getOrgToken(organizationId: string): Promise<string> {
+  private async _getOrganizationToken(organizationId: string): Promise<string> {
     const organization = await Organization.find(organizationId)
 
     if (!organization) {
@@ -187,17 +176,15 @@ class GitlabIntegrationService {
     })
 
     if (!tokenIsValid) {
-      const updatedToken = await this._updateToken({ existingToken: organization.gitlabToken })
-      return Encryption.decrypt(updatedToken.token)!
+      const refreshedToken = await this._refreshToken({ existingToken: organization.gitlabToken })
+      return Encryption.decrypt(refreshedToken.token)!
     }
 
     return Encryption.decrypt(organization.gitlabToken.token)!
   }
 
   /**
-   *
    * Return task status given an Gitlab issue status
-   *
    */
   private _getTaskStatusFromGitlabIssue(gitlabStatus: string): TaskStatus {
     const status = gitlabStatus.toLowerCase()
@@ -208,9 +195,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Parse Gitlab issue to Task
-   *
    */
   private async _parseGitlabIssueToTask(
     issue: GitlabIssue,
@@ -227,9 +212,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Update or Create task given a Gitab Issue
-   *
    */
   private async _updateOrCreateTaskFromGitlabIssue(issue: GitlabIssue, projectId: string) {
     const searchPayload = { gitlabId: issue.id }
@@ -239,7 +222,6 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Update project tasks given a list of all project Gitlab issues
    */
   private async _updateProjectTasks({ project, issues }: RefreshProjectTasksRequest) {
@@ -276,9 +258,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Update project with it's Gitlab data
-   *
    */
   public async updateProject(project: Project, token: string): Promise<void> {
     if (!project) return
@@ -290,7 +270,6 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Integrate project
    */
   public async importProject({ id, payload, bouncer }: ImportProjectRequest): Promise<void> {
@@ -320,7 +299,7 @@ class GitlabIntegrationService {
 
     await bouncer.authorize('OrganizationManager', organization)
 
-    const token = await this._getOrgToken(project.organizationId)
+    const token = await this._getOrganizationToken(project.organizationId)
 
     project = await project.merge({ gitlabId }).save()
 
@@ -336,7 +315,6 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Update task assignments on webhook
    */
   private async _updateTaskAssignmentsOnWebhook({
@@ -366,9 +344,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Parse Gitlab issue from webhook to Task
-   *
    */
   private async _parseGitlabIssueFromWebhookToTask(
     issue: GitlabIssueFromWebhook,
@@ -389,9 +365,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Update or Create task given a Gitlab Issue from Webhook
-   *
    */
   private async _updateOrCreateTaskFromGitlabIssueOnWebhook(
     issue: GitlabIssueFromWebhook,
@@ -404,9 +378,7 @@ class GitlabIntegrationService {
   }
 
   /**
-   *
    * Create or update task by webhook
-   *
    */
   public async createOrUpdateIssueByWebHook(issue: GitlabIssueFromWebhook) {
     const project = await Project.findBy('gitlabId', issue.project_id)
@@ -423,8 +395,11 @@ class GitlabIntegrationService {
     })
   }
 
+  /**
+   * Delete project webhooks
+   */
   public async deleteProjectWebhooks(project: Project) {
-    const token = await this._getOrgToken(project.organizationId)
+    const token = await this._getOrganizationToken(project.organizationId)
 
     const webhooks = await Webhook.query().where('projectId', project.id)
 

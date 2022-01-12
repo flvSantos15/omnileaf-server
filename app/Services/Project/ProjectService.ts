@@ -8,11 +8,8 @@ import {
 } from 'App/Interfaces/Project/project-service.interfaces'
 import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
-import Task from 'App/Models/Task'
 import User from 'App/Models/User'
 import { ProjectRoles } from 'Contracts/enums'
-import GitlabIntegrationService from '../GitlabIntegration/GitlabIntegrationService'
-import JiraIntegrationService from '../JiraIntegration/JiraIntegrationService'
 
 class ProjectService {
   public async getAll(): Promise<Project[]> {
@@ -71,16 +68,6 @@ class ProjectService {
     }
 
     await bouncer.authorize('ProjectManager', project)
-
-    if (project.gitlabId) {
-      await GitlabIntegrationService.deleteProjectWebhooks(project)
-    }
-
-    if (project.jiraId) {
-      await JiraIntegrationService.deleteProjectWebhooks(project)
-    }
-
-    await Task.query().where('projectId', project.id).update({ isDeleted: true })
 
     await project.merge({ isDeleted: true }).save()
   }

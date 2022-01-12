@@ -8,7 +8,7 @@ export interface GitlabApiRequest {
   token?: string
 }
 
-export interface UpdateTokenRequest {
+export interface RefreshTokenRequest {
   existingToken: GitlabToken
 }
 
