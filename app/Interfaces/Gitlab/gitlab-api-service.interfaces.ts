@@ -1,6 +1,6 @@
 import GitlabToken from 'App/Models/GitlabToken'
 import Project from 'App/Models/Project'
-import { GitlabTask } from './gitlab-task.interface'
+import { GitlabIssue } from './gitlab-issue.interface'
 import { GitlabUser } from './gitlab-user.interface'
 
 export interface GitlabApiRequest {
@@ -8,7 +8,7 @@ export interface GitlabApiRequest {
   token?: string
 }
 
-export interface UpdateTokenRequest {
+export interface RefreshTokenRequest {
   existingToken: GitlabToken
 }
 
@@ -24,5 +24,11 @@ export interface RefreshProjectUsersRequest {
 
 export interface RefreshProjectTasksRequest {
   project: Project
-  tasks: GitlabTask[]
+  issues: GitlabIssue[]
+}
+
+export interface DeleteWebhookRequest {
+  projectId: number
+  hookId: number
+  token: string
 }

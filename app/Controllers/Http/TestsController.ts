@@ -1,12 +1,11 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import GitlabApiService from 'App/Services/GitlabIntegration/GitlabApiService'
 
 export default class TestsController {
-  public async test({ response }: HttpContextContract) {
-    // const payload = request.only(['projectId', 'jiraId'])
+  public async test({ request, response }: HttpContextContract) {
+    const { id, token } = request.only(['id', 'token'])
 
-    // await JiraIntegrationService.importProject({ payload, bouncer })
-
-    // const { id, cloudId, token } = request.only(['id', 'cloudId', 'token'])
+    await GitlabApiService.registerProjectWebhook({ id, token })
 
     // const data = await JiraApiService._getProjectRolesLinks({ id, cloudId, token })
 

@@ -117,7 +117,7 @@ export default class User extends BaseModel {
   public organizations: ManyToMany<typeof Organization>
 
   @hasOne(() => GitlabToken, {
-    foreignKey: 'owner_id',
+    foreignKey: 'ownerId',
   })
   public gitlabToken: HasOne<typeof GitlabToken>
 

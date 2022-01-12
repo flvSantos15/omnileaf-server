@@ -69,7 +69,7 @@ class ProjectService {
 
     await bouncer.authorize('ProjectManager', project)
 
-    await project.delete()
+    await project.merge({ isDeleted: true }).save()
   }
 
   public async addParticipant({ id, payload, bouncer }: AddParticipantRequest): Promise<void> {

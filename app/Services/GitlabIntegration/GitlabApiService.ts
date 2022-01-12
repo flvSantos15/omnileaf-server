@@ -1,68 +1,38 @@
 import Env from '@ioc:Adonis/Core/Env'
-import axios, { AxiosInstance } from 'axios'
-import { GitlabApiRequest } from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
-import { GitlabTask } from 'App/Interfaces/Gitlab/gitlab-task.interface'
-import { GitlabUser } from 'App/Interfaces/Gitlab/gitlab-user.interface'
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios'
+import {
+  DeleteWebhookRequest,
+  GitlabApiRequest,
+} from 'App/Interfaces/Gitlab/gitlab-api-service.interfaces'
+import { GitlabIssue } from 'App/Interfaces/Gitlab/gitlab-issue.interface'
 import { RefreshToken } from 'App/Interfaces/Gitlab/refresh-token.interface'
-import { GitlabProject } from 'App/Interfaces/Gitlab/gitlab-project.interface'
-import { GitlabOrganization } from 'App/Interfaces/Gitlab/gitlab-organization.interface'
+import { Exception } from '@adonisjs/core/build/standalone'
+import { GitlabWebhook } from 'App/Interfaces/Gitlab/gitlab-webhook.interface'
 
 class GitlabApiServce {
   protected client: AxiosInstance
 
   constructor() {
     this.client = axios.create({ baseURL: 'https://gitlab.com/api/v4' })
+    this.addInterceptors(this.client)
   }
 
-  public async getProjectUsers({ id, token }: GitlabApiRequest): Promise<GitlabUser[]> {
-    const { data } = await this.client({
-      method: 'GET',
-      url: `/projects/${id}/members`,
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    return data
-  }
+  private addInterceptors(client: AxiosInstance) {
+    function onReponse(response: AxiosResponse) {
+      return response
+    }
 
-  public async getProjectTasks({ id, token }: GitlabApiRequest): Promise<GitlabTask[]> {
-    const { data } = await this.client({
-      method: 'GET',
-      url: `/projects/${id}/issues`,
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    return data
-  }
+    function onReponseError(error: AxiosError) {
+      console.log(error.response)
+      if (error.response?.status === 401) {
+        throw new Exception(
+          'Gitlab integration token is not valid anymore. Try to integrate again',
+          400
+        )
+      }
+    }
 
-  public async getUserOrganizations({ token }: GitlabApiRequest): Promise<GitlabOrganization[]> {
-    const { data } = await this.client({
-      method: 'GET',
-      url: `/groups`,
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    return data
-  }
-
-  public async getUserProjects({ token }: GitlabApiRequest): Promise<GitlabProject[]> {
-    const { data } = await this.client({
-      method: 'GET',
-      url: `/projects`,
-      headers: { Authorization: `Bearer ${token}` },
-      params: {
-        membership: true,
-      },
-    })
-    return data
-  }
-
-  public async getUserTasks({ token }: GitlabApiRequest): Promise<GitlabTask[]> {
-    const { data } = await this.client({
-      method: 'GET',
-      url: `/projects`,
-      headers: { Authorization: `Bearer ${token}` },
-      params: {
-        membership: true,
-      },
-    })
-    return data
+    client.interceptors.response.use(onReponse, onReponseError)
   }
 
   public async refreshToken(refreshToken: string): Promise<RefreshToken> {
@@ -79,6 +49,61 @@ class GitlabApiServce {
       },
     })
     return data
+  }
+
+  public async getProjectIssues({ id, token }: GitlabApiRequest): Promise<GitlabIssue[]> {
+    const { data } = await this.client({
+      method: 'GET',
+      url: `/projects/${id}/issues`,
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    return data
+  }
+
+  public async registerProjectWebhook({ id, token }: GitlabApiRequest) {
+    const endpoint = `projects/${id}/hooks`
+
+    const urlRoute = '/gitlab/webhook/issue'
+
+    const url =
+      Env.get('NODE_ENV') === 'production'
+        ? Env.get('PROD_API_URL') + urlRoute
+        : Env.get('DEV_API_URL') + urlRoute
+    const body = {
+      push_events: false,
+      issues_events: true,
+      url,
+    }
+
+    try {
+      const response = await this.client.post<GitlabWebhook>(endpoint, body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response?.status !== 201) {
+        throw new Exception('Failed to register project Webhook', 400)
+      }
+
+      return response.data
+    } catch (err) {
+      throw new Exception(`Failed to register webhook: ${err.message}`, 400)
+    }
+  }
+
+  public async deleteWebhook({ projectId, hookId, token }: DeleteWebhookRequest) {
+    const endpoint = `/projects/${projectId}/hooks/${hookId}`
+
+    try {
+      await this.client.delete(endpoint, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    } catch (err) {
+      throw new Exception(`Failed to delete webhook: ${err.message}`, 400)
+    }
   }
 }
 

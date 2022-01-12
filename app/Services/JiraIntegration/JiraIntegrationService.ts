@@ -19,8 +19,13 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import IntegrationAssignPendences from 'App/Models/IntegrationAssignPendences'
 import { JiraIssue } from 'App/Interfaces/Jira/jira-issue.interface'
 import { TaskStatus } from 'Contracts/enums'
+import Webhook from 'App/Models/Webhook'
 
 class JiraIntegrationService {
+  /**
+   * Check if there is any assignments to do when user is integrated with Jira
+   * if so, assign.
+   */
   private async _validateUserAssignPendences(user: User) {
     const tasksToAssign = await IntegrationAssignPendences.query().where('jiraId', user.jiraId)
 
@@ -33,6 +38,9 @@ class JiraIntegrationService {
     await IntegrationAssignPendences.query().where('jiraId', user.jiraId).delete()
   }
 
+  /**
+   * Integrate user with Gitlab
+   */
   public async importUser({ payload, user, bouncer }: ImportJiraUserRequest) {
     const { token } = payload
 
@@ -64,6 +72,9 @@ class JiraIntegrationService {
     await this._validateUserAssignPendences(user)
   }
 
+  /**
+   * Integrate Organization with Gitlab
+   */
   public async importOrganization({ id, payload, user, bouncer }: ImportJiraOrganizationRequest) {
     const { jiraSiteId } = payload
 
@@ -79,13 +90,16 @@ class JiraIntegrationService {
       throw new Exception('User is not integrated with Jira', 400)
     }
 
-    await bouncer.authorize('OrganizationManager', organization)
+    await bouncer.authorize('OrganizationCreator', organization)
 
     await organization.merge({ jiraId: jiraSiteId }).save()
 
     await user.jiraToken.merge({ organizationId: organization.id }).save()
   }
 
+  /**
+   * Check if token is not expired
+   */
   private _tokenIsValid({ expiresIn, createdAt }: ValidateTokenProps) {
     const fiveMinutesBeforeExpires = expiresIn - 60 * 5
     const fiveMinuteBeforeExpiresInSec = createdAt + fiveMinutesBeforeExpires
@@ -94,7 +108,10 @@ class JiraIntegrationService {
     return currentTimeInSeconds < fiveMinuteBeforeExpiresInSec
   }
 
-  private async _updateToken(token: JiraToken) {
+  /**
+   * Refresh token
+   */
+  private async _refreshToken(token: JiraToken) {
     const newToken = await JiraApiService.refreshToken(
       Encryption.decrypt(token.refreshToken) as string
     )
@@ -111,7 +128,10 @@ class JiraIntegrationService {
     return token
   }
 
-  private async _getOrgToken(organizationId: string): Promise<string> {
+  /**
+   * Get valid Organization token
+   */
+  private async _getOrganizationToken(organizationId: string): Promise<string> {
     const organization = await Organization.find(organizationId)
 
     if (!organization) {
@@ -133,16 +153,14 @@ class JiraIntegrationService {
       return Encryption.decrypt(organization.jiraToken.token) as string
     }
 
-    const updatedToken = await this._updateToken(organization.jiraToken)
+    const refreshedToken = await this._refreshToken(organization.jiraToken)
     Logger.info('Organization token succesfully refreshed')
-    return Encryption.decrypt(updatedToken.token) as string
+    return Encryption.decrypt(refreshedToken.token) as string
   }
 
   /**
-   *
-   * Handle Update Project
+   * Return task status given an Gitlab issue status
    */
-
   private _getTaskStatusFromJiraIssue(jiraStatus: string) {
     const status = jiraStatus.toLowerCase()
     if (status === 'closed' || status === 'done') {
@@ -151,6 +169,9 @@ class JiraIntegrationService {
     return TaskStatus.IN_PROGRESS
   }
 
+  /**
+   * Update or Create task given a Gitab Issue
+   */
   private async _updateOrCreateTaskFromJiraIssue({
     issue,
     projectId,
@@ -168,6 +189,9 @@ class JiraIntegrationService {
     return taskPayload
   }
 
+  /**
+   * Update or Create task given a Gitab Issue
+   */
   private async _updateProjectTasks({ project, issues }: UpdateProjectTaskProps) {
     await project.load('tasks')
     // Update or create found tasks.
@@ -203,6 +227,9 @@ class JiraIntegrationService {
     })
   }
 
+  /**
+   * Update project with it's Gitlab data
+   */
   public async updateProject(project: Project, token: string): Promise<void> {
     if (!project) return
     if (!project.jiraId) return
@@ -220,10 +247,8 @@ class JiraIntegrationService {
   }
 
   /**
-   *
-   * Handle Import Project
+   * Integrate project with Jira
    */
-
   public async importProject({ id, payload, bouncer }: ImportJiraProjectRequest) {
     const { jiraId } = payload
 
@@ -246,29 +271,32 @@ class JiraIntegrationService {
     await organization.load('jiraToken')
 
     if (!organization.jiraId || !organization.jiraToken) {
-      throw new Exception('Organization is not integrated with Gitlab.', 400)
+      throw new Exception('Organization is not integrated with Jira.', 400)
     }
 
     await bouncer.authorize('OrganizationManager', organization)
 
-    const token = await this._getOrgToken(project.organizationId)
+    const token = await this._getOrganizationToken(project.organizationId)
 
     project = await project.merge({ jiraId }).save()
 
-    await JiraApiService.registerProjectWebhook({
+    const webhook = await JiraApiService.registerProjectWebhook({
       id: project.jiraId,
       cloudId: organization.jiraId,
       token,
+    })
+
+    await Webhook.create({
+      projectId: project.id,
+      jiraId: webhook.webhookRegistrationResult[0].createdWebhookId,
     })
 
     await this.updateProject(project, token)
   }
 
   /**
-   *
-   * Handle Project Changes From Webhook
+   * Update task assignments on webhook
    */
-
   private async _updateTaskAssignmentsOnWebhook({
     task,
     issueAssignee,
@@ -295,6 +323,9 @@ class JiraIntegrationService {
     await task.related('usersAssigned').attach([user.id])
   }
 
+  /**
+   * Create or update task by webhook
+   */
   public async createOrUpdateIssueByWebHook(issue: JiraIssue) {
     const project = await Project.findBy('jiraId', issue.fields.project.id)
 
@@ -313,11 +344,33 @@ class JiraIntegrationService {
     })
   }
 
+  /**
+   * Delete issue by webhook
+   */
   public async deleteIssueByWebhook(jiraId: string) {
     const task = await Task.findBy('jiraId', jiraId)
     if (task) {
       await task.merge({ isDeleted: true }).save()
     }
+  }
+
+  /**
+   * Delete project webhooks
+   */
+  public async deleteProjectWebhooks(project: Project) {
+    await project.load('organization')
+
+    const token = await this._getOrganizationToken(project.organizationId)
+
+    const webhooks = await Webhook.query().where('projectId', project.id)
+
+    const webhookIds = webhooks.map((webhook) => webhook.jiraId)
+
+    const cloudId = project.organization.jiraId
+
+    await JiraApiService.deleteWebhook({ webhookIds, cloudId, token })
+
+    await Webhook.query().where('projectId', project.id).delete()
   }
 }
 

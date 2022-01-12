@@ -15,3 +15,9 @@ export interface GetUsersFromGroupRequest {
   cloudId?: string
   token?: string
 }
+
+export interface DeleteWebhookRequest {
+  webhookIds: string[]
+  cloudId?: string
+  token?: string
+}

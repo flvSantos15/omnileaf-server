@@ -53,10 +53,6 @@ export default class JiraIntegrationsController {
       'issue',
     ]) as unknown as JiraIssueWebhook
 
-    console.log(webhookEvent)
-
-    console.log(issue)
-
     switch (webhookEvent) {
       case JiraIssueWebhookEvent.CREATED:
         await JiraIntegrationService.createOrUpdateIssueByWebHook(issue)
