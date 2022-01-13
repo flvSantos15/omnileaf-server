@@ -7,7 +7,11 @@ class AuthService {
   public async login({ payload, auth }: LoginRequest): Promise<void> {
     const { email, password } = payload
 
-    const user = await User.findByOrFail('email', email)
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      throw new Exception('Email not found', 404)
+    }
 
     if (user && !(await Hash.verify(user.password, password))) {
       throw new Exception("Credentials doesn't match", 403)
