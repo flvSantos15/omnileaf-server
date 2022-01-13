@@ -44,9 +44,6 @@ export default class Task extends BaseModel {
   @column()
   public isDeleted: boolean
 
-  @column({ columnName: 'list_id' })
-  public listId?: string
-
   @column({ columnName: 'gitlab_id' })
   public gitlabId?: number
 

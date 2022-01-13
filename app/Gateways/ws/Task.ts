@@ -1,4 +1,3 @@
-import List from 'App/Models/List'
 import Task from 'App/Models/Task'
 import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import { Socket } from 'socket.io'
@@ -20,18 +19,12 @@ export const registerTaskHandlers = (
       validateIdParam(taskId)
       validateIdParam(listId)
       //Verify if list exists
-      const list = await List.find(listId)
-      if (!list) {
-        socket.emit('task:updateListError', { message: 'List not found.' })
-        return
-      }
+
       const task = await Task.find(taskId)
       if (!task) {
         socket.emit('task:updateListError', { message: 'Task not found.' })
         return
       }
-
-      await task.merge({ listId }).save()
     } catch {
       socket.emit('task:updateListError', { message: 'Failed to Update Task List' })
     }
