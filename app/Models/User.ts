@@ -13,8 +13,6 @@ import {
 import { UserRoles } from 'Contracts/enums'
 import TrackingSession from './TrackingSession'
 import Project from './Project'
-import Board from './Board'
-import List from './List'
 import Task from './Task'
 import Screenshot from './Screenshot'
 import Organization from './Organization'
@@ -81,16 +79,6 @@ export default class User extends BaseModel {
     pivotColumns: ['role'],
   })
   public assignedProjects: ManyToMany<typeof Project>
-
-  @hasMany(() => Board, {
-    foreignKey: 'creator_id',
-  })
-  public ownedBoards: HasMany<typeof Board>
-
-  @hasMany(() => List, {
-    foreignKey: 'creator_id',
-  })
-  public ownedLists: HasMany<typeof List>
 
   @hasMany(() => Task, {
     foreignKey: 'creatorId',

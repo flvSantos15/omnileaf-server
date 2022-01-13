@@ -5,7 +5,6 @@ import {
   RegisterTaskRequest,
   UpdateTaskRequest,
 } from 'App/Interfaces/Task/task-service.interfaces'
-import List from 'App/Models/List'
 import Project from 'App/Models/Project'
 import Task from 'App/Models/Task'
 import { UnsignUserRequest } from '../../Interfaces/Task/task-service.interfaces'
@@ -41,13 +40,6 @@ class TaskService {
       throw new Exception('Project not found', 404)
     }
 
-    if (payload.listId) {
-      const list = await List.find(payload.listId)
-      if (!list) {
-        throw new Exception('List not found.', 404)
-      }
-    }
-
     await bouncer.authorize('ProjectManager', project)
 
     const task = await Task.create({ ...payload, creatorId: user.id })
@@ -56,13 +48,6 @@ class TaskService {
   }
 
   public async update({ id, payload, bouncer }: UpdateTaskRequest) {
-    if (payload.listId) {
-      const list = await List.find(payload.listId)
-      if (!list) {
-        throw new Exception('List not found.', 404)
-      }
-    }
-
     const task = await Task.find(id)
 
     if (!task) {
