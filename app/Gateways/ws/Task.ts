@@ -1,5 +1,5 @@
 import Task from 'App/Models/Task'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 import { Socket } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
@@ -16,8 +16,8 @@ export const registerTaskHandlers = (
     const { taskId, listId } = payload
 
     try {
-      validateIdParam(taskId)
-      validateIdParam(listId)
+      UuidValidator.v4(taskId)
+      UuidValidator.v4(listId)
       //Verify if list exists
 
       const task = await Task.find(taskId)

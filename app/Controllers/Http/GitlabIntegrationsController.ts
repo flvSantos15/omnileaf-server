@@ -1,10 +1,10 @@
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { GitlabIssueWebhook } from 'App/Interfaces/Gitlab/gitlab-integration-service.interfaces'
 import ImportGitlabOrganizationValidator from 'App/Validators/GitlabIntegration/ImportGitlabOrganizationValidator'
 import ImportGitlabProjectValidator from 'App/Validators/GitlabIntegration/ImportGitlabProjectValidator'
 import ImportGitlabUserValidator from 'App/Validators/GitlabIntegration/ImportGitlabUserValidator'
 import GitlabIntegrationService from 'App/Services/GitlabIntegration/GitlabIntegrationService'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class GitlabIntegrationsController {
   public async importUser({ request, response, auth, bouncer, logger }: HttpContextContract) {
@@ -26,7 +26,7 @@ export default class GitlabIntegrationsController {
     bouncer,
     logger,
   }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(ImportGitlabOrganizationValidator)
 
@@ -40,7 +40,7 @@ export default class GitlabIntegrationsController {
   }
 
   public async importProject({ request, response, bouncer, logger }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(ImportGitlabProjectValidator)
 

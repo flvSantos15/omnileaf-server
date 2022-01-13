@@ -1,11 +1,11 @@
 import Logger from '@ioc:Adonis/Core/Logger'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import CreateOrganizationValidator from 'App/Validators/Organization/CreateOrganizationValidator'
 import UpdateOrganizationValidator from 'App/Validators/Organization/UpdateOrganizationValidator'
 import AddOrganizationMemberValidator from 'App/Validators/Organization/AddOrganizationMemberValidator'
 import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 import OrganizationService from 'App/Services/Organization/OrganizationService'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class OrganizationsController {
   public async list({ response }: HttpContextContract) {
@@ -17,7 +17,7 @@ export default class OrganizationsController {
   }
 
   public async show({ request, response }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const organization = await OrganizationService.getOne(id)
 
@@ -39,7 +39,7 @@ export default class OrganizationsController {
   }
 
   public async update({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(UpdateOrganizationValidator)
 
@@ -51,7 +51,7 @@ export default class OrganizationsController {
   }
 
   public async delete({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     await OrganizationService.delete({ id, bouncer })
 
@@ -61,7 +61,7 @@ export default class OrganizationsController {
   }
 
   public async addMember({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(AddOrganizationMemberValidator)
 
@@ -73,7 +73,7 @@ export default class OrganizationsController {
   }
 
   public async removeMember({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(RemoveOrganizationMemberValidator)
 

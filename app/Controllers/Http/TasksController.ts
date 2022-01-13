@@ -1,11 +1,11 @@
 import TaskService from 'App/Services/Task/TaskService'
 import Logger from '@ioc:Adonis/Core/Logger'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import AssignUserToTaskValidator from 'App/Validators/Task/AssignUserValidator'
 import CreateTaskValidator from 'App/Validators/Task/CreateTaskValidator'
 import UnssignUserToTaskValidator from 'App/Validators/Task/UnssignUserValidator'
 import UpdateTaskValidator from 'App/Validators/Task/UpdateTaskValidator'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class TasksController {
   public async list({ response }: HttpContextContract) {
@@ -17,7 +17,7 @@ export default class TasksController {
   }
 
   public async show({ request, response }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const task = await TaskService.getOne(id)
 
@@ -38,7 +38,7 @@ export default class TasksController {
   }
 
   public async update({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(UpdateTaskValidator)
 
@@ -50,7 +50,7 @@ export default class TasksController {
   }
 
   public async delete({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     await TaskService.delete({ id, bouncer })
 
@@ -60,7 +60,7 @@ export default class TasksController {
   }
 
   public async assignUser({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(AssignUserToTaskValidator)
 
@@ -72,7 +72,7 @@ export default class TasksController {
   }
 
   public async unssignUser({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(UnssignUserToTaskValidator)
 

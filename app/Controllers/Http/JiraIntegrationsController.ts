@@ -3,12 +3,12 @@ import JiraIntegrationService from 'App/Services/JiraIntegration/JiraIntegration
 import ImportJiraUserValidator from 'App/Validators/JiraIntegration/ImportJiraUserValidator'
 import ImportJiraOrganizationValidator from 'App/Validators/JiraIntegration/ImportOrganizationValidator'
 import Logger from '@ioc:Adonis/Core/Logger'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import {
   JiraIssueWebhook,
   JiraIssueWebhookEvent,
 } from 'App/Interfaces/Jira/jira-integration-service.interfaces'
 import ImportJiraProjectValidator from 'App/Validators/JiraIntegration/ImportProjectValidator'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class JiraIntegrationsController {
   public async importUser({ request, response, auth, bouncer }: HttpContextContract) {
@@ -24,7 +24,7 @@ export default class JiraIntegrationsController {
   }
 
   public async importOrganization({ request, response, auth, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(ImportJiraOrganizationValidator)
 
@@ -38,7 +38,7 @@ export default class JiraIntegrationsController {
   }
 
   public async importProject({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(ImportJiraProjectValidator)
 

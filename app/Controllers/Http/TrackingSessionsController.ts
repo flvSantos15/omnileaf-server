@@ -1,8 +1,8 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import CreateTrackingSessionValidator from 'App/Validators/TrackingSession/CreateTrackingSessionValidator'
 import TrackingSessionService from 'App/Services/TrackingSession/TrackingSessionService'
 import Logger from '@ioc:Adonis/Core/Logger'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class TrackingSessionsController {
   public async list({ response }: HttpContextContract) {
@@ -14,7 +14,7 @@ export default class TrackingSessionsController {
   }
 
   public async show({ request, response }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const trackingSession = await TrackingSessionService.getOne(id)
 
@@ -36,7 +36,7 @@ export default class TrackingSessionsController {
   }
 
   public async closeSession({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     await TrackingSessionService.closeSession({ id, bouncer })
 

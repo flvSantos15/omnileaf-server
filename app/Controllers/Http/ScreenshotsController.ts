@@ -4,9 +4,9 @@ import Application from '@ioc:Adonis/Core/Application'
 import ScreenshotService from 'App/Services/Screenshot/ScreenshotService'
 import CreateScreenshotValidator from 'App/Validators/Screenshots/CreateScreenshotValidator'
 import UploadScreenshotValidator from 'App/Validators/Screenshots/UploadScreenshotValidator'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import Screenshot from 'App/Models/Screenshot'
 import path from 'path'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class ScreenshotsController {
   constructor() {}
@@ -45,7 +45,7 @@ export default class ScreenshotsController {
   }
 
   public async delete({ request, response, bouncer, logger }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const screenshot = await Screenshot.find(id)
 

@@ -1,11 +1,11 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
 import CreateProjectValidator from 'App/Validators/Project/CreateProjectValidator'
 import UpdateProjectValidator from 'App/Validators/Project/UpdateProjectValidator'
 import AddParticipantValidator from 'App/Validators/Project/AddParticipantValidator'
 import RemoveParticipantValidator from 'App/Validators/Project/RemoveParticipantValidator'
 import ProjectService from 'App/Services/Project/ProjectService'
 import Logger from '@ioc:Adonis/Core/Logger'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class ProjectsController {
   public async list({ response }: HttpContextContract) {
@@ -17,7 +17,7 @@ export default class ProjectsController {
   }
 
   public async show({ request, response }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const project = await ProjectService.getOne({ id })
 
@@ -39,7 +39,7 @@ export default class ProjectsController {
   }
 
   public async update({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(UpdateProjectValidator)
 
@@ -51,7 +51,7 @@ export default class ProjectsController {
   }
 
   public async delete({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     await ProjectService.delete({ id, bouncer })
 
@@ -61,7 +61,7 @@ export default class ProjectsController {
   }
 
   public async addParticipant({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(AddParticipantValidator)
 
@@ -73,7 +73,7 @@ export default class ProjectsController {
   }
 
   public async removeParticipant({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+    const id = UuidValidator.v4(request.param('id'))
 
     const payload = await request.validate(RemoveParticipantValidator)
 
