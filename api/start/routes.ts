@@ -11,12 +11,10 @@ import './routes/JiraIntegration'
 
 import Env from '@ioc:Adonis/Core/Env'
 
-const enviroment = Env.get('NODE_ENV')
-const helloMessage =
-  enviroment === 'production' ? 'Hello from Production' : 'Hello from Development'
+const helloMessage = Env.get('NODE_ENV') === 'production' ? 'From Production' : 'From Development'
 
 Route.get('/', async () => {
-  return helloMessage
+  return { hello: helloMessage }
 })
 
 Route.post('/test', 'TestsController.test').middleware('auth')

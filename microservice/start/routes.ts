@@ -19,9 +19,14 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
-import User from 'App/Models/User'
+
+import Env from '@ioc:Adonis/Core/Env'
+
+const helloMessage =
+  Env.get('NODE_ENV') === 'production'
+    ? 'From Production Microservice'
+    : 'From Development Microservice'
 
 Route.get('/', async () => {
-  const users = await User.all()
-  return { hello: users }
+  return { hello: helloMessage }
 })
