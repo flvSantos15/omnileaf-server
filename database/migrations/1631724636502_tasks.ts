@@ -23,7 +23,6 @@ export default class Tasks extends BaseSchema {
         .notNullable()
         .defaultTo(TaskStatus.IN_PROGRESS)
       table.boolean('is_deleted').defaultTo(false)
-      table.uuid('list_id').unsigned().references('id').inTable('lists')
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')
       table.string('jira_id')
