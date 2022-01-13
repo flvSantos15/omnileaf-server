@@ -13,8 +13,6 @@ import {
 import { UserRoles } from 'Contracts/enums'
 import TrackingSession from './TrackingSession'
 import Project from './Project'
-import Board from './Board'
-import List from './List'
 import Task from './Task'
 import Screenshot from './Screenshot'
 import Organization from './Organization'
@@ -78,21 +76,12 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Project, {
     pivotTable: 'project_user',
+    pivotColumns: ['role'],
   })
   public assignedProjects: ManyToMany<typeof Project>
 
-  @hasMany(() => Board, {
-    foreignKey: 'creator_id',
-  })
-  public ownedBoards: HasMany<typeof Board>
-
-  @hasMany(() => List, {
-    foreignKey: 'creator_id',
-  })
-  public ownedLists: HasMany<typeof List>
-
   @hasMany(() => Task, {
-    foreignKey: 'creator_id',
+    foreignKey: 'creatorId',
   })
   public ownedTasks: HasMany<typeof Task>
 
@@ -107,7 +96,7 @@ export default class User extends BaseModel {
   public assignedTasks: ManyToMany<typeof Task>
 
   @hasMany(() => Screenshot, {
-    foreignKey: 'user_id',
+    foreignKey: 'userId',
   })
   public screenshots: HasMany<typeof Screenshot>
 
@@ -135,7 +124,7 @@ export default class User extends BaseModel {
 
   public serializeExtras() {
     return {
-      projectRole: this.$extras.pivot_role,
+      role: this.$extras.pivot_role,
     }
   }
 }

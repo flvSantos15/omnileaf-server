@@ -11,7 +11,6 @@ import {
   manyToMany,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
-import Board from './Board'
 import Task from './Task'
 import Tag from './Tag'
 import Organization from './Organization'
@@ -70,11 +69,6 @@ export default class Project extends BaseModel {
     pivotColumns: ['role'],
   })
   public usersAssigned: ManyToMany<typeof User>
-
-  @hasMany(() => Board, {
-    foreignKey: 'projectId',
-  })
-  public boards: HasMany<typeof Board>
 
   @hasMany(() => Task, {
     foreignKey: 'projectId',

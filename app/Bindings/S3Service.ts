@@ -1,7 +1,7 @@
 import AWS from 'aws-sdk'
 import Env from '@ioc:Adonis/Core/Env'
 import { PutObjectRequest } from 'aws-sdk/clients/s3'
-import { createString } from 'App/Utils/CreateRandomString'
+import { string } from '@ioc:Adonis/Core/Helpers'
 import S3ServiceInterface from 'Contracts/interfaces/S3Service.interface'
 
 export default class S3Service implements S3ServiceInterface {
@@ -26,7 +26,7 @@ export default class S3Service implements S3ServiceInterface {
   }
 
   public async uploadImage(buffer: Buffer) {
-    let filename = createString(60)
+    const filename = string.generateRandom(40)
     this.uploadImageParams.Body = buffer
     this.uploadImageParams.Key = `images/${filename}`
     await this.s3.upload(this.uploadImageParams).promise()

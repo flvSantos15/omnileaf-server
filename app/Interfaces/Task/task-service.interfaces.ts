@@ -7,7 +7,6 @@ export interface RegisterTaskRequest {
     name: string
     body?: string
     projectId: string
-    listId?: string
   }
   bouncer: ActionsAuthorizerContract<User>
   auth: AuthContract
@@ -19,7 +18,6 @@ export interface UpdateTaskRequest {
     name?: string
     body?: string
     timeEstimated?: number
-    listId?: string
   }
   bouncer: ActionsAuthorizerContract<User>
 }

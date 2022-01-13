@@ -11,7 +11,6 @@ import {
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Project from './Project'
-import List from './List'
 import Screenshot from './Screenshot'
 import Tag from './Tag'
 import TrackingSession from './TrackingSession'
@@ -72,11 +71,6 @@ export default class Task extends BaseModel {
     foreignKey: 'projectId',
   })
   public project: BelongsTo<typeof Project>
-
-  @belongsTo(() => List, {
-    foreignKey: 'listId',
-  })
-  public list: BelongsTo<typeof List>
 
   @manyToMany(() => User, {
     pivotTable: 'task_user',

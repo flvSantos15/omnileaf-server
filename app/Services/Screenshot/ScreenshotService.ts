@@ -1,31 +1,18 @@
 import fs from 'fs'
 import sharp from 'sharp'
 import Logger from '@ioc:Adonis/Core/Logger'
-import User from 'App/Models/User'
 import Screenshot from 'App/Models/Screenshot'
 import Task from 'App/Models/Task'
 import TrackingSession from 'App/Models/TrackingSession'
-import { Exception } from '@adonisjs/core/build/standalone'
-import { ActionsAuthorizerContract } from '@ioc:Adonis/Addons/Bouncer'
 import S3Service from '@ioc:Omnileaf/S3Service'
-
-interface RegisterRequest {
-  payload: {
-    trackingSessionId: string
-    url: string
-    blurredUrl: string
-  }
-  user: User
-  bouncer: ActionsAuthorizerContract<User>
-}
-
-interface DeleteRequest {
-  screenshot: Screenshot | null
-  bouncer: ActionsAuthorizerContract<User>
-}
+import { Exception } from '@adonisjs/core/build/standalone'
+import {
+  DeleteScreenshotRequest,
+  RegisterScreenshotRequest,
+} from 'App/Interfaces/Screenshot/screenshot-service.interface'
 
 class ScreenShotService {
-  public async register({ payload, user, bouncer }: RegisterRequest) {
+  public async register({ payload, user, bouncer }: RegisterScreenshotRequest) {
     const { trackingSessionId, url, blurredUrl } = payload
 
     const trackingSession = await TrackingSession.find(trackingSessionId)
@@ -85,7 +72,7 @@ class ScreenShotService {
     return { url, blurredUrl }
   }
 
-  public async delete({ screenshot, bouncer }: DeleteRequest) {
+  public async delete({ screenshot, bouncer }: DeleteScreenshotRequest) {
     if (!screenshot) {
       throw new Exception('Screenshot not found.', 404)
     }
