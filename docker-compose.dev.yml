@@ -3,7 +3,7 @@ services:
   app:
     image: registry.gitlab.com/mlgroup/omni-leaf-backend/develop
     build:
-      context: .
+      context: ./api
       dockerfile: Dockerfile.dev
     volumes:
       - .:/usr/src/app
