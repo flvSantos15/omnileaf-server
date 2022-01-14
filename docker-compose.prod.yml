@@ -1,9 +1,18 @@
 version: '3.8'
 services:
-  app:
+  api:
     image: registry.gitlab.com/mlgroup/omni-leaf-backend/main
     build:
       context: .
+      dockerfile: Dockerfile.prod
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+  microservice:
+    image: registry.gitlab.com/mlgroup/omni-leaf-backend/microservice/main
+    build:
+      context: ./microservice
       dockerfile: Dockerfile.prod
     volumes:
       - .:/usr/src/app
