@@ -1,11 +1,10 @@
+import fs from 'fs'
+import path from 'path'
 import { Exception } from '@adonisjs/core/build/standalone'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Application from '@ioc:Adonis/Core/Application'
 import ScreenshotService from 'App/Services/Screenshot/ScreenshotService'
 import CreateScreenshotValidator from 'App/Validators/Screenshots/CreateScreenshotValidator'
-import UploadScreenshotValidator from 'App/Validators/Screenshots/UploadScreenshotValidator'
-import Screenshot from 'App/Models/Screenshot'
-import path from 'path'
 import UuidValidator from 'App/Validators/Global/UuidValidator'
 
 export default class ScreenshotsController {
@@ -13,19 +12,14 @@ export default class ScreenshotsController {
 
   public async register({ request, response, logger, auth, bouncer }: HttpContextContract) {
     const user = auth.use('web').user!
-    const payload = await request.validate(CreateScreenshotValidator)
 
-    const screenshot = await ScreenshotService.register({ payload, user, bouncer })
+    const { trackingSessionId, screenshotMultiPart } = await request.validate(
+      CreateScreenshotValidator
+    )
 
-    logger.info('Screenshot succesfully registered on database.')
+    const screenshot = await ScreenshotService.register({ trackingSessionId, user, bouncer })
 
-    response.send(screenshot)
-  }
-
-  public async upload({ request, response, logger }: HttpContextContract) {
-    const { screenshot } = await request.validate(UploadScreenshotValidator)
-
-    const filename = screenshot.fileName || screenshot.clientName
+    const filename = screenshotMultiPart.fileName || screenshotMultiPart.clientName
 
     if (!filename) {
       throw new Exception('Filename can not be null.', 400)
@@ -33,23 +27,33 @@ export default class ScreenshotsController {
 
     const imagesDir = Application.tmpPath('uploads/images')
 
-    screenshot.move(imagesDir)
+    await screenshotMultiPart.move(imagesDir)
 
+    const buffer = this._getImageAsBufferAndDeleteFile(imagesDir, filename)
+
+    await ScreenshotService.uploadRegular(screenshot.location, buffer)
+
+    await ScreenshotService.uploadBlurred(screenshot.blurredLocation, buffer)
+
+    logger.info('Screenshot succesfully registered on database.')
+
+    response.send(screenshot.serialize())
+  }
+
+  private _getImageAsBufferAndDeleteFile(imagesDir: string, filename: string): Buffer {
     const imgPath = path.join(imagesDir, filename)
 
-    const uploadUrls = await ScreenshotService.upload(imgPath)
+    const buffer = fs.readFileSync(imgPath)
 
-    logger.info('Screenshot uploaded succesfully')
+    fs.unlinkSync(imgPath)
 
-    response.send(uploadUrls)
+    return buffer
   }
 
   public async delete({ request, response, bouncer, logger }: HttpContextContract) {
     const id = UuidValidator.v4(request.param('id'))
 
-    const screenshot = await Screenshot.find(id)
-
-    await ScreenshotService.delete({ screenshot, bouncer })
+    await ScreenshotService.delete({ id, bouncer })
 
     logger.info('Screenshot deleted succesfully')
 

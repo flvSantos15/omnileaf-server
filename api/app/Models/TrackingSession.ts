@@ -12,6 +12,7 @@ import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
 import Screenshot from './Screenshot'
+import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
 
 export default class TrackingSession extends BaseModel {
   @column({ isPrimary: true })
@@ -36,7 +37,7 @@ export default class TrackingSession extends BaseModel {
   public startedAt: DateTime
 
   @column({ columnName: 'stopped_at' })
-  public stoppedAt: string
+  public stoppedAt: DateTime
 
   //Relations
   @belongsTo(() => User, {
@@ -56,14 +57,14 @@ export default class TrackingSession extends BaseModel {
 
   //Hooks
   @beforeUpdate()
-  public static calculateTrackingTime(trackingSession: TrackingSession) {
-    trackingSession.stoppedAt = new Date().toLocaleString('en-US', {
-      timeZone: 'America/Sao_Paulo',
-    })
+  public static sessionClosed(trackingSession: TrackingSession) {
+    if (trackingSession.$dirty.status === TrackingSessionStatus.FINISHED) {
+      trackingSession.stoppedAt = CustomHelpers.dateAsDateTime(new Date())
 
-    const stoppedAtSeconds = new Date(trackingSession.stoppedAt).getTime() / 1000
-    const startedAtSeconds = trackingSession.startedAt.toSeconds()
+      const stoppedAtSeconds = trackingSession.stoppedAt.toSeconds()
+      const startedAtSeconds = trackingSession.startedAt.toSeconds()
 
-    trackingSession.trackingTime = Math.floor(stoppedAtSeconds - startedAtSeconds)
+      trackingSession.trackingTime = stoppedAtSeconds - startedAtSeconds
+    }
   }
 }

@@ -1,18 +1,19 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { afterCreate, BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Task from './Task'
 import TrackingSession from './TrackingSession'
+import { string } from '@ioc:Adonis/Core/Helpers'
 
 export default class Screenshot extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
   @column()
-  public url: string
+  public location: string
 
-  @column({ columnName: 'blurred_url' })
-  public blurredUrl: string
+  @column()
+  public blurredLocation: string
 
   @column({ columnName: 'deleted' })
   public isDeleted: boolean
@@ -46,4 +47,14 @@ export default class Screenshot extends BaseModel {
     foreignKey: 'trackingSessionId',
   })
   public trackingSession: BelongsTo<typeof TrackingSession>
+
+  @afterCreate()
+  public static async saveScreenshotLocation(screenshot: Screenshot) {
+    const location = 'images/' + screenshot.id + string.generateRandom(15)
+    const blurredLocation = 'images/blurred/' + screenshot.id + string.generateRandom(15)
+
+    screenshot.location = location
+    screenshot.blurredLocation = blurredLocation
+    await screenshot.save()
+  }
 }

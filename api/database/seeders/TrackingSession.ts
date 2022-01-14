@@ -1,6 +1,7 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
+import Screenshot from 'App/Models/Screenshot'
 import TrackingSession from 'App/Models/TrackingSession'
-import { dummySession } from 'Database/seeders-constants'
+import { defaultId, dummySession } from 'Database/seeders-constants'
 
 export default class TrackingSessionSeeder extends BaseSeeder {
   public async run() {
@@ -9,6 +10,21 @@ export default class TrackingSessionSeeder extends BaseSeeder {
 
     if (session) return
 
-    await TrackingSession.create(dummySession)
+    const sessions = await TrackingSession.createMany([
+      dummySession,
+      {
+        ...dummySession,
+        id: undefined,
+      },
+      { ...dummySession, id: undefined },
+    ])
+
+    sessions.forEach(async (session) => {
+      await Screenshot.create({
+        trackingSessionId: session.id,
+        taskId: defaultId,
+        userId: defaultId,
+      })
+    })
   }
 }
