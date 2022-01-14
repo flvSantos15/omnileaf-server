@@ -18,4 +18,3 @@ Route.get('/', async () => {
 })
 
 Route.post('/test', 'TestsController.test').middleware('auth')
-Route.get('/showUsers', 'TestsController.showUsers')
