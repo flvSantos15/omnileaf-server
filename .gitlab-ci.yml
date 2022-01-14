@@ -4,8 +4,10 @@ stages:
   - deploy
 
 variables:
-  TAG_LATEST: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
-  CONTAINER_NAME: backend_$CI_COMMIT_REF_NAME
+  API_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  MICROSERVICE_IMAGE: $CI_REGISTRY_IMAGE/microservice/$CI_COMMIT_REF_NAME:latest
+  API_CONTAINER: backend_$CI_COMMIT_REF_NAME
+  MICROSERVICE_CONTAINER: microservice_$CI_COMMIT_REF_NAME
 
 publish-dev:
   image: docker:latest
@@ -16,7 +18,8 @@ publish-dev:
     - apk add --no-cache docker-compose
     - docker-compose -f docker-compose.dev.yml build
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker push $TAG_LATEST
+    - docker-compose -f docker-compose.dev.yml push
+
   only:
     - develop
 
@@ -29,7 +32,7 @@ publish-prod:
     - apk add --no-cache docker-compose
     - docker-compose -f docker-compose.prod.yml build
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker push $TAG_LATEST
+    - docker-compose -f docker-compose.prod.yml push
   only:
     - main
 
@@ -42,10 +45,12 @@ deploy:
     - chmod og= $ID_RSA
     - apt-get update && apt-get install -y openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $TAG_LATEST || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_LATEST"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $CONTAINER_NAME || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $CONTAINER_NAME --memory="2g" --net backend-network -d $TAG_LATEST"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $API_IMAGE $MICROSERVICE_IMAGE || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $API_IMAGE"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $MICROSERVICE_IMAGE"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $API_CONTAINER $MICROSERVICE_CONTAINER || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $API_CONTAINER --memory="2g" --net backend-network -d $API_IMAGE"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $MICROSERVICE_CONTAINER --memory="2g" --net backend-network -d $MICROSERVICE_IMAGE"
   only:
     - develop
     - main
