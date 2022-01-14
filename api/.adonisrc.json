@@ -16,7 +16,11 @@
     "Database": "database",
     "Contracts": "contracts"
   },
-  "preloads": ["./start/routes", "./start/kernel", "./start/bouncer"],
+  "preloads": [
+    "./start/routes",
+    "./start/kernel",
+    "./start/bouncer"
+  ],
   "providers": [
     "./providers/AppProvider",
     "@adonisjs/core",
@@ -26,9 +30,12 @@
     "@adonisjs/bouncer",
     "@adonisjs/mail",
     "@adonisjs/view",
-    "adonis5-scheduler"
+    "adonis5-scheduler",
+    "@adonisjs/redis"
   ],
-  "aceProviders": ["@adonisjs/repl"],
+  "aceProviders": [
+    "@adonisjs/repl"
+  ],
   "metaFiles": [
     {
       "pattern": "resources/views/**/*.edge",
