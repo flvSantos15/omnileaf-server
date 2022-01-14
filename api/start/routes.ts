@@ -8,6 +8,7 @@ import './routes/TrackingSession'
 import './routes/Screenshots'
 import './routes/GitlabIntegration'
 import './routes/JiraIntegration'
+import './routes/Reports'
 
 import Env from '@ioc:Adonis/Core/Env'
 
