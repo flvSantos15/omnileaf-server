@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeCreate,
   beforeUpdate,
   BelongsTo,
   belongsTo,
@@ -14,6 +15,7 @@ import Task from './Task'
 import Screenshot from './Screenshot'
 import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
 import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
+import Project from './Project'
 
 export default class TrackingSession extends BaseModel {
   public static namingStrategy = new CamelCaseNamingStrategy()
@@ -29,6 +31,9 @@ export default class TrackingSession extends BaseModel {
 
   @column()
   public userId: string
+
+  @column()
+  public projectId: string
 
   @column()
   public taskId: string
@@ -48,6 +53,11 @@ export default class TrackingSession extends BaseModel {
   })
   public user: BelongsTo<typeof User>
 
+  @belongsTo(() => Project, {
+    foreignKey: 'projectId',
+  })
+  public project: BelongsTo<typeof Project>
+
   @belongsTo(() => Task, {
     foreignKey: 'taskId',
   })
@@ -57,6 +67,13 @@ export default class TrackingSession extends BaseModel {
     foreignKey: 'trackingSessionId',
   })
   public screenshots: HasMany<typeof Screenshot>
+
+  @beforeCreate()
+  public static async addProjectId(trackingSession: TrackingSession) {
+    const task = await Task.findOrFail(trackingSession.taskId)
+
+    trackingSession.merge({ projectId: task.projectId })
+  }
 
   //Hooks
   @beforeUpdate()

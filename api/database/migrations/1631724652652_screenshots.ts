@@ -17,6 +17,13 @@ export default class Screenshots extends BaseSchema {
         .notNullable()
         .onDelete('CASCADE')
       table
+        .uuid('project_id')
+        .unsigned()
+        .references('id')
+        .inTable('projects')
+        .notNullable()
+        .onDelete('CASCADE')
+      table
         .uuid('task_id')
         .unsigned()
         .references('id')

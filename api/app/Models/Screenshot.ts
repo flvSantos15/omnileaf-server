@@ -1,11 +1,19 @@
 import Env from '@ioc:Adonis/Core/Env'
 import { DateTime } from 'luxon'
-import { afterCreate, BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {
+  afterCreate,
+  BaseModel,
+  beforeCreate,
+  BelongsTo,
+  belongsTo,
+  column,
+} from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Task from './Task'
 import TrackingSession from './TrackingSession'
 import { string } from '@ioc:Adonis/Core/Helpers'
 import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
+import Project from './Project'
 
 export default class Screenshot extends BaseModel {
   public static namingStrategy = new CamelCaseNamingStrategy()
@@ -38,6 +46,9 @@ export default class Screenshot extends BaseModel {
   public userId: string
 
   @column()
+  public projectId: string
+
+  @column()
   public taskId: string
 
   @column()
@@ -54,6 +65,11 @@ export default class Screenshot extends BaseModel {
   })
   public user: BelongsTo<typeof User>
 
+  @belongsTo(() => Project, {
+    foreignKey: 'projectId',
+  })
+  public project: BelongsTo<typeof Project>
+
   @belongsTo(() => Task, {
     foreignKey: 'taskId',
   })
@@ -64,16 +80,28 @@ export default class Screenshot extends BaseModel {
   })
   public trackingSession: BelongsTo<typeof TrackingSession>
 
+  @beforeCreate()
+  public static async addUserAndTaskAndProjecIds(screenshot: Screenshot) {
+    const trackingSession = await TrackingSession.findOrFail(screenshot.trackingSessionId)
+    const userId = trackingSession.userId
+
+    const taskId = trackingSession.taskId
+
+    const projectId = trackingSession.projectId
+
+    screenshot.merge({ userId, projectId, taskId })
+  }
+
   @afterCreate()
   public static async saveScreenshotLocation(screenshot: Screenshot) {
     if (!screenshot.location && !screenshot.blurredLocation) {
       const location =
         Env.get('NODE_ENV') === 'development'
-          ? 'dev'
+          ? 'dev/'
           : '' + 'images/' + screenshot.id + string.generateRandom(15)
       const blurredLocation =
         Env.get('NODE_ENV') === 'development'
-          ? 'dev'
+          ? 'dev/'
           : '' + 'images/blurred/' + screenshot.id + string.generateRandom(15)
 
       screenshot.location = location
