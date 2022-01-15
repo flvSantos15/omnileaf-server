@@ -1,9 +1,9 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import Screenshot from 'App/Models/Screenshot'
 import TrackingSession from 'App/Models/TrackingSession'
-import { defaultId, dummySession } from 'Database/seeders-constants'
+import { defaultId, defaultScreenshotCode, dummySession } from 'Database/seeders-constants'
 
-export default class TrackingSessionSeeder extends BaseSeeder {
+export default class TrackingSessionWithScreenshot extends BaseSeeder {
   public async run() {
     // Write your database queries inside the run method
     const session = await TrackingSession.find(dummySession.id)
@@ -24,6 +24,8 @@ export default class TrackingSessionSeeder extends BaseSeeder {
         trackingSessionId: session.id,
         taskId: defaultId,
         userId: defaultId,
+        location: 'images/' + defaultId + '-' + defaultScreenshotCode,
+        blurredLocation: 'images/blurred/' + defaultId + '-' + defaultScreenshotCode,
       })
     })
   }

@@ -4,15 +4,28 @@ import User from './User'
 import Task from './Task'
 import TrackingSession from './TrackingSession'
 import { string } from '@ioc:Adonis/Core/Helpers'
+import Env from '@ioc:Adonis/Core/Env'
 
 export default class Screenshot extends BaseModel {
   @column({ isPrimary: true })
   public id: string
 
-  @column()
+  @column({
+    serialize: (value: string) => {
+      const adress = 'https://' + Env.get('SPACES_NAME') + '.' + Env.get('SPACES_ENDPOINT') + '/'
+
+      return adress + value
+    },
+  })
   public location: string
 
-  @column()
+  @column({
+    serialize: (value: string) => {
+      const adress = 'https://' + Env.get('SPACES_NAME') + '.' + Env.get('SPACES_ENDPOINT') + '/'
+
+      return adress + value
+    },
+  })
   public blurredLocation: string
 
   @column({ columnName: 'deleted' })
@@ -50,11 +63,19 @@ export default class Screenshot extends BaseModel {
 
   @afterCreate()
   public static async saveScreenshotLocation(screenshot: Screenshot) {
-    const location = 'images/' + screenshot.id + string.generateRandom(15)
-    const blurredLocation = 'images/blurred/' + screenshot.id + string.generateRandom(15)
+    if (!screenshot.location && !screenshot.blurredLocation) {
+      const location =
+        Env.get('NODE_ENV') === 'development'
+          ? 'dev'
+          : '' + 'images/' + screenshot.id + string.generateRandom(15)
+      const blurredLocation =
+        Env.get('NODE_ENV') === 'development'
+          ? 'dev'
+          : '' + 'images/blurred/' + screenshot.id + string.generateRandom(15)
 
-    screenshot.location = location
-    screenshot.blurredLocation = blurredLocation
-    await screenshot.save()
+      screenshot.location = location
+      screenshot.blurredLocation = blurredLocation
+      await screenshot.save()
+    }
   }
 }

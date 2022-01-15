@@ -7,7 +7,7 @@ import { TrackingSessionStatus } from 'Contracts/enums'
 import TrackingSession from '../app/Models/TrackingSession'
 
 export const defaultId = '19e183c4-50cb-4cda-83eb-9acc494071ac'
-export const defaultScreenshotCode = 'fVOewLLLGDQ8'
+export const defaultScreenshotCode = 'do-not-delete.png'
 
 export const dummyUser: Partial<User> = {
   id: defaultId,

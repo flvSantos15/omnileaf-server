@@ -25,7 +25,7 @@ class ReportsService {
 
     const screenshots = await queryScreenshots
 
-    return screenshots
+    return screenshots.map((screenshot) => screenshot.serialize())
   }
 }
 
