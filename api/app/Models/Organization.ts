@@ -1,9 +1,11 @@
 import { DateTime } from 'luxon'
 import {
+  afterCreate,
   BaseModel,
   BelongsTo,
   belongsTo,
   column,
+  computed,
   HasMany,
   hasMany,
   HasOne,
@@ -18,6 +20,7 @@ import GitlabToken from './GitlabToken'
 import JiraToken from './JiraToken'
 import OrganizationUser from './OrganizationUser'
 import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
+import { OrganizationLabels } from 'Contracts/enums'
 
 export default class Organization extends BaseModel {
   public static namingStrategy = new CamelCaseNamingStrategy()
@@ -48,6 +51,12 @@ export default class Organization extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @computed()
+  public get userLabels() {
+    const relationLabels = this.memberRelations.map((relation) => relation.labels)[0]
+    return relationLabels.map((label) => label.title)
+  }
 
   @belongsTo(() => User, {
     foreignKey: 'creatorId',
@@ -81,8 +90,24 @@ export default class Organization extends BaseModel {
 
   @hasMany(() => OrganizationUser, {
     foreignKey: 'organizationId',
+    serializeAs: null,
   })
   public memberRelations: HasMany<typeof OrganizationUser>
 
-  public userLabels: string[]
+  @afterCreate()
+  public static async createLabelsAndAssignCreator(organization: Organization) {
+    await organization.related('members').attach([organization.creatorId])
+
+    const relation = await OrganizationUser.query()
+      .where('organization_id', organization.id)
+      .andWhere('user_id', organization.creatorId)
+      .firstOrFail()
+
+    Object.values(OrganizationLabels).map(async (lb) => {
+      const label = await Label.create({ title: lb, organizationId: organization.id })
+      if (lb === OrganizationLabels.OWNER) {
+        await label.related('organizationUser').attach([relation.id])
+      }
+    })
+  }
 }
