@@ -13,21 +13,24 @@ import User from './User'
 import Task from './Task'
 import Screenshot from './Screenshot'
 import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class TrackingSession extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
   @column()
   public status: TrackingSessionStatus
 
-  @column({ columnName: 'tracking_time' })
+  @column()
   public trackingTime: number
 
-  @column({ columnName: 'user_id' })
+  @column()
   public userId: string
 
-  @column({ columnName: 'task_id' })
+  @column()
   public taskId: string
 
   @column.dateTime({ autoCreate: true })
@@ -36,7 +39,7 @@ export default class TrackingSession extends BaseModel {
   @column.dateTime({ autoCreate: true, columnName: 'started_at' })
   public startedAt: DateTime
 
-  @column({ columnName: 'stopped_at' })
+  @column()
   public stoppedAt: DateTime
 
   //Relations

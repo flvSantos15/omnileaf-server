@@ -17,27 +17,30 @@ import Label from './Label'
 import GitlabToken from './GitlabToken'
 import JiraToken from './JiraToken'
 import OrganizationUser from './OrganizationUser'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Organization extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
   @column()
   public name: string
 
-  @column({ columnName: 'avatar_url' })
+  @column()
   public avatarUrl: string
 
   @column()
   public description: string
 
-  @column({ columnName: 'creator_id' })
+  @column()
   public creatorId: string
 
   @column()
   public gitlabId: number
 
-  @column({ columnName: 'jira_id' })
+  @column()
   public jiraId: string
 
   @column.dateTime({ autoCreate: true })

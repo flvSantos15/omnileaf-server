@@ -20,15 +20,18 @@ import Hash from '@ioc:Adonis/Core/Hash'
 import OrganizationUser from './OrganizationUser'
 import GitlabToken from './GitlabToken'
 import JiraToken from './JiraToken'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class User extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
   @column()
   public name: string
 
-  @column({ columnName: 'display_name' })
+  @column()
   public displayName: string
 
   @column()
@@ -37,7 +40,7 @@ export default class User extends BaseModel {
   @column({ serializeAs: null })
   public password: string
 
-  @column({ columnName: 'avatar_url' })
+  @column()
   public avatarUrl: string
 
   @column()
@@ -46,16 +49,16 @@ export default class User extends BaseModel {
   @column()
   public account_type: UserRoles
 
-  @column({ columnName: 'latest_tracking_session_id' })
+  @column()
   public latestTrackingSessionId: string
 
-  @column({ columnName: 'remember_me_token' })
+  @column()
   public rememberMeToken: string
 
-  @column({ columnName: 'gitlab_id' })
+  @column()
   public gitlabId: number
 
-  @column({ columnName: 'jira_id' })
+  @column()
   public jiraId: string
 
   @column.dateTime({ autoCreate: true })

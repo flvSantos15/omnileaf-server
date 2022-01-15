@@ -1,12 +1,15 @@
+import Env from '@ioc:Adonis/Core/Env'
 import { DateTime } from 'luxon'
 import { afterCreate, BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Task from './Task'
 import TrackingSession from './TrackingSession'
 import { string } from '@ioc:Adonis/Core/Helpers'
-import Env from '@ioc:Adonis/Core/Env'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Screenshot extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
@@ -31,13 +34,13 @@ export default class Screenshot extends BaseModel {
   @column({ columnName: 'deleted' })
   public isDeleted: boolean
 
-  @column({ columnName: 'user_id' })
+  @column()
   public userId: string
 
-  @column({ columnName: 'task_id' })
+  @column()
   public taskId: string
 
-  @column({ columnName: 'tracking_session_id' })
+  @column()
   public trackingSessionId: string
 
   @column.dateTime({ autoCreate: true })
