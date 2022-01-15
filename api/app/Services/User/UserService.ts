@@ -13,9 +13,7 @@ class UserService {
   public async getAll(): Promise<ModelObject[]> {
     const users = await User.all()
 
-    const usersSerialized = users.map((user) => user.serialize())
-
-    return usersSerialized
+    return users.map((user) => user.serialize())
   }
 
   public async getOne({ id, params }: GetUserRequest): Promise<ModelObject> {
@@ -41,7 +39,7 @@ class UserService {
       await user.load('screenshots')
     }
 
-    return user
+    return user.serialize()
   }
 
   public async getUserOrganizations({ id, params }: GetUserRequest) {
@@ -60,11 +58,11 @@ class UserService {
         })
       })
 
-      return user
+      return user.organizations.map((organization) => organization.serialize())
     }
     await user.load('organizations')
 
-    return user
+    return user.organizations.map((organization) => organization.serialize())
   }
 
   public async getUserProjects({ id, params }: GetUserRequest) {
@@ -81,7 +79,7 @@ class UserService {
         })
       })
 
-      return user.serialize()
+      return user.assignedProjects.map((projetc) => projetc.serialize())
     }
 
     await user.load('assignedProjects', (projectsQuery) => {
@@ -90,7 +88,7 @@ class UserService {
       })
     })
 
-    return user.serialize()
+    return user.assignedProjects.map((projetc) => projetc.serialize())
   }
 
   public async getUserTasks({ id, params }: GetUserRequest) {
@@ -107,14 +105,14 @@ class UserService {
         })
       })
 
-      return user.serialize()
+      return user.assignedTasks.map((task) => task.serialize())
     }
 
     await user.load('assignedTasks', (tasksQuery) => {
       tasksQuery.where('isDeleted', false).preload('trackingSessions')
     })
 
-    return user.serialize()
+    return user.assignedTasks.map((task) => task.serialize())
   }
 
   public async register({ payload }: RegisterUserResquest): Promise<ModelObject> {
