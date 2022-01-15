@@ -1,10 +1,10 @@
-export interface ScreenshotsReportParams {
+export interface ReportParams {
   filters: {
     date: string
     user: string
   }
 }
 
-export interface ScreenshotsReportRequest {
-  params: ScreenshotsReportParams
+export interface ReportRequest {
+  params: ReportParams
 }

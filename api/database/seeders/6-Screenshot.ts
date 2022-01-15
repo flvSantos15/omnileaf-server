@@ -1,21 +1,14 @@
 import BaseSeeder from '@ioc:Adonis/Lucid/Seeder'
 import Screenshot from 'App/Models/Screenshot'
-import { dummySession } from 'Database/seeders-constants'
+import { dummyScreenshot } from 'Database/seeders-constants'
 
 export default class ScreenshotSeeder extends BaseSeeder {
   public async run() {
     // Write your database queries inside the run method
-    const session = await Screenshot.find(dummySession.id)
+    const screenshot = await Screenshot.find(dummyScreenshot.id)
 
-    if (session) return
+    if (screenshot) return
 
-    await Screenshot.createMany([
-      dummySession,
-      {
-        ...dummySession,
-        id: undefined,
-      },
-      { ...dummySession, id: undefined },
-    ])
+    await Screenshot.createMany([dummyScreenshot, { ...dummyScreenshot, id: undefined }])
   }
 }
