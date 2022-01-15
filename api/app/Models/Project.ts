@@ -16,8 +16,11 @@ import Tag from './Tag'
 import Organization from './Organization'
 import GitlabIntegrationService from 'App/Services/GitlabIntegration/GitlabIntegrationService'
 import JiraIntegrationService from 'App/Services/JiraIntegration/JiraIntegrationService'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Project extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
@@ -30,22 +33,22 @@ export default class Project extends BaseModel {
   @column()
   public isDeleted: boolean
 
-  @column({ columnName: 'creator_id' })
+  @column()
   public creatorId?: string
 
-  @column({ columnName: 'organization_id' })
+  @column()
   public organizationId: string
 
-  @column({ columnName: 'gitlab_id' })
+  @column()
   public gitlabId?: number
 
-  @column({ columnName: 'gitlab_creator_id' })
+  @column()
   public gitlabCreatorId?: number
 
-  @column({ columnName: 'jira_id' })
+  @column()
   public jiraId?: string
 
-  @column({ columnName: 'jira_creator_id' })
+  @column()
   public jiraCreatorId?: string
 
   @column.dateTime({ autoCreate: true })

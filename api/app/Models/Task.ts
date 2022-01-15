@@ -15,8 +15,11 @@ import Screenshot from './Screenshot'
 import Tag from './Tag'
 import TrackingSession from './TrackingSession'
 import { TaskStatus } from 'Contracts/enums'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Task extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
@@ -26,16 +29,16 @@ export default class Task extends BaseModel {
   @column()
   public body?: string
 
-  @column({ columnName: 'time_estimated' })
+  @column()
   public timeEstimated: number
 
   @column()
   public links?: string
 
-  @column({ columnName: 'creator_id' })
+  @column()
   public creatorId?: string
 
-  @column({ columnName: 'project_id' })
+  @column()
   public projectId: string
 
   @column()
@@ -44,13 +47,13 @@ export default class Task extends BaseModel {
   @column()
   public isDeleted: boolean
 
-  @column({ columnName: 'gitlab_id' })
+  @column()
   public gitlabId?: number
 
-  @column({ columnName: 'gitlab_creator_id' })
+  @column()
   public gitlabCreatorId?: number
 
-  @column({ columnName: 'jira_id' })
+  @column()
   public jiraId: string
 
   @column.dateTime({ autoCreate: true })

@@ -1,15 +1,18 @@
 import { DateTime } from 'luxon'
 import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
 import Encryption from '@ioc:Adonis/Core/Encryption'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class GitlabToken extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
-  @column({ columnName: 'owner_id' })
+  @column()
   public ownerId: string
 
-  @column({ columnName: 'organization_id' })
+  @column()
   public organizationId: string
 
   @column({
@@ -20,17 +23,16 @@ export default class GitlabToken extends BaseModel {
   public token: string
 
   @column({
-    columnName: 'refresh_token',
     serialize: (value: string) => {
       return Encryption.decrypt(value)
     },
   })
   public refreshToken: string
 
-  @column({ columnName: 'expires_in' })
+  @column()
   public expiresIn: number
 
-  @column({ columnName: 'created_time' })
+  @column()
   public createdTime: number
 
   @column.dateTime({ autoCreate: true })

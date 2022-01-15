@@ -1,4 +1,5 @@
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import CustomHelpers from 'App/Bindings/CustomHelpers'
 import S3Service from 'App/Bindings/S3Service'
 
 export default class AppProvider {
@@ -7,6 +8,7 @@ export default class AppProvider {
   public register() {
     // Register your own bindings
     this.app.container.singleton('Omnileaf/S3Service', () => new S3Service())
+    this.app.container.singleton('Omnileaf/CustomHelpers', () => new CustomHelpers())
   }
 
   public async boot() {

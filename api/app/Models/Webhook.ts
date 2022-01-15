@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Webhook extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 

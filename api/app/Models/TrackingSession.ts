@@ -12,21 +12,25 @@ import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
 import Screenshot from './Screenshot'
+import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class TrackingSession extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
   @column()
   public status: TrackingSessionStatus
 
-  @column({ columnName: 'tracking_time' })
+  @column()
   public trackingTime: number
 
-  @column({ columnName: 'user_id' })
+  @column()
   public userId: string
 
-  @column({ columnName: 'task_id' })
+  @column()
   public taskId: string
 
   @column.dateTime({ autoCreate: true })
@@ -35,8 +39,8 @@ export default class TrackingSession extends BaseModel {
   @column.dateTime({ autoCreate: true, columnName: 'started_at' })
   public startedAt: DateTime
 
-  @column({ columnName: 'stopped_at' })
-  public stoppedAt: string
+  @column()
+  public stoppedAt: DateTime
 
   //Relations
   @belongsTo(() => User, {
@@ -56,14 +60,14 @@ export default class TrackingSession extends BaseModel {
 
   //Hooks
   @beforeUpdate()
-  public static calculateTrackingTime(trackingSession: TrackingSession) {
-    trackingSession.stoppedAt = new Date().toLocaleString('en-US', {
-      timeZone: 'America/Sao_Paulo',
-    })
+  public static sessionClosed(trackingSession: TrackingSession) {
+    if (trackingSession.$dirty.status === TrackingSessionStatus.FINISHED) {
+      trackingSession.stoppedAt = CustomHelpers.dateAsDateTime(new Date())
 
-    const stoppedAtSeconds = new Date(trackingSession.stoppedAt).getTime() / 1000
-    const startedAtSeconds = trackingSession.startedAt.toSeconds()
+      const stoppedAtSeconds = trackingSession.stoppedAt.toSeconds()
+      const startedAtSeconds = trackingSession.startedAt.toSeconds()
 
-    trackingSession.trackingTime = Math.floor(stoppedAtSeconds - startedAtSeconds)
+      trackingSession.trackingTime = stoppedAtSeconds - startedAtSeconds
+    }
   }
 }
