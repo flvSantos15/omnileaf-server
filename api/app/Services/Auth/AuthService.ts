@@ -4,7 +4,7 @@ import User from 'App/Models/User'
 import Hash from '@ioc:Adonis/Core/Hash'
 
 class AuthService {
-  public async login({ payload, auth }: LoginRequest): Promise<void> {
+  public async login({ payload, auth }: LoginRequest) {
     const { email, password } = payload
 
     const user = await User.findBy('email', email)
@@ -20,6 +20,12 @@ class AuthService {
     const rememberMe = true
 
     await auth.use('web').login(user, rememberMe)
+
+    return user.serialize({
+      fields: {
+        pick: ['id', 'name', 'email', 'avatarUrl', 'latestTrackingSessionId', 'gitlabId', 'jiraId'],
+      },
+    })
   }
 }
 

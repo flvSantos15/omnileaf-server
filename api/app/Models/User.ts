@@ -52,7 +52,7 @@ export default class User extends BaseModel {
   @column()
   public latestTrackingSessionId: string
 
-  @column()
+  @column({ serializeAs: null })
   public rememberMeToken: string
 
   @column()
