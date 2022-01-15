@@ -3,7 +3,6 @@ import User from 'App/Models/User'
 
 export interface RegisterScreenshotRequest {
   trackingSessionId: string
-  user: User
   bouncer: ActionsAuthorizerContract<User>
 }
 

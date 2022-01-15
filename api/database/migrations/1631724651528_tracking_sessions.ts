@@ -13,7 +13,20 @@ export default class TrackingSessions extends BaseSchema {
         .notNullable()
       table.integer('tracking_time')
 
-      table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
+      table
+        .uuid('user_id')
+        .unsigned()
+        .references('id')
+        .inTable('users')
+        .notNullable()
+        .onDelete('CASCADE')
+      table
+        .uuid('project_id')
+        .unsigned()
+        .references('id')
+        .inTable('projects')
+        .notNullable()
+        .onDelete('CASCADE')
       table
         .uuid('task_id')
         .unsigned()
