@@ -54,8 +54,13 @@ export default class Organization extends BaseModel {
 
   @computed()
   public get userLabels() {
-    const relationLabels = this.memberRelations.map((relation) => relation.labels)[0]
-    return relationLabels.map((label) => label.title)
+    let result: OrganizationLabels[] = []
+    if (this.memberRelations) {
+      const relationLabels = this.memberRelations.map((relation) => relation.labels)[0]
+      result = relationLabels.map((label) => label.title)
+    }
+
+    return result
   }
 
   @belongsTo(() => User, {
