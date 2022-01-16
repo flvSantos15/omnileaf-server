@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeFetch,
+  beforeFind,
   BelongsTo,
   belongsTo,
   column,
@@ -8,6 +10,7 @@ import {
   hasMany,
   ManyToMany,
   manyToMany,
+  ModelQueryBuilderContract,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Project from './Project'
@@ -91,4 +94,14 @@ export default class Task extends BaseModel {
     foreignKey: 'taskId',
   })
   public trackingSessions: HasMany<typeof TrackingSession>
+
+  @beforeFind()
+  public static ignoreDeletedOnFind(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
+
+  @beforeFetch()
+  public static ignoreDeletedOnFetch(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
 }

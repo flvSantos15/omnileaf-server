@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeFetch,
+  beforeFind,
   beforeSave,
   BelongsTo,
   belongsTo,
@@ -9,6 +11,7 @@ import {
   hasMany,
   ManyToMany,
   manyToMany,
+  ModelQueryBuilderContract,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Task from './Task'
@@ -87,6 +90,16 @@ export default class Project extends BaseModel {
     return {
       role: this.$extras.pivot_role,
     }
+  }
+
+  @beforeFind()
+  public static ignoreDeletedOnFind(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
+
+  @beforeFetch()
+  public static ignoreDeletedOnFetch(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
   }
 
   @beforeSave()
