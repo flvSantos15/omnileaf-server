@@ -84,7 +84,7 @@ export default class TrackingSession extends BaseModel {
       const stoppedAtSeconds = trackingSession.stoppedAt.toSeconds()
       const startedAtSeconds = trackingSession.startedAt.toSeconds()
 
-      trackingSession.trackingTime = stoppedAtSeconds - startedAtSeconds
+      trackingSession.trackingTime = Math.floor(stoppedAtSeconds - startedAtSeconds)
     }
   }
 }

@@ -11,4 +11,11 @@ export default class CustomHelpers implements CustomHelpersInterface {
 
     return DateTime.fromISO(date.toISOString())
   }
+
+  groupBy(arr: any[], key: string) {
+    return arr.reduce(function (acc: any, curr: any) {
+      ;(acc[curr[key]] = acc[curr[key]] || []).push(curr)
+      return acc
+    }, {})
+  }
 }

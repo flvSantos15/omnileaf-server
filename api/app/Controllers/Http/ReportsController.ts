@@ -1,25 +1,38 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { ReportParams } from 'App/Interfaces/Reports/reports-service.interface'
+import {
+  ReportParams,
+  TimeAndActivityReportParams,
+} from 'App/Interfaces/Reports/reports-service.interface'
 import ReportsService from 'App/Services/Reports/ReportsService'
 
 export default class ReportsController {
   public async screenshots({ request, response, logger }: HttpContextContract) {
     const params = request.qs() as ReportParams
 
-    const screenshots = await ReportsService.screenshots({ params })
+    const screenshotsReport = await ReportsService.getScreenshotsReport({ params })
 
     logger.info('Succesfully retrieved Screenshots reports')
 
-    response.send(screenshots)
+    response.send(screenshotsReport)
   }
 
   public async trackingSessions({ request, response, logger }: HttpContextContract) {
     const params = request.qs() as ReportParams
 
-    const trackingSessions = await ReportsService.trackingSessions({ params })
+    const trackingSessionsReport = await ReportsService.getTrackingSessionsReport({ params })
 
     logger.info('Succesfully retrieved Tracking Sessions reports')
 
-    response.send(trackingSessions)
+    response.send(trackingSessionsReport)
+  }
+
+  public async timeAndActivity({ request, response, logger }: HttpContextContract) {
+    const params = request.qs() as TimeAndActivityReportParams
+
+    const timeAndActivityReport = await ReportsService.getTimeAndActivityReport({ params })
+
+    logger.info('Succesfully retrieved Time & Activity reports')
+
+    response.send(timeAndActivityReport)
   }
 }
