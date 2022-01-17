@@ -1,6 +1,7 @@
 import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
 import Organization from 'App/Models/Organization'
 import Project from 'App/Models/Project'
+import Screenshot from 'App/Models/Screenshot'
 import Task from 'App/Models/Task'
 import User from 'App/Models/User'
 import { TrackingSessionStatus } from 'Contracts/enums'
@@ -44,4 +45,11 @@ export const dummySession: Partial<TrackingSession> = {
   startedAt: CustomHelpers.dateAsDateTime(new Date()),
   stoppedAt: CustomHelpers.dateAsDateTime(new Date()).plus({ minutes: 10 }),
   trackingTime: 600,
+}
+
+export const dummyScreenshot: Partial<Screenshot> = {
+  id: defaultId,
+  location: `images/${defaultId}-${defaultScreenshotCode}`,
+  blurredLocation: `images/blurred/${defaultId}-${defaultScreenshotCode}`,
+  trackingSessionId: defaultId,
 }

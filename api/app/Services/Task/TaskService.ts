@@ -73,7 +73,7 @@ class TaskService {
 
     await bouncer.authorize('ProjectManager', task.project)
 
-    await task.delete()
+    await task.merge({ isDeleted: true }).save()
   }
 
   public async assignUser({ id, payload, bouncer }: AssignUserRequest) {

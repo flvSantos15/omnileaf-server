@@ -10,14 +10,12 @@ import UuidValidator from 'App/Validators/Global/UuidValidator'
 export default class ScreenshotsController {
   constructor() {}
 
-  public async register({ request, response, logger, auth, bouncer }: HttpContextContract) {
-    const user = auth.use('web').user!
-
+  public async register({ request, response, logger, bouncer }: HttpContextContract) {
     const { trackingSessionId, screenshotMultiPart } = await request.validate(
       CreateScreenshotValidator
     )
 
-    const screenshot = await ScreenshotService.register({ trackingSessionId, user, bouncer })
+    const screenshot = await ScreenshotService.register({ trackingSessionId, bouncer })
 
     const filename = screenshotMultiPart.fileName || screenshotMultiPart.clientName
 

@@ -13,9 +13,7 @@ class UserService {
   public async getAll(): Promise<ModelObject[]> {
     const users = await User.all()
 
-    const usersSerialized = users.map((user) => user.serialize())
-
-    return usersSerialized
+    return users.map((user) => user.serialize())
   }
 
   public async getOne({ id, params }: GetUserRequest): Promise<ModelObject> {
@@ -41,30 +39,26 @@ class UserService {
       await user.load('screenshots')
     }
 
-    return user
+    return user.serialize()
   }
 
-  public async getUserOrganizations({ id, params }: GetUserRequest) {
+  public async getUserOrganizations({ id }: GetUserRequest) {
     const user = await User.find(id)
 
     if (!user) {
       throw new Exception('User Id does not exists.', 404)
     }
 
-    if (params.labels) {
-      await user.load('organizations', (organizationsQuery) => {
-        organizationsQuery.preload('memberRelations', (relationsQuery) => {
-          relationsQuery.where('user_id', user.id).preload('labels', (labelsQuery) => {
-            labelsQuery.select('title')
-          })
+    const organizations = await user
+      .related('organizations')
+      .query()
+      .preload('memberRelations', (relationsQuery) => {
+        relationsQuery.where('user_id', user.id).preload('labels', (labelsQuery) => {
+          labelsQuery.select('title')
         })
       })
 
-      return user
-    }
-    await user.load('organizations')
-
-    return user
+    return organizations.map((organization) => organization.serialize())
   }
 
   public async getUserProjects({ id, params }: GetUserRequest) {
@@ -73,24 +67,20 @@ class UserService {
     if (!user) {
       throw new Exception('User not found', 404)
     }
-
-    if (params.trackingSessions) {
-      await user.load('assignedProjects', (projectsQuery) => {
-        projectsQuery.where('isDeleted', false).preload('tasks', (tasksQuery) => {
-          tasksQuery.where('isDeleted', false).preload('trackingSessions')
+    const projects = await user
+      .related('assignedProjects')
+      .query()
+      .preload('tasks', (tasksQuery) => {
+        tasksQuery.whereIn('id', (query) => {
+          query.from('task_user').select('task_id').where('user_id', user.id)
         })
+
+        if (params.trackingSessions) {
+          tasksQuery.preload('trackingSessions')
+        }
       })
 
-      return user.serialize()
-    }
-
-    await user.load('assignedProjects', (projectsQuery) => {
-      projectsQuery.where('isDeleted', false).preload('tasks', (tasksQuery) => {
-        tasksQuery.where('isDeleted', false)
-      })
-    })
-
-    return user.serialize()
+    return projects.map((projetc) => projetc.serialize())
   }
 
   public async getUserTasks({ id, params }: GetUserRequest) {
@@ -100,21 +90,16 @@ class UserService {
       throw new Exception('User not found', 404)
     }
 
-    if (params.screenshots) {
-      await user.load('assignedTasks', (tasksQuery) => {
-        tasksQuery.where('isDeleted', false).preload('trackingSessions', (sessionsQuery) => {
+    const tasks = await user
+      .related('assignedTasks')
+      .query()
+      .preload('trackingSessions', (sessionsQuery) => {
+        if (params.screenshots) {
           sessionsQuery.preload('screenshots')
-        })
+        }
       })
 
-      return user.serialize()
-    }
-
-    await user.load('assignedTasks', (tasksQuery) => {
-      tasksQuery.where('isDeleted', false).preload('trackingSessions')
-    })
-
-    return user.serialize()
+    return tasks.map((task) => task.serialize())
   }
 
   public async register({ payload }: RegisterUserResquest): Promise<ModelObject> {
