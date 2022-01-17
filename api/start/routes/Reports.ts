@@ -4,4 +4,6 @@ Route.group(() => {
   Route.get('reports/screenshots', 'ReportsController.screenshots')
 
   Route.get('reports/tracking-sessions', 'ReportsController.trackingSessions')
+
+  Route.get('reports/time-and-activity', 'ReportsController.timeAndActivity')
 }).middleware('reports')
