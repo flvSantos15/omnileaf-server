@@ -6,6 +6,16 @@ import {
 import ReportsService from 'App/Services/Reports/ReportsService'
 
 export default class ReportsController {
+  public async getDailyTrack({ auth, response, logger }: HttpContextContract) {
+    const user = auth.use('web').user!
+
+    const dailyWork = await ReportsService.getDailyTrack(user)
+
+    logger.info('Succesfully retrieved user daily work')
+
+    response.send(dailyWork)
+  }
+
   public async screenshots({ request, response, logger }: HttpContextContract) {
     const params = request.qs() as ReportParams
 

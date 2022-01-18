@@ -7,8 +7,75 @@ import {
 import { Exception } from '@adonisjs/core/build/standalone'
 import TrackingSession from 'App/Models/TrackingSession'
 import Database from '@ioc:Adonis/Lucid/Database'
+import User from 'App/Models/User'
 
 class ReportsService {
+  public async getDailyTrack(user: User) {
+    const today = new Date()
+    const todayAsDateTime = CustomHelpers.dateAsDateTime(today)
+    const todayAsDateTimePluOne = todayAsDateTime.plus({ days: 1 })
+
+    const trackingSessions = await TrackingSession.query()
+      .where('user_id', user.id)
+      .andWhereBetween('started_at', [
+        todayAsDateTime.toSQLDate(),
+        todayAsDateTimePluOne.toSQLDate(),
+      ])
+      .preload('project')
+      .preload('task')
+
+    return this._getDailyTrackPerProjectAndTask(trackingSessions)
+  }
+
+  private _getDailyTrackPerProjectAndTask(sessions: TrackingSession[]) {
+    return sessions.reduce(
+      (acc: any, curr) => {
+        acc.totalTracked += curr.trackingTime
+
+        const projectIndex = acc.projects
+          .map((dailyTrack: any) => dailyTrack.projectId)
+          .indexOf(curr.project.id)
+
+        const projectIsNotInArray = projectIndex < 0
+
+        if (projectIsNotInArray) {
+          const newArrayItem = {
+            projectId: curr.projectId,
+            trackingTime: curr.trackingTime,
+            tasks: [{ taskId: curr.taskId, trackingTime: curr.trackingTime }],
+          }
+          acc.projects.push(newArrayItem)
+
+          return acc
+        }
+
+        acc.projects[projectIndex].trackingTime += curr.trackingTime
+
+        const taskIndex = acc.projects[projectIndex].tasks
+          .map((task: any) => task.taskId)
+          .indexOf(curr.taskId)
+
+        const taskIsNotInProjectArray = taskIndex < 0
+
+        if (taskIsNotInProjectArray) {
+          const newTasksArrayItem = {
+            taskId: curr.taskId,
+            trackingTime: curr.trackingTime,
+          }
+
+          acc.projects[projectIndex].tasks.push(newTasksArrayItem)
+
+          return acc
+        }
+
+        acc.projects[projectIndex].tasks[taskIndex].trackingTime += curr.trackingTime
+
+        return acc
+      },
+      { totalTracked: 0, projects: [] }
+    )
+  }
+
   public async getScreenshotsReport({ params }: ReportRequest) {
     const { filters } = params
 
