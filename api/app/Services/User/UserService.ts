@@ -105,7 +105,8 @@ class UserService extends UserServiceExtension {
           query.from('task_user').select('task_id').where('user_id', user.id)
           tasksQuery.preload('trackingSessions', (sessionsQuery) => {
             sessionsQuery
-              .whereBetween('started_at', [
+              .where('user_id', user.id)
+              .andWhereBetween('started_at', [
                 todayAsDateTime.toSQLDate(),
                 todayAsDateTimePluOne.toSQLDate(),
               ])
