@@ -39,6 +39,16 @@ export default class UsersController {
     response.json(user)
   }
 
+  public async showProjectsWithDailyTrack({ request, response, logger }: HttpContextContract) {
+    const id = UuidValidator.v4(request.param('id'))
+
+    const projects = await UserService.getProjectsWithDailyTrack(id)
+
+    logger.info(`Succesfully retrived projects with daily track of user ${id}`)
+
+    response.json(projects)
+  }
+
   public async showUserTasks({ request, response }: HttpContextContract) {
     const id = UuidValidator.v4(request.param('id'))
 

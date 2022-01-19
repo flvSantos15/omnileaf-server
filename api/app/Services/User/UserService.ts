@@ -8,8 +8,10 @@ import {
   UpdateUserRequest,
 } from '../../Interfaces/User/user-service.interfaces'
 import { ModelObject } from '@ioc:Adonis/Lucid/Orm'
+import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
+import UserServiceExtension from 'App/Extensions/UserServiceExtension'
 
-class UserService {
+class UserService extends UserServiceExtension {
   public async getAll(): Promise<ModelObject[]> {
     const users = await User.all()
 
@@ -67,6 +69,7 @@ class UserService {
     if (!user) {
       throw new Exception('User not found', 404)
     }
+
     const projects = await user
       .related('assignedProjects')
       .query()
@@ -81,6 +84,37 @@ class UserService {
       })
 
     return projects.map((projetc) => projetc.serialize())
+  }
+
+  public async getProjectsWithDailyTrack(id: string) {
+    const user = await User.find(id)
+
+    if (!user) {
+      throw new Exception('User not found', 404)
+    }
+
+    const today = new Date()
+    const todayAsDateTime = CustomHelpers.dateAsDateTime(today)
+    const todayAsDateTimePluOne = todayAsDateTime.plus({ days: 1 })
+
+    const projects = await user
+      .related('assignedProjects')
+      .query()
+      .preload('tasks', (tasksQuery) => {
+        tasksQuery.whereIn('id', (query) => {
+          query.from('task_user').select('task_id').where('user_id', user.id)
+          tasksQuery.preload('trackingSessions', (sessionsQuery) => {
+            sessionsQuery
+              .whereBetween('started_at', [
+                todayAsDateTime.toSQLDate(),
+                todayAsDateTimePluOne.toSQLDate(),
+              ])
+              .preload('task')
+          })
+        })
+      })
+
+    return this._summarizeProjectsDailyTrack(projects)
   }
 
   public async getUserTasks({ id, params }: GetUserRequest) {

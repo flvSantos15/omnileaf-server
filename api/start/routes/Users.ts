@@ -15,6 +15,8 @@ Route.group(() => {
 
   Route.get('users/:id/projects', 'UsersController.showUserProjects')
 
+  Route.get('users/:id/projects-daily', 'UsersController.showProjectsWithDailyTrack')
+
   Route.get('users/:id/tasks', 'UsersController.showUserTasks')
 
   Route.put('users/:id', 'UsersController.update')
