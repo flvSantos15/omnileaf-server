@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import {
   BaseModel,
   beforeCreate,
-  beforeUpdate,
   BelongsTo,
   belongsTo,
   column,
@@ -13,7 +12,6 @@ import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
 import Screenshot from './Screenshot'
-import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
 import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 import Project from './Project'
 
@@ -32,6 +30,7 @@ export default class TrackingSession extends BaseModel {
   @column()
   public userId: string
 
+  //This property is auto created on beforeCreate hook
   @column()
   public projectId: string
 
@@ -73,18 +72,5 @@ export default class TrackingSession extends BaseModel {
     const task = await Task.findOrFail(trackingSession.taskId)
 
     trackingSession.merge({ projectId: task.projectId })
-  }
-
-  //Hooks
-  @beforeUpdate()
-  public static sessionClosed(trackingSession: TrackingSession) {
-    if (trackingSession.$dirty.status === TrackingSessionStatus.FINISHED) {
-      trackingSession.stoppedAt = CustomHelpers.dateAsDateTime(new Date())
-
-      const stoppedAtSeconds = trackingSession.stoppedAt.toSeconds()
-      const startedAtSeconds = trackingSession.startedAt.toSeconds()
-
-      trackingSession.trackingTime = Math.floor(stoppedAtSeconds - startedAtSeconds)
-    }
   }
 }

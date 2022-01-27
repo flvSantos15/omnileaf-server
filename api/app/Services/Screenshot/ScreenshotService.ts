@@ -11,7 +11,9 @@ import {
 } from 'App/Interfaces/Screenshot/screenshot-service.interface'
 
 class ScreenShotService {
-  public async register({ trackingSessionId, bouncer }: RegisterScreenshotRequest) {
+  public async register({ payload, bouncer, buffer }: RegisterScreenshotRequest) {
+    const { trackingSessionId } = payload
+
     const trackingSession = await TrackingSession.find(trackingSessionId)
 
     if (!trackingSession) {
@@ -20,9 +22,11 @@ class ScreenShotService {
 
     await bouncer.authorize('SessionOwner', trackingSession)
 
-    const screenshot = await Screenshot.create({
-      trackingSessionId: trackingSession.id,
-    })
+    const screenshot = await Screenshot.create({ ...payload })
+
+    await this.uploadRegular(screenshot.location, buffer)
+
+    await this.uploadBlurred(screenshot.blurredLocation, buffer)
 
     return screenshot
   }

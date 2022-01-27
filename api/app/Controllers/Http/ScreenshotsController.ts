@@ -11,11 +11,9 @@ export default class ScreenshotsController {
   constructor() {}
 
   public async register({ request, response, logger, bouncer }: HttpContextContract) {
-    const { trackingSessionId, screenshotMultiPart } = await request.validate(
-      CreateScreenshotValidator
-    )
+    const payload = await request.validate(CreateScreenshotValidator)
 
-    const screenshot = await ScreenshotService.register({ trackingSessionId, bouncer })
+    const { screenshotMultiPart } = payload
 
     const filename = screenshotMultiPart.fileName || screenshotMultiPart.clientName
 
@@ -29,9 +27,7 @@ export default class ScreenshotsController {
 
     const buffer = this._getImageAsBufferAndDeleteFile(imagesDir, filename)
 
-    await ScreenshotService.uploadRegular(screenshot.location, buffer)
-
-    await ScreenshotService.uploadBlurred(screenshot.blurredLocation, buffer)
+    const screenshot = await ScreenshotService.register({ payload, bouncer, buffer })
 
     logger.info('Screenshot succesfully registered on database.')
 
