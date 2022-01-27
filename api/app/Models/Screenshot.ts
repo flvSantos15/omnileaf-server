@@ -97,11 +97,11 @@ export default class Screenshot extends BaseModel {
     if (!screenshot.location && !screenshot.blurredLocation) {
       const location =
         Env.get('NODE_ENV') === 'development'
-          ? 'dev/'
+          ? 'dev/' + 'images/' + screenshot.id + string.generateRandom(15)
           : '' + 'images/' + screenshot.id + string.generateRandom(15)
       const blurredLocation =
         Env.get('NODE_ENV') === 'development'
-          ? 'dev/'
+          ? 'dev/' + 'images/blurred/' + screenshot.id + string.generateRandom(15)
           : '' + 'images/blurred/' + screenshot.id + string.generateRandom(15)
 
       screenshot.location = location

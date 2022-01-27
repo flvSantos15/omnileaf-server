@@ -40,22 +40,16 @@ export default class UserServiceExtension {
           }, 0),
           tasks: [
             ...currProj.tasks.map((task) => {
-              return { taskId: task.id, taskName: task.name, tracked: 0 }
+              return {
+                taskId: task.id,
+                taskName: task.name,
+                tracked: task.trackingSessions.reduce((acc, curr) => {
+                  return acc + curr.trackingTime
+                }, 0),
+              }
             }),
-          ] as any[],
+          ],
         }
-
-        projectSessions.forEach((session) => {
-          const taskIndex = newArrayItem.tasks
-            .map((task: any) => task.taskId)
-            .indexOf(session.taskId)
-
-          const taskIsInNewItemArray = taskIndex >= 0
-
-          if (taskIsInNewItemArray) {
-            newArrayItem.tasks[taskIndex].tracked += session.trackingTime
-          }
-        })
 
         projAcc.projects.push(newArrayItem)
 
