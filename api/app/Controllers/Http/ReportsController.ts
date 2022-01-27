@@ -1,45 +1,52 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import {
-  ReportParams,
-  TimeAndActivityReportParams,
-} from 'App/Interfaces/Reports/reports-service.interface'
-import ReportsService from 'App/Services/Reports/ReportsService'
+  AllScreenshotReportParams,
+  EveryTenMinutesParams,
+  TimeAndActivityOnScreenshotsReportsParams,
+} from 'App/Interfaces/Reports/screenshots-reports-service.interface'
+import { TimeAndActivityReportParams } from 'App/Interfaces/Reports/time-and-activity-service.interface'
+import ScreenshotsReportsService from 'App/Services/Reports/ScreenshotsReportsService'
+import TimeAndActivityService from 'App/Services/Reports/TimeAndActivityService'
 
 export default class ReportsController {
-  public async getDailyTrack({ auth, response, logger }: HttpContextContract) {
-    const user = auth.use('web').user!
+  public async timeAndActivityOnScreenshotsReports({
+    request,
+    response,
+    logger,
+  }: HttpContextContract) {
+    const params = request.qs() as TimeAndActivityOnScreenshotsReportsParams
 
-    const dailyWork = await ReportsService.getDailyTrack(user)
+    const timeAndActivityReport = await ScreenshotsReportsService.timeAndActivity({ params })
 
-    logger.info('Succesfully retrieved user daily work')
+    logger.info('Succesfully retrieved time and activity on screenshots reports')
 
-    response.send(dailyWork)
+    response.send(timeAndActivityReport)
   }
 
-  public async screenshots({ request, response, logger }: HttpContextContract) {
-    const params = request.qs() as ReportParams
+  public async allScreenshots({ request, response, logger }: HttpContextContract) {
+    const params = request.qs() as AllScreenshotReportParams
 
-    const screenshotsReport = await ReportsService.getScreenshotsReport({ params })
+    const screenshotsReport = await ScreenshotsReportsService.allScreenshots({ params })
 
     logger.info('Succesfully retrieved Screenshots reports')
 
     response.send(screenshotsReport)
   }
 
-  public async trackingSessions({ request, response, logger }: HttpContextContract) {
-    const params = request.qs() as ReportParams
+  public async everyTenMinutesScreenshots({ request, response, logger }: HttpContextContract) {
+    const params = request.qs() as EveryTenMinutesParams
 
-    const trackingSessionsReport = await ReportsService.getTrackingSessionsReport({ params })
+    const trackingSessionsReport = await ScreenshotsReportsService.everyTenMinutes({ params })
 
     logger.info('Succesfully retrieved Tracking Sessions reports')
 
     response.send(trackingSessionsReport)
   }
 
-  public async timeAndActivity({ request, response, logger }: HttpContextContract) {
+  public async groupedReportOnTimeAndActivity({ request, response, logger }: HttpContextContract) {
     const params = request.qs() as TimeAndActivityReportParams
 
-    const timeAndActivityReport = await ReportsService.getTimeAndActivityReport({ params })
+    const timeAndActivityReport = await TimeAndActivityService.getGroupedReport({ params })
 
     logger.info('Succesfully retrieved Time & Activity reports')
 
