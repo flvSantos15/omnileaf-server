@@ -5,6 +5,6 @@ export default class CreateScreenshotValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
     trackingSessionId: schema.string({}, [rules.uuid({ version: 4 })]),
-    screenshotMultiPart: schema.file({ extnames: ['png'] }),
+    base64: schema.string(),
   })
 }
