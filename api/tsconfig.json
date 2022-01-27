@@ -36,7 +36,8 @@
       "@adonisjs/mail",
       "@adonisjs/view",
       "adonis5-scheduler",
-      "@adonisjs/redis"
+      "@adonisjs/redis",
+      "adonis5-swagger"
     ]
   }
 }

@@ -6,9 +6,9 @@ Route.group(() => {
     'ReportsController.timeAndActivityOnScreenshotsReports'
   )
 
-  Route.get('reports/screenshots', 'ReportsController.allScreenshots')
+  Route.get('reports/screenshots/all', 'ReportsController.allScreenshots')
 
-  Route.get('reports/tracking-sessions', 'ReportsController.everyTenMinutesScreenshots')
+  Route.get('reports/screenshots/every-ten-minutes', 'ReportsController.everyTenMinutesScreenshots')
 
   Route.get('reports/time-and-activity', 'ReportsController.timeAndActivity')
 })
