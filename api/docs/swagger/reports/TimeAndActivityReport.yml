@@ -1,0 +1,48 @@
+/reports/time-and-activity/grouped:
+  get:
+    tags:
+      - Reports
+    description: Time And Activity Grouped
+    parameters:
+      - in: query
+        name: start
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: groupBy
+        schema:
+          type: string
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Name-Of-Grouped-Property:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      started_date:
+                        type: string
+                        format: date
+                      tracking_time:
+                        type: string
+                      task:
+                        type: string
+                      project:
+                        type: string
