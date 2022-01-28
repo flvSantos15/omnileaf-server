@@ -1,0 +1,45 @@
+/users/{id}/projects-daily:
+  get:
+    tags:
+      - Users
+    description: Get user daily track summary by project
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                totalTracked:
+                  type: integer
+                projects:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      projectId:
+                        type: string
+                        format: uuid
+                      projectName:
+                        type: string
+                      tracked:
+                        type: integer
+                      tasks:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            taskId:
+                              type: string
+                              format: uuid
+                            taskName:
+                              type: string
+                            tracked:
+                              type: integer

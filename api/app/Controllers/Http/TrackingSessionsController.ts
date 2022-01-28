@@ -58,7 +58,7 @@ export default class TrackingSessionsController {
 
     logger.info('Succesfully closed Tracking Session')
 
-    response.status(200)
+    response.status(204)
   }
 
   public async createMany({ request, response, bouncer, logger }: HttpContextContract) {

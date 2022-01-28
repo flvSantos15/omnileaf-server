@@ -1,0 +1,92 @@
+/activity/screenshots/time-and-activity:
+  get:
+    tags:
+      - Activity
+    description: Screenshots time and activity report
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: date
+        schema:
+          type: date
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                time:
+                  type: object
+                  properties:
+                    totalWorked:
+                      type: number
+                    toPrevDay:
+                      type: number
+                activity:
+                  type: object
+                  properties:
+                    average:
+                      type: number
+                    toPrevDay:
+                      type: number
+                    toOrgAverage:
+                      type: number
+
+/activity/screenshots/all:
+  get:
+    tags:
+      - Activity
+    description: All Screenshots
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: date
+        schema:
+          type: Date
+          required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Screenshot'
+
+/activity/screenshots/every-ten-minutes:
+  get:
+    tags:
+      - Activity
+    description: Every Ten Minutes Screenshots
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: date
+        schema:
+          type: Date
+          required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/TrackingSession'

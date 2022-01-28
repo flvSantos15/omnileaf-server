@@ -9,7 +9,7 @@ Route.group(() => {
 
   Route.post('tracking-sessions/create-many', 'TrackingSessionsController.createMany')
 
-  Route.patch('tracking-sessions/:id/close/', 'TrackingSessionsController.closeSession')
+  Route.patch('tracking-sessions/:id/close', 'TrackingSessionsController.closeSession')
 
   Route.patch(
     'tracking-sessions/:id/tracking-time',

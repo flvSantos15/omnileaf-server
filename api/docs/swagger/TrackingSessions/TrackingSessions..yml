@@ -1,0 +1,118 @@
+/tracking-sessions/{id}:
+  get:
+    tags:
+      - Tracking Sessions
+    description: Show tracking session
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/TrackingSession'
+
+/tracking-sessions:
+  post:
+    tags:
+      - Tracking Sessions
+    description: Register new tracking session
+    parameters:
+      - in: body
+        name: taskId
+        schema:
+          type: string
+          format: uuid
+          required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/TrackingSession'
+
+/tracking-sessions/{id}/tracking-time:
+  patch:
+    tags:
+      - Tracking Sessions
+    description: Update Tracking Time
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+    responses:
+      204:
+        description: No content
+
+/tracking-sessions/{id}/close:
+  patch:
+    tags:
+      - Tracking Sessions
+    description: Close Session
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+    responses:
+      204:
+        description: No content
+
+tracking-sessions/create-many:
+  post:
+    tags:
+      - Tracking Sessions
+    description: Register new tracking session
+    parameters:
+      - in: body
+        schema:
+          type: object
+          properties:
+            sessions:
+              type: array
+              items:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  trackingTime:
+                    type: integer
+                  userId:
+                    type: string
+                    format: uuid
+                  taskId:
+                    type: string
+                    format: uuid
+                  startedAt:
+                    type: string
+                    example: 2018-12-25T23:50:55.999-0300
+                  stoppedAt:
+                    type: string
+                    example: 2018-12-25T23:50:55.999-0300
+                  screenshots:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        createdAt:
+                          type: string
+                          example: 2018-12-25T23:50:55.999-0300
+                        base64:
+                          type: string
+                          format: byte
+                    required: false
+
+    responses:
+      204:
+        description: No content
