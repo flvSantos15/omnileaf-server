@@ -1,0 +1,52 @@
+definitions:
+  Project:
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      description:
+        type: string
+      isDeleted:
+        type: boolean
+      creatorId:
+        type: string
+        format: uuid
+      organizationId:
+        type: string
+        format: uuid
+      gitlabId:
+        type: integer
+      gitlabCreatorId:
+        type: integer
+      jiraId:
+        type: string
+      jiraCreatorId:
+        type: string
+      role:
+        type: string
+        enum:
+          - PV
+          - U
+          - PM
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      owner:
+        type: array
+        items:
+          $ref: '#/definitions/User'
+      organization:
+        $ref: '#/definitions/Organization'
+      usersAssigned:
+        type: array
+        items:
+          $ref: '#/definitions/User'
+      tasks:
+        type: array
+        items:
+        $ref: '#/definitions/Task'

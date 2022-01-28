@@ -1,0 +1,92 @@
+/reports/screenshots/time-and-activity:
+  get:
+    tags:
+      - Screenshot Reports
+    description: Screenshots time and activity report
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: date
+        schema:
+          type: date
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                time:
+                  type: object
+                  properties:
+                    totalWorked:
+                      type: number
+                    toPrevDay:
+                      type: number
+                activity:
+                  type: object
+                  properties:
+                    average:
+                      type: number
+                    toPrevDay:
+                      type: number
+                    toOrgAverage:
+                      type: number
+
+/reports/screenshots/all:
+  get:
+    tags:
+      - Screenshot Reports
+    description: All Screenshots
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: date
+        schema:
+          type: Date
+          required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Screenshot'
+
+/reports/screenshots/every-ten-minutes:
+  get:
+    tags:
+      - Screenshot Reports
+    description: Every Ten Minutes Screenshots
+    parameters:
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: date
+        schema:
+          type: Date
+          required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/TrackingSession'

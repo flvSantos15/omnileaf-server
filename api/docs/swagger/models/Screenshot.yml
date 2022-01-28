@@ -1,0 +1,40 @@
+definitions:
+  Screenshot:
+    properties:
+      id:
+        type: string
+        format: uuid
+      location:
+        type: string
+        format: uri
+      blurredLocation:
+        type: string
+        format: uri
+      isDeleted:
+        type: boolean
+      userId:
+        type: string
+        format: uuid
+      projectId:
+        type: string
+        format: uuid
+      taskId:
+        type: string
+        format: uuid
+      trackingSessionId:
+        type: string
+        format: uuid
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      user:
+        $ref: '#/definitions/User'
+      project:
+        $ref: '#/definitions/Project'
+      task:
+        $ref: '#/definitions/Task'
+      trackingSession:
+        $ref: '#/definitions/TrackingSession'

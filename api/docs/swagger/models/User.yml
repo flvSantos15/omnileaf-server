@@ -1,0 +1,26 @@
+definitions:
+  User:
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      email:
+        type: string
+        format: email
+      avatarUrl:
+        type: string
+        format: uri
+      phone:
+        type: string
+      gitlabId:
+        type: integer
+      jiraId:
+        type: string
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date

@@ -1,0 +1,42 @@
+definitions:
+  TrackingSession:
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      body:
+        type: string
+      trackingTime:
+        type: integer
+      status:
+        type: string
+        enum:
+          - IN_PROGRESS
+          - FINISHED
+      userId:
+        type: string
+        format: uuid
+      projectId:
+        type: string
+        format: uuid
+      taskId:
+        type: string
+        format: uuid
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      startedAt:
+        type: string
+        format: date
+      stoppedAt:
+        type: string
+        format: date
+      user:
+        $ref: '#/definitions/User'
+      project:
+        $ref: '#/definitions/Project'

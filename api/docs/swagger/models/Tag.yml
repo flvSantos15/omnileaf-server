@@ -1,0 +1,23 @@
+definitions:
+  Tag:
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      color:
+        type: string
+      projectId:
+        type: string
+        format: uuid
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      project:
+        $ref: '#/definitions/Project'
+      task:
+        $ref: '#/definitions/Task'
