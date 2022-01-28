@@ -1,0 +1,42 @@
+/screenshots:
+  post:
+    tags:
+      - Screenshots
+    description: Create new screenshot
+    parameters:
+      - in: body
+        name: trackingSessionId
+        schema:
+          type: string
+          format: uuid
+          required: true
+      - in: body
+        name: base64
+        schema:
+          type: string
+          format: byte
+          required: true
+
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/Screenshot'
+
+/screenshots/{id}:
+  delete:
+    tags:
+      - Screenshots
+    description: Delete Screenshot
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+    responses:
+      204:
+        description: No content
