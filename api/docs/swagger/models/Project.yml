@@ -37,16 +37,14 @@ definitions:
         type: string
         format: date
       owner:
-        type: array
-        items:
-          $ref: '#/definitions/User'
+        type: string
+        example: User{}
       organization:
-        $ref: '#/definitions/Organization'
+        type: string
+        example: Organization{}
       usersAssigned:
-        type: array
-        items:
-          $ref: '#/definitions/User'
+        type: string
+        example: User[]
       tasks:
-        type: array
-        items:
-        $ref: '#/definitions/Task'
+        type: string
+        example: Task[]

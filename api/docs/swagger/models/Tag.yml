@@ -18,6 +18,8 @@ definitions:
         type: string
         format: date
       project:
-        $ref: '#/definitions/Project'
+        type: string
+        example: Project{}
       task:
-        $ref: '#/definitions/Task'
+        type: string
+        example: Task{}

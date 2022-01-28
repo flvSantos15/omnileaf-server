@@ -24,3 +24,15 @@ definitions:
       updatedAt:
         type: string
         format: date
+      assignedProjects:
+        type: string
+        example: Project[]
+      assignedTasks:
+        type: string
+        example: Task[]
+      screenshots:
+        type: string
+        example: Screenshot[]
+      organizations:
+        type: string
+        example: Organization[]

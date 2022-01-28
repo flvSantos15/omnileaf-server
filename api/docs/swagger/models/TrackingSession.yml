@@ -37,6 +37,14 @@ definitions:
         type: string
         format: date
       user:
-        $ref: '#/definitions/User'
+        type: string
+        example: User{}
       project:
-        $ref: '#/definitions/Project'
+        type: string
+        example: Project{}
+      task:
+        type: string
+        example: Task{}
+      screenshots:
+        type: string
+        example: Screenshot[]

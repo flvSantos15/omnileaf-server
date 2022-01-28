@@ -31,22 +31,20 @@ definitions:
         type: string
         format: date
       creator:
-        $ref: '#/definitions/User'
+        type: string
+        example: User{}
       project:
-        $ref: '#/definitions/Project'
+        type: string
+        example: Project{}
       usersAssigned:
-        type: array
-        items:
-          $ref: '#/definitions/Project'
+        type: string
+        example: User[]
       screenshots:
-        type: array
-          items:
-            $ref: '#/definitions/Screenshot'
+        type: string
+        example: Screenshot[]
       tags:
-        type: array
-          items:
-            $ref: '#/definitions/Tag'
+        type: string
+        example: Tag[]
       trackingSessions:
-        type: array
-            items:
-              $ref: '#/definitions/TrackingSession'
+        type: string
+        example: TrackingSession[]

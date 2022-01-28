@@ -31,10 +31,14 @@ definitions:
         type: string
         format: date
       user:
-        $ref: '#/definitions/User'
+        type: string
+        example: User{}
       project:
-        $ref: '#/definitions/Project'
+        type: string
+        example: Project{}
       task:
-        $ref: '#/definitions/Task'
+        type: string
+        example: Task{}
       trackingSession:
-        $ref: '#/definitions/TrackingSession'
+        type: string
+        example: TrackingSession[]

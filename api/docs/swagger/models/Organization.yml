@@ -29,16 +29,14 @@ definitions:
         items:
           type: string
       creator:
-        $ref: '#/definitions/User'
+        type: string
+        example: User{}
       projects:
-        type: array
-        items:
-          $ref: '#/definitions/Project'
+        type: string
+        example: Project[]
       members:
-        type: array
-        items:
-          $ref: '#/definitions/User'
+        type: string
+        example: User[]
       labels:
-        type: array
-        items:
-          $ref: '#/definitions/Label'
+        type: string
+        example: Label[]
