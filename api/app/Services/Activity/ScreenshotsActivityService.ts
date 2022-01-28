@@ -1,17 +1,17 @@
+import Database from '@ioc:Adonis/Lucid/Database'
 import CustomHelpers from '@ioc:Omnileaf/CustomHelpers'
+import {
+  AllScreenshotsRequest,
+  EveryTenMinutesRequest,
+  TimeAndActivityOnScreenshotsRequest,
+} from 'App/Interfaces/Activity/screenshots-activity-service.interfaces'
 import Screenshot from 'App/Models/Screenshot'
 import TrackingSession from 'App/Models/TrackingSession'
 import User from 'App/Models/User'
-import {
-  AllScreenshotReportRequest,
-  EveryTenMinutesReportRequest,
-  TimeAndActivityOnScreenshotsReportsRequest,
-} from 'App/Interfaces/Reports/screenshots-reports-service.interface'
-import Database from '@ioc:Adonis/Lucid/Database'
 import { Exception } from '@adonisjs/core/build/standalone'
 
-class ScreenshotsReportsService {
-  public async timeAndActivity({ params }: TimeAndActivityOnScreenshotsReportsRequest) {
+class ScreenshotsActivityService {
+  public async timeAndActivity({ params }: TimeAndActivityOnScreenshotsRequest) {
     if (!params || !params.userId || !params.date) {
       throw new Exception('Invalid request. Params userId and date are required', 400)
     }
@@ -60,7 +60,7 @@ class ScreenshotsReportsService {
     return timeAndActivity
   }
 
-  public async allScreenshots({ params }: AllScreenshotReportRequest) {
+  public async allScreenshots({ params }: AllScreenshotsRequest) {
     if (!params || !params.userId || !params.date) {
       throw new Exception('Invalid request. Params userId and date are required', 400)
     }
@@ -91,7 +91,7 @@ class ScreenshotsReportsService {
     return screenshots.map((screenshot) => screenshot.serialize())
   }
 
-  public async everyTenMinutes({ params }: EveryTenMinutesReportRequest) {
+  public async everyTenMinutes({ params }: EveryTenMinutesRequest) {
     if (!params || !params.userId || !params.date) {
       throw new Exception('Invalid request. Params userId and date are required', 400)
     }
@@ -124,4 +124,4 @@ class ScreenshotsReportsService {
   }
 }
 
-export default new ScreenshotsReportsService()
+export default new ScreenshotsActivityService()

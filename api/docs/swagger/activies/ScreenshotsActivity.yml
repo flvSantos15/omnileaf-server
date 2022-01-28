@@ -1,7 +1,7 @@
-/reports/screenshots/time-and-activity:
+/activity/screenshots/time-and-activity:
   get:
     tags:
-      - Screenshot Reports
+      - Activity
     description: Screenshots time and activity report
     parameters:
       - in: query
@@ -39,10 +39,10 @@
                     toOrgAverage:
                       type: number
 
-/reports/screenshots/all:
+/activity/screenshots/all:
   get:
     tags:
-      - Screenshot Reports
+      - Activity
     description: All Screenshots
     parameters:
       - in: query
@@ -65,10 +65,10 @@
               items:
                 $ref: '#/definitions/Screenshot'
 
-/reports/screenshots/every-ten-minutes:
+/activity/screenshots/every-ten-minutes:
   get:
     tags:
-      - Screenshot Reports
+      - Activity
     description: Every Ten Minutes Screenshots
     parameters:
       - in: query
