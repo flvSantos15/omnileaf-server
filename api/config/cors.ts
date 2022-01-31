@@ -45,7 +45,7 @@ const corsConfig: CorsConfig = {
   |                     one of the above values.
   |
   */
-  origin: true,
+  origin: Env.get('NODE_ENV') === 'production' ? true : '*',
 
   /*
   |--------------------------------------------------------------------------
