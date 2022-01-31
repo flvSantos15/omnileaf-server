@@ -16,6 +16,7 @@ export default class CreateManySessionValidator {
         screenshots: schema.array.optional().members(
           schema.object().members({
             createdAt: schema.date(),
+            isDeleted: schema.boolean(),
             base64: schema.string(),
           })
         ),

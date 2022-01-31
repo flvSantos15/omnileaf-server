@@ -1,0 +1,38 @@
+/auth/login:
+  post:
+    tags:
+      - Auth
+    description: Login
+    parameters:
+      - in: body
+        name: email
+        schema:
+          type: string
+          format: email
+          required: true
+      - in: body
+        name: password
+        schema:
+          type: string
+          format: password
+          required: true
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                email:
+                  type: string
+                avatarUrl:
+                  type: string
+                gitlabId:
+                  type: integer
+                jiraId:
+                  type: string

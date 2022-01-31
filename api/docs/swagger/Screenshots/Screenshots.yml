@@ -3,6 +3,7 @@
     tags:
       - Screenshots
     description: Create new screenshot
+    summary: RETURNS SCREENSHOT MODEL
     parameters:
       - in: body
         name: trackingSessionId

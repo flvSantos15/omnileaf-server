@@ -3,6 +3,7 @@
     tags:
       - Tracking Sessions
     description: Show tracking session
+    summary: RETURNS TRACKING SESSION MODEL
     parameters:
       - in: path
         name: id
@@ -23,6 +24,7 @@
     tags:
       - Tracking Sessions
     description: Register new tracking session
+    summary: RETURNS TRACKING SESSION MODEL
     parameters:
       - in: body
         name: taskId
