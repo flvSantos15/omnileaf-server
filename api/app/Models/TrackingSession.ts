@@ -32,6 +32,10 @@ export default class TrackingSession extends BaseModel {
 
   //This property is auto created on beforeCreate hook
   @column()
+  public organizationId: string
+
+  //This property is auto created on beforeCreate hook
+  @column()
   public projectId: string
 
   @column()
@@ -68,9 +72,9 @@ export default class TrackingSession extends BaseModel {
   public screenshots: HasMany<typeof Screenshot>
 
   @beforeCreate()
-  public static async addProjectId(trackingSession: TrackingSession) {
+  public static async addProjectAndOrganizationIds(trackingSession: TrackingSession) {
     const task = await Task.findOrFail(trackingSession.taskId)
 
-    trackingSession.merge({ projectId: task.projectId })
+    trackingSession.merge({ projectId: task.projectId, organizationId: task.organizationId })
   }
 }

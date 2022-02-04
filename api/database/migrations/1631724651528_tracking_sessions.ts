@@ -21,6 +21,12 @@ export default class TrackingSessions extends BaseSchema {
         .notNullable()
         .onDelete('CASCADE')
       table
+        .uuid('organization_id')
+        .unsigned()
+        .references('id')
+        .inTable('organizations')
+        .onDelete('CASCADE')
+      table
         .uuid('project_id')
         .unsigned()
         .references('id')

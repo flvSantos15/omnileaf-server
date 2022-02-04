@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeCreate,
   beforeFetch,
   beforeFind,
   BelongsTo,
@@ -40,6 +41,10 @@ export default class Task extends BaseModel {
 
   @column()
   public creatorId?: string
+
+  //This property is auto created on beforeCreate hook
+  @column()
+  public organizationId: string
 
   @column()
   public projectId: string
@@ -103,5 +108,12 @@ export default class Task extends BaseModel {
   @beforeFetch()
   public static ignoreDeletedOnFetch(query: ModelQueryBuilderContract<typeof User>) {
     query.where('is_deleted', false)
+  }
+
+  @beforeCreate()
+  public static async addOrganizationId(task: Task) {
+    const project = await Project.findOrFail(task.projectId)
+
+    task.merge({ organizationId: project.organizationId })
   }
 }
