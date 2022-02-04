@@ -12,6 +12,12 @@ export default class Tasks extends BaseSchema {
       table.integer('time_estimated')
       table.uuid('creator_id').unsigned().references('id').inTable('users')
       table
+        .uuid('organization_id')
+        .unsigned()
+        .references('id')
+        .inTable('organizations')
+        .onDelete('CASCADE')
+      table
         .uuid('project_id')
         .unsigned()
         .references('id')
