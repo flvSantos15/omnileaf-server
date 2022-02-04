@@ -28,7 +28,7 @@ export default class ReportsController {
 
     const sessions = await TimeAndActivityService.getHoursWorkedPerDay({ params })
 
-    logger.info('Succesfully retrieved organization users work summary')
+    logger.info('Succesfully retrieved hours worked per day report')
 
     response.send(sessions)
   }
@@ -38,7 +38,7 @@ export default class ReportsController {
 
     const timeAndActivityReport = await TimeAndActivityService.getGroupedReport({ params })
 
-    logger.info('Succesfully retrieved Time & Activity reports')
+    logger.info('Succesfully retrieved time and activity grouped reports')
 
     response.send(timeAndActivityReport)
   }

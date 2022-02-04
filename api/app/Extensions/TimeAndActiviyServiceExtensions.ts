@@ -74,7 +74,9 @@ class TimeAndActivityServiceExtensions {
 
       newGroup[group] = {}
       newGroup[group][groupBy] = grouped[group][0][groupBy]
-      //TO-DO: If groupby === project add projectAvatar
+      if (groupBy === 'project') {
+        newGroup[group]['projectAvatar'] = ''
+      }
       newGroup[group]['data'] = currentData
     }
 

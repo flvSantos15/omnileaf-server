@@ -3,7 +3,7 @@ export interface GroupedReportParams {
   end: string
   userId: string
   organizationId: string
-  groupBy: 'started_date' | 'task' | 'project'
+  groupBy: 'date' | 'task' | 'project' | 'client'
 }
 
 export interface GroupedReportRequest {

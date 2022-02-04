@@ -114,7 +114,6 @@ class TimeAndActivityService {
       .orderBy('date')
 
     return TimeAndActiviyServiceExtensions.mapSessionsToGroupedReport(sessionsSum, groupBy)
-    // return CustomHelpers.groupBy(sessionsSum, groupBy)
   }
 
   public async getUserWeeklyReport({ params }: UserWeeklyReportRequest) {
