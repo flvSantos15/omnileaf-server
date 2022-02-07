@@ -28,6 +28,7 @@ export const dummyProject: Partial<Project> = {
   id: defaultId,
   name: 'Omnileaf',
   creatorId: defaultId,
+  clientId: defaultId,
   organizationId: defaultId,
 }
 

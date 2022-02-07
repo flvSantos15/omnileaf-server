@@ -40,6 +40,12 @@ export default class Project extends BaseModel {
   public creatorId?: string
 
   @column()
+  public clientId: string
+
+  @column()
+  public avatarUrl: string
+
+  @column()
   public organizationId: string
 
   @column()
@@ -69,6 +75,11 @@ export default class Project extends BaseModel {
     foreignKey: 'organizationId',
   })
   public organization: BelongsTo<typeof Organization>
+
+  @belongsTo(() => User, {
+    foreignKey: 'clientId',
+  })
+  public client: BelongsTo<typeof User>
 
   @manyToMany(() => User, {
     pivotTable: 'project_user',
