@@ -1,0 +1,83 @@
+/manual-entries:
+  post:
+    tags:
+      - Manual Entries
+    description: Register manual entry request
+    summary: RETURNS MANUAL ENTRY MODEL
+    parameters:
+      - in: body
+        name: taskId
+        schema:
+          type: string
+          format: uuid
+          required: true
+      - in: body
+        name: startedDate
+        schema:
+          type: string
+          format: date
+          required: true
+      - in: body
+        name: finishedDate
+        schema:
+          type: string
+          format: date
+          required: true
+      - in: body
+        name: workedFrom
+        schema:
+          type: string
+          example: 00:00
+          required: true
+      - in: body
+        name: workedTo
+        schema:
+          type: string
+          example: 00:00
+          required: true
+      - in: body
+        name: reason
+        schema:
+          type: string
+          required: false
+
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/ManualEntry'
+
+/manual-entries/{manualEntryId}/approve:
+  patch:
+    tags:
+      - Manual Entries
+    description: Approve manual entry request
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+
+    responses:
+      204:
+        description: No content
+
+/manual-entries/{manualEntryId}/deny:
+  patch:
+    tags:
+      - Manual Entries
+    description: Deny manual entry request
+    parameters:
+      - in: path
+        name: id
+        type: string
+        format: uuid
+        required: true
+
+    responses:
+      204:
+        description: No content

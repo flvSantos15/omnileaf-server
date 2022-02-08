@@ -1,0 +1,35 @@
+definitions:
+  ManualEntry:
+    properties:
+      id:
+        type: string
+        format: uuid
+      userId:
+        type: string
+        format: uuid
+      taskId:
+        type: string
+        format: uuid
+      trackingSessionId:
+        type: string
+        format: uuid
+      startedDate:
+        type: string
+        format: date
+      finishedDate:
+        type: string
+        format: date
+      workedFrom:
+        type: string
+        example: 00:00
+      workedTo:
+        type: string
+        example: 00:00
+      reason:
+        type: string
+      status:
+        type: string
+        enum:
+          - IN_PROGRESS
+          - APPROVED
+          - DENIED
