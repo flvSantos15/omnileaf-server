@@ -10,6 +10,7 @@ import './routes/GitlabIntegration'
 import './routes/JiraIntegration'
 import './routes/Reports'
 import './routes/Activity'
+import './routes/ManualEntries'
 
 import Env from '@ioc:Adonis/Core/Env'
 

@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import { ManualEntryStatus } from 'Contracts/enums/manual-entry-status'
 
 export default class ManualEntries extends BaseSchema {
   protected tableName = 'manual_entries'
@@ -26,6 +27,9 @@ export default class ManualEntries extends BaseSchema {
       table.string('worked_from').notNullable()
       table.string('worked_to').notNullable()
       table.text('reason')
+      table
+        .enum('status', Object.values(ManualEntryStatus))
+        .defaultTo(ManualEntryStatus.IN_PROGRESS)
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

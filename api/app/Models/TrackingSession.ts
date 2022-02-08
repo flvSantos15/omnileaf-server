@@ -14,6 +14,7 @@ import Task from './Task'
 import Screenshot from './Screenshot'
 import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 import Project from './Project'
+import { TrackingSessionType } from 'Contracts/enums/tracking-session-type'
 
 export default class TrackingSession extends BaseModel {
   public static namingStrategy = new CamelCaseNamingStrategy()
@@ -23,6 +24,9 @@ export default class TrackingSession extends BaseModel {
 
   @column()
   public status: TrackingSessionStatus
+
+  @column()
+  public type: TrackingSessionType
 
   @column()
   public trackingTime: number
