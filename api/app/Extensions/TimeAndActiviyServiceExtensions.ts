@@ -62,7 +62,10 @@ class TimeAndActivityServiceExtensions {
 
   public mapSessionsToGroupedReport(sessions: any[], groupBy: string) {
     const groupByClause =
-      (groupBy === 'project' && 'project_id') || (groupBy === 'task' && 'task_id') || groupBy
+      (groupBy === 'project' && 'project_id') ||
+      (groupBy === 'task' && 'task_id') ||
+      (groupBy === 'client' && 'client_id') ||
+      groupBy
 
     const newGroup = {}
     const newGroupArray: any[] = []

@@ -118,10 +118,27 @@
         content:
           application/json:
             schema:
-              oneOf:
-                - $ref: '#/components/schemas/date'
-                - $ref: '#/components/schemas/project'
-                - $ref: '#/components/schemas/task'
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        tracking_time:
+                          type: string
+                        task:
+                          type: string
+                        project:
+                          type: string
 
 /reports/time-and-activity/user-weekly:
   get:
@@ -236,76 +253,3 @@
                     type: integer
                   averageActivity:
                     type: integer
-
-components:
-  schemas:
-    date:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          data:
-            type: array
-            items:
-              type: object
-              properties:
-                date:
-                  type: string
-                  format: date
-                tracking_time:
-                  type: string
-                task:
-                  type: string
-                project:
-                  type: string
-
-    project:
-      type: array
-      items:
-        type: object
-        properties:
-          project:
-            type: string
-            format: date
-          projectAvatar:
-            type: string
-          data:
-            type: array
-            items:
-              type: object
-              properties:
-                date:
-                  type: string
-                  format: date
-                tracking_time:
-                  type: string
-                task:
-                  type: string
-                project:
-                  type: string
-
-    task:
-      type: array
-      items:
-        type: object
-        properties:
-          date:
-            type: string
-            format: date
-          data:
-            type: array
-            items:
-              type: object
-              properties:
-                date:
-                  type: string
-                  format: date
-                tracking_time:
-                  type: string
-                task:
-                  type: string
-                project:
-                  type: string
