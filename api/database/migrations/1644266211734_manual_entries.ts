@@ -28,7 +28,11 @@ export default class ManualEntries extends BaseSchema {
       table.string('worked_to').notNullable()
       table.text('reason')
       table
-        .enum('status', Object.values(ManualEntryStatus))
+        .enum('status', Object.values(ManualEntryStatus), {
+          useNative: true,
+          enumName: 'manual_entry_status',
+          existingType: false,
+        })
         .defaultTo(ManualEntryStatus.IN_PROGRESS)
 
       /**
@@ -41,5 +45,6 @@ export default class ManualEntries extends BaseSchema {
 
   public async down() {
     this.schema.dropTable(this.tableName)
+    this.schema.raw('DROP TYPE IF EXISTS "manual_entry_status"')
   }
 }

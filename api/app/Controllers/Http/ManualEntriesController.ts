@@ -14,10 +14,10 @@ export default class ManualEntriesController {
     response.send(entry)
   }
 
-  public async approove({ request, response, bouncer, logger }: HttpContextContract) {
+  public async approve({ request, response, bouncer, logger }: HttpContextContract) {
     const entryId = UuidValidator.v4(request.param('id'))
 
-    await ManualEntryService.approove({ entryId, bouncer })
+    await ManualEntryService.approve({ entryId, bouncer })
 
     logger.info('Succesfully approoved manual entry request')
 

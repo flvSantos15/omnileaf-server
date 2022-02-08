@@ -1,4 +1,4 @@
 export enum TrackingSessionType {
-  SYSTEM,
-  MANUAL,
+  SYSTEM = 'SYSTEM',
+  MANUAL = 'MANUAL',
 }

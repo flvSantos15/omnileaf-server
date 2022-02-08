@@ -10,8 +10,8 @@ export enum TrackingSessionStatus {
 }
 
 export enum TaskStatus {
-  IN_PROGRESS,
-  CLOSED,
+  IN_PROGRESS = 'IN_PROGRESS',
+  CLOSED = 'CLOSED',
 }
 
 export enum OrganizationLabels {

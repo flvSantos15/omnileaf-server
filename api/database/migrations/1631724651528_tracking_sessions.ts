@@ -14,8 +14,13 @@ export default class TrackingSessions extends BaseSchema {
         .defaultTo(TrackingSessionStatus.IN_PROGRESS)
         .notNullable()
 
-      table.enum('type', Object.values(TrackingSessionType)).defaultTo(TrackingSessionType.SYSTEM)
-        .notNullable
+      table
+        .enum('type', Object.values(TrackingSessionType), {
+          useNative: true,
+          enumName: 'tracking_session_type',
+          existingType: false,
+        })
+        .defaultTo(TrackingSessionType.SYSTEM).notNullable
 
       table.integer('tracking_time')
 
@@ -63,5 +68,6 @@ export default class TrackingSessions extends BaseSchema {
 
   public async down() {
     this.schema.dropTable(this.tableName)
+    this.schema.raw('DROP TYPE IF EXISTS "tracking_session_type"')
   }
 }

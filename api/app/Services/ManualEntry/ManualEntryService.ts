@@ -56,7 +56,7 @@ class ManualEntryService {
     ]
   }
 
-  public async approove({ entryId, bouncer }: ApprooveEntryRequest) {
+  public async approve({ entryId, bouncer }: ApprooveEntryRequest) {
     const entry = await ManualEntry.find(entryId)
 
     if (!entry) {
