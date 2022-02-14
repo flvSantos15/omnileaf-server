@@ -8,6 +8,7 @@ import {
 } from 'App/Interfaces/TrackingSession/tracking-session-service.interfaces'
 import Task from 'App/Models/Task'
 import TrackingSession from 'App/Models/TrackingSession'
+import Screenshot from 'App/Models/Screenshot'
 import User from 'App/Models/User'
 import { TrackingSessionStatus } from 'Contracts/enums'
 import ScreenshotService from '../Screenshot/ScreenshotService'
@@ -49,7 +50,7 @@ class TrackingSessionService {
   }
 
   public async updateTrackingTime({ id, payload, bouncer }: UpdateTaskTrackingTimeRequest) {
-    const { trackingTime } = payload
+    const { trackingTime, inactivityTime } = payload
 
     const session = await TrackingSession.find(id)
 
@@ -63,7 +64,7 @@ class TrackingSessionService {
 
     await bouncer.authorize('SessionOwner', session)
 
-    await session.merge({ trackingTime }).save()
+    await session.merge({ trackingTime, inactivityTime }).save()
   }
 
   public async closeSession({ id, payload, bouncer }: CloseTrackingSessionRequest) {
@@ -87,7 +88,7 @@ class TrackingSessionService {
   public async createMany({ payload, bouncer }: CreateManySessionsRequest) {
     const { sessions } = payload
 
-    sessions.forEach(async (session) => {
+    for await (const session of sessions) {
       const { screenshots, ...newSessionPayload } = session
 
       const task = await Task.find(session.taskId)
@@ -108,7 +109,14 @@ class TrackingSessionService {
 
           const payload = {
             trackingSessionId: newSession.id,
+            deleted: screenshot.isDeleted,
             createdAt,
+          }
+
+          if (screenshot.isDeleted) {
+            await Screenshot.create(payload)
+
+            return
           }
 
           const buffer = Buffer.from(base64.replace(/^data:image\/\w+;base64,/, ''), 'base64')
@@ -116,7 +124,7 @@ class TrackingSessionService {
           await ScreenshotService.register({ payload, bouncer, buffer })
         }
       }
-    })
+    }
   }
 
   public async track({ taskId, userId }: TrackRequest) {

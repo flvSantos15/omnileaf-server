@@ -7,7 +7,6 @@ export interface RegisterScreenshotRequest {
   buffer: Buffer
   payload: {
     trackingSessionId: string
-    isDeleted?: boolean
     createdAt?: DateTime
   }
 }

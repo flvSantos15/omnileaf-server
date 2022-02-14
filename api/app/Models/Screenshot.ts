@@ -95,17 +95,15 @@ export default class Screenshot extends BaseModel {
   @afterCreate()
   public static async saveScreenshotLocation(screenshot: Screenshot) {
     if (!screenshot.location && !screenshot.blurredLocation) {
-      const location =
+      screenshot.location =
         Env.get('NODE_ENV') === 'development'
-          ? 'dev/' + 'images/' + screenshot.id + string.generateRandom(15)
+          ? 'dev/'
           : '' + 'images/' + screenshot.id + string.generateRandom(15)
-      const blurredLocation =
+      screenshot.blurredLocation =
         Env.get('NODE_ENV') === 'development'
-          ? 'dev/' + 'images/blurred/' + screenshot.id + string.generateRandom(15)
+          ? 'dev/'
           : '' + 'images/blurred/' + screenshot.id + string.generateRandom(15)
 
-      screenshot.location = location
-      screenshot.blurredLocation = blurredLocation
       await screenshot.save()
     }
   }

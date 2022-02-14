@@ -32,6 +32,9 @@ export default class TrackingSession extends BaseModel {
   public trackingTime: number
 
   @column()
+  public inactivityTime: number
+
+  @column()
   public userId: string
 
   //This property is auto created on beforeCreate hook
