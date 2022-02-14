@@ -24,6 +24,7 @@ export interface CloseTrackingSessionRequest {
   id: string
   payload: {
     trackingTime: number
+    inactivityTime: number
   }
   bouncer: ActionsAuthorizerContract<User>
 }

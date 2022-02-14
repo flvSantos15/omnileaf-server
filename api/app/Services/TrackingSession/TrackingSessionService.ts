@@ -68,8 +68,6 @@ class TrackingSessionService {
   }
 
   public async closeSession({ id, payload, bouncer }: CloseTrackingSessionRequest) {
-    const { trackingTime } = payload
-
     const session = await TrackingSession.find(id)
 
     if (!session) {
@@ -82,7 +80,7 @@ class TrackingSessionService {
 
     await bouncer.authorize('OwnUser', session.userId)
 
-    await session.merge({ trackingTime, status: TrackingSessionStatus.FINISHED }).save()
+    await session.merge({ ...payload, status: TrackingSessionStatus.FINISHED }).save()
   }
 
   public async createMany({ payload, bouncer }: CreateManySessionsRequest) {

@@ -12,9 +12,9 @@ import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
 import Screenshot from './Screenshot'
-import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 import Project from './Project'
 import { TrackingSessionType } from 'Contracts/enums/tracking-session-type'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class TrackingSession extends BaseModel {
   public static namingStrategy = new CamelCaseNamingStrategy()

@@ -29,9 +29,13 @@
       - in: body
         name: taskId
         schema:
-          type: string
-          format: uuid
-          required: true
+          type: object
+          properties:
+            taskId:
+              type: string
+              format: uuid
+              required: true
+
     responses:
       200:
         description: OK
@@ -52,6 +56,19 @@
         type: string
         format: uuid
         required: true
+
+      - in: body
+        name: Body View
+        schema:
+          type: object
+          properties:
+            trackingTime:
+              type: integer
+              required: true
+            inactivityTime:
+              type: integer
+              required: false
+
     responses:
       204:
         description: No content
@@ -67,6 +84,19 @@
         type: string
         format: uuid
         required: true
+
+      - in: body
+        name: Body View
+        schema:
+          type: object
+          properties:
+            trackingTime:
+              type: integer
+              required: true
+            inactivityTime:
+              type: integer
+              required: true
+
     responses:
       204:
         description: No content
@@ -89,6 +119,8 @@ tracking-sessions/create-many:
                   status:
                     type: string
                   trackingTime:
+                    type: integer
+                  inactivityTime:
                     type: integer
                   userId:
                     type: string
@@ -113,6 +145,9 @@ tracking-sessions/create-many:
                         base64:
                           type: string
                           format: byte
+                        isDeleted:
+                          type: boolean
+                          example: false
                     required: false
 
     responses:

@@ -5,5 +5,6 @@ export default class CloseSessionValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
     trackingTime: schema.number(),
+    inactivityTime: schema.number(),
   })
 }
