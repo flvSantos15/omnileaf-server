@@ -15,6 +15,7 @@ export interface UpdateTaskTrackingTimeRequest {
   id: string
   payload: {
     trackingTime: number
+    inactivityTime?: number
   }
   bouncer: ActionsAuthorizerContract<User>
 }
@@ -23,6 +24,7 @@ export interface CloseTrackingSessionRequest {
   id: string
   payload: {
     trackingTime: number
+    inactivityTime: number
   }
   bouncer: ActionsAuthorizerContract<User>
 }
@@ -42,6 +44,7 @@ export interface CreateManySessionsRequest {
 interface SessionOnCreateManyView {
   status?: TrackingSessionStatus
   trackingTime: number
+  inactivityTime?: number
   userId: string
   taskId: string
   startedAt: DateTime
@@ -52,4 +55,5 @@ interface SessionOnCreateManyView {
 interface ScreenshotOnCreateManyView {
   createdAt: DateTime
   base64: string
+  isDeleted?: boolean
 }

@@ -20,9 +20,11 @@ export default class TrackingSessions extends BaseSchema {
           enumName: 'tracking_session_type',
           existingType: false,
         })
-        .defaultTo(TrackingSessionType.SYSTEM).notNullable
+        .defaultTo(TrackingSessionType.SYSTEM)
+        .notNullable()
 
       table.integer('tracking_time')
+      table.integer('inactivity_time')
 
       table
         .uuid('user_id')

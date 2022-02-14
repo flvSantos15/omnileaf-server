@@ -9,6 +9,7 @@ export default class CreateManySessionValidator {
       schema.object().members({
         status: schema.enum.optional(Object.values(TrackingSessionStatus)),
         trackingTime: schema.number(),
+        inactivityTime: schema.number(),
         userId: schema.string({}, [rules.uuid({ version: 4 })]),
         taskId: schema.string({}, [rules.uuid({ version: 4 })]),
         startedAt: schema.date(),
@@ -16,7 +17,7 @@ export default class CreateManySessionValidator {
         screenshots: schema.array.optional().members(
           schema.object().members({
             createdAt: schema.date(),
-            isDeleted: schema.boolean(),
+            isDeleted: schema.boolean.optional(),
             base64: schema.string(),
           })
         ),
