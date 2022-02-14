@@ -38,19 +38,21 @@ class TimeAndActivityService {
       query.on(`${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
     })
 
-    const { timeTracked } = await sessionsQuery
+    const usersWorkSummary = await sessionsQuery
       .sum(`${TrackingSession.table}.tracking_time as timeTracked`)
-      .first()
 
-    const { projectsWorked } = await sessionsQuery
       .countDistinct(`${Project.table}.id as projectsWorked`)
-      .first()
 
-    const usersWorkSummary = {
-      timeTracked: timeTracked ? Number(timeTracked) : 0,
-      averageActivity: 0,
-      projectsWorked: projectsWorked ? Number(projectsWorked) : 0,
-    }
+      .select(
+        Database.raw(
+          `TRIM(
+            TO_CHAR(
+              ((1 - (sum(${TrackingSession.table}.inactivity_time) / sum(${TrackingSession.table}.tracking_time))) * 100
+            ), '999%')
+          ) as activity`
+        )
+      )
+      .first()
 
     return usersWorkSummary
   }

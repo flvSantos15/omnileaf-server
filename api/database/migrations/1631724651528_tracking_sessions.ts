@@ -23,8 +23,8 @@ export default class TrackingSessions extends BaseSchema {
         .defaultTo(TrackingSessionType.SYSTEM)
         .notNullable()
 
-      table.integer('tracking_time')
-      table.integer('inactivity_time')
+      table.integer('tracking_time').defaultTo(0)
+      table.integer('inactivity_time').defaultTo(0)
 
       table
         .uuid('user_id')
