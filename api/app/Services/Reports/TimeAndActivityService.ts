@@ -85,7 +85,6 @@ class TimeAndActivityService {
     return sessions
   }
 
-  //TO-DO: Add client filter
   public async getGroupedReport({ params }: GroupedReportRequest) {
     await GetGroupedReportValidator.validate(params)
 
@@ -100,21 +99,21 @@ class TimeAndActivityService {
       .andWhere(`${TrackingSession.table}.user_id`, userId)
       .join(`${Task.table}`, `${TrackingSession.table}.task_id`, '=', `${Task.table}.id`)
       .join(`${Project.table}`, `${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
-      .join(`${User.table}`, `${Project.table}.client_id`, '=', `${User.table}.id`)
+      .leftJoin(`${User.table}`, `${Project.table}.client_id`, '=', `${User.table}.id`)
 
       .select(
         Database.raw(
-          `to_char(started_at, 'YYYY-MM-DD') as date, 
-          sum(${TrackingSession.table}.tracking_time) as tracking_time, 
-          ${Task.table}.name as task,
-          ${Task.table}.id as task_id,
-          ${Project.table}.name as project,
-          ${Project.table}.id as project_id,
-          ${User.table}.name as client,
-          ${User.table}.id as client_id`
+          `to_char(started_at, 'YYYY-MM-DD') as date,
+        sum(${TrackingSession.table}.tracking_time) as tracking_time,
+        ${Task.table}.name as task,
+        ${Task.table}.id as task_id,
+        ${Project.table}.name as project,
+        ${Project.table}.id as project_id,
+        ${User.table}.name as client,
+        ${User.table}.id as client_id`
         )
       )
-      .groupByRaw(`${Project.table}.id, ${Task.table}.id,${User.table}.id, date`)
+      .groupByRaw(`${Project.table}.id, ${Task.table}.id, ${User.table}.id, date`)
       .orderBy('date')
 
     return TimeAndActiviyServiceExtensions.mapSessionsToGroupedReport(sessionsSum, groupBy)
@@ -133,7 +132,6 @@ class TimeAndActivityService {
       .andWhere(`${TrackingSession.table}.organization_id`, organizationId)
       .andWhere(`${TrackingSession.table}.user_id`, userId)
       .join(`${Project.table}`, `${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
-      //TO-DO: SELECT PROJECT AVATAR URL
       .select(
         Database.raw(
           `to_char(started_at, 'YYYY-MM-DD') as date, 
