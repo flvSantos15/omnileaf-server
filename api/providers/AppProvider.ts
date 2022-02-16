@@ -13,6 +13,15 @@ export default class AppProvider {
 
   public async boot() {
     // IoC container is ready
+
+    // Register Sendgrid Mailer
+    const { SendgridDriver } = await import('./SendgridDriver')
+
+    const Mail = this.app.container.use('Adonis/Addons/Mail')
+
+    Mail.extend('sendgrid', (_mail, _mapping, config) => {
+      return new SendgridDriver(config)
+    })
   }
 
   public async ready() {
