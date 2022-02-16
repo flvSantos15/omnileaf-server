@@ -1,4 +1,5 @@
-import sendgrid from '@sendgrid/mail'
+import nodemailer from 'nodemailer'
+import sendgridTransporter from 'nodemailer-sendgrid-transport'
 import { MailDriverContract, MessageNode } from '@ioc:Adonis/Addons/Mail'
 
 /**
@@ -7,7 +8,7 @@ import { MailDriverContract, MessageNode } from '@ioc:Adonis/Addons/Mail'
 export type SendgridConfig = {
   driver: 'sendgrid'
   auth: {
-    apiKey: string
+    api_key: string
   }
 }
 
@@ -18,22 +19,22 @@ export class SendgridDriver implements MailDriverContract {
     /**
      * Instantiate the nodemailer transport
      */
-    sendgrid.setApiKey(this.config.auth.apiKey)
-
-    this.transporter = sendgrid
+    console.log(this.config)
+    this.transporter = nodemailer.createTransport(sendgridTransporter(this.config))
   }
 
   /**
    * Send email using the underlying transport
    */
   public async send(message: MessageNode) {
-    return this.transporter.send(message)
+    return this.transporter.sendMail(message)
   }
 
   /**
    * Cleanup resources
    */
   public close() {
+    this.transporter.close()
     this.transporter = null
   }
 }

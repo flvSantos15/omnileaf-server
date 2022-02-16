@@ -18,7 +18,7 @@ const mailConfig: MailConfig = {
   | a mailer
   |
   */
-  mailer: 'mailgun',
+  mailer: 'sendgrid',
 
   /*
   |--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ const mailConfig: MailConfig = {
     sendgrid: {
       driver: 'sendgrid',
       auth: {
-        apiKey: Env.get('SENDGRID_API_KEY'),
+        api_key: Env.get('SENDGRID_API_KEY'),
       },
     },
   },

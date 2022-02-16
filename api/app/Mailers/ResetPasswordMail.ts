@@ -9,7 +9,7 @@ export default class ResetPasswordMail extends BaseMailer {
   public async prepare(message: MessageContract) {
     message
       .subject('OMNILEAF - Reset your password')
-      .from('no-reply@mg.omnileaf.tk')
+      .from('no-reply@omnileaf.ml')
       .to(this.email)
       .html(await View.render('emails/reset-password', { url: this.url }))
   }
