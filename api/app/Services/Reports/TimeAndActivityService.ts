@@ -85,11 +85,12 @@ class TimeAndActivityService {
       .select(
         Database.raw(
           `to_char(started_at, 'YYYY-MM-DD') as date,
-          sum(${TrackingSession.table}.tracking_time) as tracking_time`
+          cast(sum(${TrackingSession.table}.tracking_time) as integer) as tracking_time,
+          ${TrackingSession.table}.type`
         )
       )
       //TO-DO: Add tracking time Type: session /  manual and groupBy type in line above
-      .groupByRaw('date')
+      .groupByRaw('date, type')
       .orderBy('date')
 
     return sessions
