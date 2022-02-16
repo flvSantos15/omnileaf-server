@@ -32,12 +32,12 @@
             schema:
               type: object
               properties:
-                timeTracked:
-                  type: integer
-                averageActivity:
-                  type: integer
-                projectsWorked:
-                  type: integer
+                time_tracked:
+                  type: number
+                projects_worked:
+                  type: number
+                activity:
+                  type: string
 
 /reports/time-and-activity/hours-per-day:
   get:
@@ -125,6 +125,8 @@
                   date:
                     type: string
                     format: date
+                  avatarUrl:
+                    type: string
                   data:
                     type: array
                     items:
@@ -134,10 +136,14 @@
                           type: string
                           format: date
                         tracking_time:
+                          type: number
+                        activity_time:
                           type: string
                         task:
                           type: string
                         project:
+                          type: string
+                        client:
                           type: string
 
 /reports/time-and-activity/user-weekly:
@@ -178,7 +184,7 @@
                 properties:
                   project:
                     type: string
-                  projectAvatar:
+                  avatarUrl:
                     type: string
                   data:
                     type: array
@@ -189,6 +195,8 @@
                           type: string
                           format: date
                         tracked:
+                          type: number
+                        activity_time:
                           type: string
                         project:
                           type: string
@@ -235,7 +243,7 @@
                 properties:
                   user:
                     type: string
-                  userAvatar:
+                  avatarUrl:
                     type: string
                   data:
                     type: array
@@ -246,6 +254,8 @@
                           type: string
                           format: date
                         tracked:
+                          type: number
+                        activity_time:
                           type: string
                         user:
                           type: string

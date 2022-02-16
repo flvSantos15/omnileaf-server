@@ -12,7 +12,7 @@ import GetGroupedReportValidator from 'App/Validators/Report/TimeAndActivity/Get
 import { DateTime } from 'luxon'
 import GetOrganizationUsersWorkSummaryValidator from 'App/Validators/Report/TimeAndActivity/GetOrganizationUsersWorkSummaryValidator'
 import GetUserWeeklyReportValidator from 'App/Validators/Report/TimeAndActivity/GetUserWeeklyReportValidator'
-import TimeAndActiviyServiceExtensions from 'App/Extensions/TimeAndActiviyServiceExtensions'
+import TimeAndActiviyExtensions from 'App/Extensions/TimeAndActiviyExtensions'
 import GetOrgWeeklyReportValidator from 'App/Validators/Report/TimeAndActivity/GetOrgWeeklyReportValidator'
 import User from 'App/Models/User'
 import Task from 'App/Models/Task'
@@ -26,35 +26,43 @@ class TimeAndActivityService {
     const startAsDateTime = DateTime.fromISO(start)
     const endAsDateTimePlusOne = DateTime.fromISO(end).plus({ days: 1 })
 
-    let sessionsQuery = Database.from(TrackingSession.table)
-      .whereBetween('started_at', [startAsDateTime.toSQLDate(), endAsDateTimePlusOne.toSQLDate()])
-      .andWhere(`${TrackingSession.table}.organization_id`, organizationId)
+    let sessionsQuery = await Database.from((subquery) => {
+      subquery
+        .from(TrackingSession.table)
+        .whereBetween('started_at', [startAsDateTime.toSQLDate(), endAsDateTimePlusOne.toSQLDate()])
+        .andWhere(`${TrackingSession.table}.organization_id`, organizationId)
 
-    if (userId) {
-      sessionsQuery = sessionsQuery.andWhere(`${TrackingSession.table}.user_id`, userId)
-    }
+      if (userId) {
+        subquery.andWhere(`${TrackingSession.table}.user_id`, userId)
+      }
 
-    sessionsQuery = sessionsQuery.join(`${Project.table}`, (query) => {
-      query.on(`${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
+      subquery
+
+        .join(`${Project.table}`, (query) => {
+          query.on(`${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
+        })
+
+        .sum(`${TrackingSession.table}.tracking_time as time_tracked`)
+
+        .countDistinct(`${Project.table}.id as projects_worked`)
+
+        .select(
+          Database.raw(
+            `trim(to_char((1 - (cast(sum(${TrackingSession.table}.inactivity_time) as float) 
+            / cast(sum(${TrackingSession.table}.tracking_time) as float))) * 100, '999%')) as activity`
+          )
+        )
+
+        .as('result')
     })
-
-    const usersWorkSummary = await sessionsQuery
-      .sum(`${TrackingSession.table}.tracking_time as timeTracked`)
-
-      .countDistinct(`${Project.table}.id as projectsWorked`)
-
       .select(
         Database.raw(
-          `TRIM(
-            TO_CHAR(
-              ((1 - (sum(${TrackingSession.table}.inactivity_time) / sum(${TrackingSession.table}.tracking_time))) * 100
-            ), '999%')
-          ) as activity`
+          'cast(result.time_tracked as integer), cast(result.projects_worked as integer), result.activity'
         )
       )
       .first()
 
-    return usersWorkSummary
+    return sessionsQuery
   }
 
   public async getHoursWorkedPerDay({ params }: HoursWorkedPerDayRequest) {
@@ -95,30 +103,42 @@ class TimeAndActivityService {
     const startAsDateTime = DateTime.fromISO(start)
     const endAsDateTimePlusOne = DateTime.fromISO(end).plus({ days: 1 })
 
-    const sessionsSum = await Database.from(TrackingSession.table)
-      .whereBetween('started_at', [startAsDateTime.toSQLDate(), endAsDateTimePlusOne.toSQLDate()])
-      .andWhere(`${TrackingSession.table}.organization_id`, organizationId)
-      .andWhere(`${TrackingSession.table}.user_id`, userId)
-      .join(`${Task.table}`, `${TrackingSession.table}.task_id`, '=', `${Task.table}.id`)
-      .join(`${Project.table}`, `${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
-      .leftJoin(`${User.table}`, `${Project.table}.client_id`, '=', `${User.table}.id`)
-
-      .select(
-        Database.raw(
-          `to_char(started_at, 'YYYY-MM-DD') as date,
-        sum(${TrackingSession.table}.tracking_time) as tracking_time,
+    const sessionsSum = await Database.from((subquery) => {
+      subquery
+        .from(TrackingSession.table)
+        .whereBetween('started_at', [startAsDateTime.toSQLDate(), endAsDateTimePlusOne.toSQLDate()])
+        .andWhere(`${TrackingSession.table}.organization_id`, organizationId)
+        .andWhere(`${TrackingSession.table}.user_id`, userId)
+        .join(`${Task.table}`, `${TrackingSession.table}.task_id`, '=', `${Task.table}.id`)
+        .join(`${Project.table}`, `${TrackingSession.table}.project_id`, '=', `${Project.table}.id`)
+        .leftJoin(`${User.table}`, `${Project.table}.client_id`, '=', `${User.table}.id`)
+        .select(
+          Database.raw(
+            `to_char(started_at, 'YYYY-MM-DD') as date,
+        cast(sum(${TrackingSession.table}.tracking_time) as integer) as tracking_time,
+        cast(sum(${TrackingSession.table}.inactivity_time) as integer) as inactivity_time,
+        trim(to_char(
+          (1 - (
+              cast(sum(${TrackingSession.table}.inactivity_time) as float) 
+              / cast(sum(${TrackingSession.table}.tracking_time) as float)
+            )
+          ) * 100, '999%')) as activity_time,
         ${Task.table}.name as task,
         ${Task.table}.id as task_id,
         ${Project.table}.name as project,
         ${Project.table}.id as project_id,
+        ${Project.table}.avatar_url as project_avatar,
         ${User.table}.name as client,
-        ${User.table}.id as client_id`
+        ${User.table}.id as client_id,
+        ${User.table}.avatar_url as client_avatar`
+          )
         )
-      )
-      .groupByRaw(`${Project.table}.id, ${Task.table}.id, ${User.table}.id, date`)
-      .orderBy('date')
+        .groupByRaw(`${Project.table}.id, ${Task.table}.id, ${User.table}.id, date`)
+        .orderBy('date')
+        .as('grouped_sessions')
+    })
 
-    return TimeAndActiviyServiceExtensions.mapSessionsToGroupedReport(sessionsSum, groupBy)
+    return TimeAndActiviyExtensions.mapSessionsToGroupedReport(sessionsSum, groupBy)
   }
 
   public async getUserWeeklyReport({ params }: UserWeeklyReportRequest) {
@@ -137,14 +157,22 @@ class TimeAndActivityService {
       .select(
         Database.raw(
           `to_char(started_at, 'YYYY-MM-DD') as date, 
-          sum(cast(tracking_sessions.tracking_time as integer)) as tracked, 
-          ${Project.table}.name as project, ${Project.table}.id as project_id`
+          cast(sum(tracking_sessions.tracking_time) as integer) as tracked,
+          trim(to_char(
+            (1 - (
+                cast(sum(${TrackingSession.table}.inactivity_time) as float) 
+                / cast(sum(${TrackingSession.table}.tracking_time) as float)
+              )
+            ) * 100, '999%')) as activity_time, 
+          ${Project.table}.name as project, 
+          ${Project.table}.id as project_id,
+          ${Project.table}.avatar_url`
         )
       )
       .groupByRaw(`${Project.table}.id, date`)
       .orderBy('date')
 
-    return TimeAndActiviyServiceExtensions.mapSessionsToUserWeeklyReport(sessions)
+    return TimeAndActiviyExtensions.mapSessionsToUserWeeklyReport(sessions)
   }
 
   public async getOrganizationWeeklyReport({ params }: OrgWeeklyReportRequest) {
@@ -168,8 +196,16 @@ class TimeAndActivityService {
       .select(
         Database.raw(
           `to_char(started_at, 'YYYY-MM-DD') as date, 
-          sum(cast(tracking_sessions.tracking_time as integer)) as tracked, 
-          ${User.table}.name as user, ${User.table}.avatar_url, ${User.table}.id as user_id`
+          cast(sum(tracking_sessions.tracking_time) as integer) as tracked,
+          trim(to_char(
+            (1 - (
+                cast(sum(${TrackingSession.table}.inactivity_time) as float) 
+                / cast(sum(${TrackingSession.table}.tracking_time) as float)
+              )
+            ) * 100, '999%')) as activity_time, 
+          ${User.table}.name as user, 
+          ${User.table}.avatar_url, 
+          ${User.table}.id as user_id`
         )
       )
       .groupByRaw(`${User.table}.id, ${User.table}.avatar_url, date`)
@@ -177,7 +213,7 @@ class TimeAndActivityService {
 
     const sessions = await sessionsQuery
 
-    return TimeAndActiviyServiceExtensions.mapSessionsToOrgWeeklyReport(sessions)
+    return TimeAndActiviyExtensions.mapSessionsToOrgWeeklyReport(sessions)
   }
 }
 
