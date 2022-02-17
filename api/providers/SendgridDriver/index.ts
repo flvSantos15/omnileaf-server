@@ -19,7 +19,6 @@ export class SendgridDriver implements MailDriverContract {
     /**
      * Instantiate the nodemailer transport
      */
-    console.log(this.config)
     this.transporter = nodemailer.createTransport(sendgridTransporter(this.config))
   }
 
