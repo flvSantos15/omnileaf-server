@@ -11,7 +11,7 @@ export default class OrganizationInvitesController {
 
     const payload = await request.validate(InviteUserValidator)
 
-    await OrganizationInviteService.inviteUser({ id, payload, bouncer })
+    await OrganizationInviteService.create({ id, payload, bouncer })
 
     logger.info('Succesfully sended user invite')
 
@@ -38,5 +38,13 @@ export default class OrganizationInvitesController {
     }
 
     response.noContent()
+  }
+
+  public async listUserInvites({ response, auth, logger }: HttpContextContract) {
+    const invites = await OrganizationInviteService.listUserInvites({ auth })
+
+    logger.info('Succesfully retrieved user invites')
+
+    response.send(invites)
   }
 }

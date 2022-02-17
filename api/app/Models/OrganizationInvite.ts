@@ -12,12 +12,12 @@ export default class OrganizationInvite extends BaseModel {
   public organizationId: string
 
   @column()
-  public userId: string
+  public userEmail: string
 
   @column()
   public status: OrganizationInviteStatus
 
-  @column()
+  @column({ serializeAs: null })
   public labelsString: string
 
   @computed()
@@ -31,13 +31,17 @@ export default class OrganizationInvite extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
+  /**
+   *
+   * Relations
+   */
   @belongsTo(() => Organization, {
     foreignKey: 'organizationId',
   })
   public organization: BelongsTo<typeof Organization>
 
   @belongsTo(() => User, {
-    foreignKey: 'userId',
+    foreignKey: 'userEmail',
   })
   public user: BelongsTo<typeof User>
 }

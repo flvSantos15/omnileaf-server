@@ -15,7 +15,7 @@ export default class OrganizationInvites extends BaseSchema {
         .inTable('organizations')
         .notNullable()
 
-      table.uuid('user_id').unsigned().references('id').inTable('users').notNullable()
+      table.string('user_email').notNullable()
 
       table
         .enum('status', Object.values(OrganizationInviteStatus))

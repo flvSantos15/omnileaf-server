@@ -8,16 +8,21 @@ import {
   AddMemberLabelsProps,
   AnswerInviteRequest,
   InviteUserRequest,
+  ListUserInvitesRequest,
 } from 'App/Interfaces/Organization/organization-invites-service'
 import Label from 'App/Models/Label'
 import { OrganizationInviteStatus } from 'Contracts/enums/organization-invite-status'
 import WelcomeToOrganizationMail from 'App/Mailers/WelcomeToOrganizationMail'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 class OrganizationInviteService {
-  public async inviteUser({ id, payload, bouncer }: InviteUserRequest) {
-    const { userId, labelIds } = payload
+  public async create({ id, payload, bouncer }: InviteUserRequest) {
+    const { email, labelIds } = payload
 
-    const [organization, user] = await Promise.all([Organization.find(id), User.find(userId)])
+    const [organization, user] = await Promise.all([
+      Organization.find(id),
+      User.findBy('email', email),
+    ])
 
     /**
      *
@@ -27,13 +32,9 @@ class OrganizationInviteService {
       throw new Exception('Organization not found', 404)
     }
 
-    if (!user) {
-      throw new Exception('User not found', 404)
-    }
-
     const invite = await OrganizationInvite.query()
       .where('organizationId', id)
-      .andWhere('userId', user.id)
+      .andWhere('userEmail', email)
       .andWhere('status', OrganizationInviteStatus.IN_PROGRESS)
       .first()
 
@@ -41,9 +42,11 @@ class OrganizationInviteService {
       throw new Exception('User is already invited', 400)
     }
 
-    await user.load('organizations')
-    if (user.organizations.map((org) => org.id).includes(id)) {
-      throw new Exception('User is already a member', 400)
+    if (user) {
+      await user.load('organizations')
+      if (user.organizations.map((org) => org.id).includes(id)) {
+        throw new Exception('User is already a member', 400)
+      }
     }
 
     for await (let labelId of labelIds) {
@@ -61,12 +64,12 @@ class OrganizationInviteService {
      * Handle
      */
     await OrganizationInvite.create({
-      userId,
+      userEmail: email,
       organizationId: id,
       labelsString: labelIds.join(';'),
     })
 
-    await new InviteToOrganizationMail(user.email, organization.name).send()
+    await new InviteToOrganizationMail(email, organization.name).send()
   }
 
   public async accept({ id, auth }: AnswerInviteRequest) {
@@ -84,7 +87,7 @@ class OrganizationInviteService {
 
     const invite = await OrganizationInvite.query()
       .where('organizationId', id)
-      .andWhere('userId', user.id)
+      .andWhere('userEmail', user.email)
       .andWhere('status', OrganizationInviteStatus.IN_PROGRESS)
       .first()
 
@@ -134,7 +137,7 @@ class OrganizationInviteService {
 
     const invite = await OrganizationInvite.query()
       .where('organizationId', id)
-      .andWhere('userId', user.id)
+      .andWhere('userEmail', user.email)
       .andWhere('status', OrganizationInviteStatus.IN_PROGRESS)
       .first()
 
@@ -148,9 +151,48 @@ class OrganizationInviteService {
 
     /**
      *
-     * Hanlde
+     * Handle
      */
     await invite.merge({ status: OrganizationInviteStatus.DENIED }).save()
+  }
+
+  public async listUserInvites({ auth }: ListUserInvitesRequest) {
+    const user = auth.use('web').user!
+
+    /**
+     *
+     * Handle
+     */
+    const invites = await Database.from((subquery) => {
+      subquery
+        .from(`${OrganizationInvite.table}`)
+        .where(`${OrganizationInvite.table}.user_email`, user.email)
+        .andWhere(`${OrganizationInvite.table}.status`, OrganizationInviteStatus.IN_PROGRESS)
+        .join(`${User.table}`, `${OrganizationInvite.table}.user_email`, '=', `${User.table}.email`)
+        .join(
+          `${Organization.table}`,
+          `${OrganizationInvite.table}.organization_id`,
+          '=',
+          `${Organization.table}.id`
+        )
+        .select(
+          Database.raw(
+            `${OrganizationInvite.table}.created_at,
+          ${OrganizationInvite.table}.status,
+          ${Organization.table}.name as organization,
+          ${Organization.table}.avatar_url
+          `
+          )
+        )
+        .as('subquery')
+    }).select({
+      avatarUrl: 'avatar_url',
+      organization: 'organization',
+      status: 'status',
+      createdAt: 'created_at',
+    })
+
+    return invites
   }
 }
 

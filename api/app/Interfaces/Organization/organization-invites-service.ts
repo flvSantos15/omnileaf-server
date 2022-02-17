@@ -5,7 +5,7 @@ import User from 'App/Models/User'
 export interface InviteUserRequest {
   id: string
   payload: {
-    userId: string
+    email: string
     labelIds: string[]
   }
   bouncer: ActionsAuthorizerContract<User>
@@ -19,4 +19,8 @@ export interface AnswerInviteRequest {
 export type AddMemberLabelsProps = {
   user: User
   labelIds: string[]
+}
+
+export interface ListUserInvitesRequest {
+  auth: AuthContract
 }

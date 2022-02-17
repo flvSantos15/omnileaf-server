@@ -4,7 +4,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 export default class InviteUserValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
-    userId: schema.string({}, [rules.uuid({ version: 4 })]),
+    email: schema.string({}, [rules.email()]),
     labelIds: schema.array().members(schema.string({}, [rules.uuid({ version: 4 })])),
   })
 }

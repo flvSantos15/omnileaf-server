@@ -7,6 +7,12 @@ Route.post('users/forgot-password', 'UsersController.forgotPassword')
 Route.patch('users/reset-password/:tokenId', 'UsersController.resetPassword')
 
 Route.group(() => {
+  /**
+   *
+   * Invites
+   */
+  Route.get('users/invites', 'OrganizationInvitesController.listUserInvites')
+
   Route.get('users', 'UsersController.list')
 
   Route.get('users/:id', 'UsersController.show')
