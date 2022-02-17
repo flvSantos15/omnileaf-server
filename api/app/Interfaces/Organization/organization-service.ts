@@ -25,20 +25,6 @@ export interface DeleteOrganizationRequest {
   bouncer: ActionsAuthorizerContract<User>
 }
 
-export type AddMemberLabelsProps = {
-  user: User
-  labelIds: string[]
-}
-
-export interface AddMemberRequest {
-  id: string
-  payload: {
-    userId: string
-    labelIds: string[]
-  }
-  bouncer: ActionsAuthorizerContract<User>
-}
-
 export interface RemoveMemberRequest {
   id: string
   payload: {

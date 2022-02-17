@@ -2,7 +2,6 @@ import Logger from '@ioc:Adonis/Core/Logger'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import CreateOrganizationValidator from 'App/Validators/Organization/CreateOrganizationValidator'
 import UpdateOrganizationValidator from 'App/Validators/Organization/UpdateOrganizationValidator'
-import AddOrganizationMemberValidator from 'App/Validators/Organization/AddOrganizationMemberValidator'
 import RemoveOrganizationMemberValidator from 'App/Validators/Organization/RemoveOrganizationMemberValidator'
 import OrganizationService from 'App/Services/Organization/OrganizationService'
 import UuidValidator from 'App/Validators/Global/UuidValidator'
@@ -56,18 +55,6 @@ export default class OrganizationsController {
     await OrganizationService.delete({ id, bouncer })
 
     Logger.info('Organization deleted succesfully')
-
-    response.status(204)
-  }
-
-  public async addMember({ request, response, bouncer }: HttpContextContract) {
-    const id = UuidValidator.v4(request.param('id'))
-
-    const payload = await request.validate(AddOrganizationMemberValidator)
-
-    await OrganizationService.addMember({ id, payload, bouncer })
-
-    Logger.info('Succesfully added membem to Organization')
 
     response.status(204)
   }
