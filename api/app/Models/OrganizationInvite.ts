@@ -1,9 +1,18 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column, computed } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  BelongsTo,
+  belongsTo,
+  column,
+  ManyToMany,
+  manyToMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import { OrganizationInviteStatus } from 'Contracts/enums/organization-invite-status'
 import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 import Organization from './Organization'
 import User from './User'
+import Label from './Label'
+import Project from './Project'
 
 export default class OrganizationInvite extends BaseModel {
   public static namingStrategy = new CamelCaseNamingStrategy()
@@ -19,22 +28,6 @@ export default class OrganizationInvite extends BaseModel {
 
   @column()
   public status: OrganizationInviteStatus
-
-  @column({ serializeAs: null })
-  public labelsString: string
-
-  @column({ serializeAs: null })
-  public projectsString: string
-
-  @computed()
-  public get labels() {
-    return this.labelsString.split(';')
-  }
-
-  @computed()
-  public get projects() {
-    return this.projectsString.split(';')
-  }
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -55,4 +48,16 @@ export default class OrganizationInvite extends BaseModel {
     foreignKey: 'userEmail',
   })
   public user: BelongsTo<typeof User>
+
+  @manyToMany(() => Label, {
+    pivotTable: 'invite_label',
+    pivotForeignKey: 'invite_id',
+  })
+  public labels: ManyToMany<typeof Label>
+
+  @manyToMany(() => Project, {
+    pivotTable: 'invite_project',
+    pivotForeignKey: 'invite_id',
+  })
+  public projects: ManyToMany<typeof Project>
 }

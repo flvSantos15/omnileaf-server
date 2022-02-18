@@ -1,7 +1,9 @@
 import { AuthContract } from '@ioc:Adonis/Addons/Auth'
 import { ActionsAuthorizerContract } from '@ioc:Adonis/Addons/Bouncer'
+import Label from 'App/Models/Label'
+import Project from 'App/Models/Project'
 import User from 'App/Models/User'
-import { ProjectRoles } from 'Contracts/enums'
+import { OrganizationLabels } from 'Contracts/enums'
 
 export interface InviteUserRequest {
   id: string
@@ -20,13 +22,13 @@ export interface AnswerInviteRequest {
 
 export type AddMemberLabelsProps = {
   user: User
-  labelIds: string[]
+  labels: Label[]
 }
 
 export type AttachMemberToProjectsProps = {
   user: User
-  projectIds: string[]
-  labelIds: string[]
+  projects: Project[]
+  labelTitles: OrganizationLabels[]
 }
 
 export interface ListUserInvitesRequest {

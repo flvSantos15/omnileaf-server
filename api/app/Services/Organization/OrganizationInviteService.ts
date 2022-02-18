@@ -37,13 +37,13 @@ class OrganizationInviteService {
       throw new Exception('Organization not found', 404)
     }
 
-    const invite = await OrganizationInvite.query()
+    const inviteExists = await OrganizationInvite.query()
       .where('organizationId', id)
       .andWhere('userEmail', email)
       .andWhere('status', OrganizationInviteStatus.IN_PROGRESS)
       .first()
 
-    if (!types.isNull(invite)) {
+    if (!types.isNull(inviteExists)) {
       throw new Exception('User is already invited', 400)
     }
 
@@ -65,14 +65,30 @@ class OrganizationInviteService {
      *
      * Handle
      */
-    await OrganizationInvite.create({
+    const invite = await OrganizationInvite.create({
       userEmail: email,
       organizationId: id,
-      labelsString: labelIds.join(';'),
-      projectsString: projectIds?.join(';'),
     })
 
+    await this._attachInviteLabels(invite, labelIds)
+
+    if (projectIds) {
+      await this._attachInviteProjects(invite, projectIds)
+    }
+
     await new InviteToOrganizationMail(email, organization.name).send()
+  }
+
+  private async _attachInviteLabels(invite: OrganizationInvite, labelIds: string[]) {
+    for await (const id of labelIds) {
+      await invite.related('labels').attach([id])
+    }
+  }
+
+  private async _attachInviteProjects(invite: OrganizationInvite, projectIds: string[]) {
+    for await (const id of projectIds) {
+      await invite.related('projects').attach([id])
+    }
   }
 
   private async _userIsMemberGuard(user: User, organizationId: string) {
@@ -159,12 +175,14 @@ class OrganizationInviteService {
      */
     await organization.related('members').attach([user.id])
 
-    await this._addMemberLabels({ user, labelIds: invite.labels })
+    await Promise.all([invite.load('labels'), invite.load('projects')])
+
+    await this._addMemberLabels({ user, labels: invite.labels })
 
     await this._attachMemberToProjects({
       user,
-      projectIds: invite.projects,
-      labelIds: invite.labels,
+      projects: invite.projects,
+      labelTitles: invite.labels.map((label) => label.title),
     })
 
     await invite.merge({ status: OrganizationInviteStatus.ACCEPTED }).save()
@@ -172,12 +190,10 @@ class OrganizationInviteService {
     await new WelcomeToOrganizationMail(user.email, organization.name).send()
   }
 
-  private async _addMemberLabels({ user, labelIds }: AddMemberLabelsProps) {
+  private async _addMemberLabels({ user, labels }: AddMemberLabelsProps) {
     await user.load('organizationRelations')
 
-    for await (let labelId of labelIds) {
-      const label = await Label.find(labelId)
-
+    for await (const label of labels) {
       const [orgRelation] = user!.organizationRelations.filter(
         (relation) => relation.organizationId === label!.organizationId
       )
@@ -188,14 +204,12 @@ class OrganizationInviteService {
 
   private async _attachMemberToProjects({
     user,
-    projectIds,
-    labelIds,
+    projects,
+    labelTitles,
   }: AttachMemberToProjectsProps) {
-    const role = await this._getProjectRole(labelIds)
+    const role = await this._getProjectRole(labelTitles)
 
-    for await (let projectId of projectIds) {
-      const project = await Project.findOrFail(projectId)
-
+    for await (const project of projects) {
       await project.related('usersAssigned').attach({
         [user.id]: {
           role,
@@ -204,16 +218,8 @@ class OrganizationInviteService {
     }
   }
 
-  private async _getProjectRole(labelIds: string[]) {
-    let orgRole: string = ''
-
-    for await (let labelId of labelIds) {
-      const label = await Label.findOrFail(labelId)
-
-      if (Object.values(OrganizationLabels).includes(label.title)) {
-        orgRole = label.title
-      }
-    }
+  private async _getProjectRole(labelTitles: OrganizationLabels[]) {
+    const orgRole = labelTitles.find((title) => Object.values(OrganizationLabels).includes(title))
 
     const managerRoles = [
       OrganizationLabels.ORGANIZATION_MANAGER,

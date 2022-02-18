@@ -22,10 +22,6 @@ export default class OrganizationInvites extends BaseSchema {
         .notNullable()
         .defaultTo(OrganizationInviteStatus.IN_PROGRESS)
 
-      table.text('labels_string').notNullable()
-
-      table.text('projects_string')
-
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
