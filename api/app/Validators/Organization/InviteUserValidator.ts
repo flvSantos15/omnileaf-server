@@ -6,5 +6,6 @@ export default class InviteUserValidator {
   public schema = schema.create({
     email: schema.string({}, [rules.email()]),
     labelIds: schema.array().members(schema.string({}, [rules.uuid({ version: 4 })])),
+    projectIds: schema.array.optional().members(schema.string({}, [rules.uuid({ version: 4 })])),
   })
 }

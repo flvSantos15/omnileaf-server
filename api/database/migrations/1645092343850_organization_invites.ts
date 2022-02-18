@@ -24,6 +24,8 @@ export default class OrganizationInvites extends BaseSchema {
 
       table.text('labels_string').notNullable()
 
+      table.text('projects_string')
+
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
