@@ -79,7 +79,12 @@
                     type: string
                     format: date
                   tracking_time:
+                    type: number
+                  type:
                     type: string
+                    enum:
+                      - 'SYSTEM'
+                      - 'MANUAL'
 
 /reports/time-and-activity/grouped:
   get:

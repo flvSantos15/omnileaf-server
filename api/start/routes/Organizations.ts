@@ -7,11 +7,24 @@ Route.group(() => {
 
   Route.post('organizations', 'OrganizationsController.create')
 
-  Route.post('organizations/add/:id', 'OrganizationsController.addMember')
-
   Route.put('organizations/:id', 'OrganizationsController.update')
 
   Route.delete('organizations/:id', 'OrganizationsController.delete')
 
-  Route.delete('organizations/remove/:id', 'OrganizationsController.removeMember')
+  Route.delete('organizations/:id/member', 'OrganizationsController.removeMember')
+
+  /**
+   *
+   * Organization invites
+   *  */
+  Route.get('organizations/:id/invites', 'OrganizationInvitesController.listOrganizationInvites')
+
+  Route.post('organizations/:id/invites', 'OrganizationInvitesController.invite')
+
+  Route.put('organizations/:id/invites/:inviteId', 'OrganizationInvitesController.update')
+
+  Route.patch(
+    'organizations/:id/invites/:inviteId/status',
+    'OrganizationInvitesController.userAnswer'
+  )
 }).middleware('auth')

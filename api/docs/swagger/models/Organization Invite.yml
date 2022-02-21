@@ -1,0 +1,30 @@
+definitions:
+  OrganizationInvite:
+    properties:
+      id:
+        type: string
+        format: uuid
+      userEmail:
+        type: string
+        format: email
+      status:
+        type: string
+        enum:
+          - IN_PROGRESS
+          - ACCEPTED
+          - DENIED
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      organization:
+        type: string
+        example: Organization[]
+      projects:
+        type: string
+        example: Project[]
+      labels:
+        type: string
+        example: Label[]

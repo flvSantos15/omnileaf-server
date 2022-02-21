@@ -10,6 +10,13 @@ definitions:
         type: string
       trackingTime:
         type: integer
+      inactivityTime:
+        type: number
+      type:
+        type: string
+        enum:
+          - 'SYSTEM'
+          - 'MANUAL'
       status:
         type: string
         enum:

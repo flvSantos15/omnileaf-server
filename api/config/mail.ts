@@ -18,7 +18,7 @@ const mailConfig: MailConfig = {
   | a mailer
   |
   */
-  mailer: 'mailgun',
+  mailer: 'sendgrid',
 
   /*
   |--------------------------------------------------------------------------
@@ -50,6 +50,12 @@ const mailConfig: MailConfig = {
       baseUrl: 'https://api.mailgun.net/v3',
       key: Env.get('MAILGUN_API_KEY'),
       domain: Env.get('MAILGUN_DOMAIN'),
+    },
+    sendgrid: {
+      driver: 'sendgrid',
+      auth: {
+        api_key: Env.get('SENDGRID_API_KEY'),
+      },
     },
   },
 }

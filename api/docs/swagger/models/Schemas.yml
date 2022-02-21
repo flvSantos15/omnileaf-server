@@ -18,3 +18,5 @@ components:
       $ref: '#/definitions/Screenshot'
     Manual Entry:
       $ref: '#/definitions/ManualEntry'
+    Organization Invite:
+      $ref: '#/definitions/OrganizationInvite'
