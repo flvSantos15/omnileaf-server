@@ -9,6 +9,7 @@ import {
   AnswerInviteRequest,
   AttachMemberToProjectsProps,
   InviteUserRequest,
+  ListOrganizationInvitesRequest,
   ListUserInvitesRequest,
 } from 'App/Interfaces/Organization/organization-invites-service'
 import Label from 'App/Models/Label'
@@ -31,11 +32,12 @@ class OrganizationInviteService {
      *
      * Guard
      */
-    await bouncer.authorize('OrganizationManager', organization!)
 
     if (!organization) {
       throw new Exception('Organization not found', 404)
     }
+
+    await bouncer.authorize('OrganizationManager', organization)
 
     const inviteExists = await OrganizationInvite.query()
       .where('organizationId', id)
@@ -272,10 +274,6 @@ class OrganizationInviteService {
   public async listUserInvites({ auth }: ListUserInvitesRequest) {
     const user = auth.use('web').user!
 
-    /**
-     *
-     * Handle
-     */
     const invites = await Database.from((subquery) => {
       subquery
         .from(`${OrganizationInvite.table}`)
@@ -304,6 +302,34 @@ class OrganizationInviteService {
       status: 'status',
       createdAt: 'created_at',
     })
+
+    return invites
+  }
+
+  public async listOrganizationInvites({ id, bouncer }: ListOrganizationInvitesRequest) {
+    const organization = await Organization.find(id)
+
+    if (!organization) {
+      throw new Exception('Organization not found', 404)
+    }
+
+    await bouncer.authorize('OrganizationManager', organization)
+
+    const invites = await OrganizationInvite.query()
+      .select(
+        `${OrganizationInvite.table}.id`,
+        `${OrganizationInvite.table}.created_at`,
+        'status',
+        'userEmail'
+      )
+      .where('organizationId', id)
+      .andWhere('status', OrganizationInviteStatus.IN_PROGRESS)
+      .preload('labels', (query) => {
+        query.select('title')
+      })
+      .preload('projects', (query) => {
+        query.select('id', 'name')
+      })
 
     return invites
   }

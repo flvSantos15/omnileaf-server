@@ -47,4 +47,19 @@ export default class OrganizationInvitesController {
 
     response.send(invites)
   }
+
+  public async listOrganizationInvites({
+    request,
+    response,
+    bouncer,
+    logger,
+  }: HttpContextContract) {
+    const id = UuidValidator.v4(request.param('id'))
+
+    const invites = await OrganizationInviteService.listOrganizationInvites({ id, bouncer })
+
+    logger.info('Succesfully retrieved organization invites')
+
+    response.send(invites)
+  }
 }

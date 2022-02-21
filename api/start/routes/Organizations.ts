@@ -17,7 +17,9 @@ Route.group(() => {
    *
    * Organization invites
    *  */
-  Route.post('organizations/:id/invite', 'OrganizationInvitesController.invite')
+  Route.get('organizations/:id/invites', 'OrganizationInvitesController.listOrganizationInvites')
 
-  Route.patch('organizations/:id/invite', 'OrganizationInvitesController.userAnswer')
+  Route.post('organizations/:id/invites', 'OrganizationInvitesController.invite')
+
+  Route.patch('organizations/:id/invites', 'OrganizationInvitesController.userAnswer')
 }).middleware('auth')

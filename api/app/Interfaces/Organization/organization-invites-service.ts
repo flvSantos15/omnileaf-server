@@ -34,3 +34,8 @@ export type AttachMemberToProjectsProps = {
 export interface ListUserInvitesRequest {
   auth: AuthContract
 }
+
+export interface ListOrganizationInvitesRequest {
+  id: string
+  bouncer: ActionsAuthorizerContract<User>
+}
