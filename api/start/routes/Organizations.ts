@@ -23,5 +23,8 @@ Route.group(() => {
 
   Route.put('organizations/:id/invites/:inviteId', 'OrganizationInvitesController.update')
 
-  Route.patch('organizations/:id/invites', 'OrganizationInvitesController.userAnswer')
+  Route.patch(
+    'organizations/:id/invites/:inviteId/status',
+    'OrganizationInvitesController.userAnswer'
+  )
 }).middleware('auth')

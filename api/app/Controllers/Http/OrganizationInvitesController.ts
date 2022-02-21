@@ -32,7 +32,7 @@ export default class OrganizationInvitesController {
   }
 
   public async userAnswer({ request, response, auth, logger }: HttpContextContract) {
-    const id = UuidValidator.v4(request.param('id'))
+    const id = UuidValidator.v4(request.param('inviteId'))
 
     const { status } = await request.validate(InviteAnswerValidator)
 

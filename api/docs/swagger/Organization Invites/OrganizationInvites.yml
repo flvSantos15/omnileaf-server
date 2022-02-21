@@ -1,0 +1,136 @@
+/organizations/{id}/invites:
+  get:
+    tags:
+      - Organization Invites
+    description: Show organization invites
+    parameters:
+      - in: path
+        name: id
+        format: uuid
+        required: true
+
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                $ref: '#/definitions/OrganizationInvite'
+
+  post:
+    tags:
+      - Organization Invites
+    description: Create new organization invite
+    parameters:
+      - in: path
+        name: id
+        format: uuid
+        required: true
+      - in: body
+        name: Body View
+        schema:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+              required: true
+            labelIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+              required: true
+            projectIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+              required: false
+
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/OrganizationInvite'
+
+/organizations/{id}/invites/{inviteId}:
+  put:
+    tags:
+      - Organization Invites
+    description: Update organization invite
+    parameters:
+      - in: path
+        name: id
+        format: uuid
+        required: true
+      - in: path
+        name: inviteId
+        format: uuid
+        required: true
+      - in: body
+        name: Body View
+        schema:
+          type: object
+          properties:
+            labelIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+              required: false
+            projectIds:
+              type: array
+              items:
+                type: string
+                format: uuid
+              required: false
+
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/OrganizationInvite'
+
+/organizations/:id/invites/status:
+  patch:
+    tags:
+      - Organization Invites
+    description: Patch organization invite status
+    parameters:
+      - in: path
+        name: id
+        format: uuid
+        required: true
+      - in: path
+        name: inviteId
+        format: uuid
+        required: true
+      - in: body
+        name: Body View
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              enum:
+                - ACCEPTED
+                - DENIED
+
+    responses:
+      200:
+        description: OK
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/definitions/OrganizationInvite'
