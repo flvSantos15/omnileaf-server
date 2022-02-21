@@ -11,6 +11,7 @@ import {
   InviteUserRequest,
   ListOrganizationInvitesRequest,
   ListUserInvitesRequest,
+  UpdateInviteRequest,
 } from 'App/Interfaces/Organization/organization-invites-service'
 import Label from 'App/Models/Label'
 import { OrganizationInviteStatus } from 'Contracts/enums/organization-invite-status'
@@ -55,7 +56,7 @@ class OrganizationInviteService {
 
     await this._ownerLabelGuard(labelIds)
 
-    if (projectIds) {
+    if (projectIds?.length) {
       await this._projectExistsGuard(projectIds, organization.id)
     }
 
@@ -72,25 +73,19 @@ class OrganizationInviteService {
       organizationId: id,
     })
 
-    await this._attachInviteLabels(invite, labelIds)
+    await invite.related('labels').sync(labelIds)
 
     if (projectIds) {
-      await this._attachInviteProjects(invite, projectIds)
+      await invite.related('projects').sync(projectIds)
     }
 
     await new InviteToOrganizationMail(email, organization.name).send()
-  }
 
-  private async _attachInviteLabels(invite: OrganizationInvite, labelIds: string[]) {
-    for await (const id of labelIds) {
-      await invite.related('labels').attach([id])
-    }
-  }
+    await invite.load('labels')
 
-  private async _attachInviteProjects(invite: OrganizationInvite, projectIds: string[]) {
-    for await (const id of projectIds) {
-      await invite.related('projects').attach([id])
-    }
+    await invite.load('projects')
+
+    return invite.serialize()
   }
 
   private async _userIsMemberGuard(user: User, organizationId: string) {
@@ -209,7 +204,7 @@ class OrganizationInviteService {
     projects,
     labelTitles,
   }: AttachMemberToProjectsProps) {
-    const role = await this._getProjectRole(labelTitles)
+    const role = this._getProjectRole(labelTitles)
 
     for await (const project of projects) {
       await project.related('usersAssigned').attach({
@@ -220,7 +215,7 @@ class OrganizationInviteService {
     }
   }
 
-  private async _getProjectRole(labelTitles: OrganizationLabels[]) {
+  private _getProjectRole(labelTitles: OrganizationLabels[]) {
     const orgRole = labelTitles.find((title) => Object.values(OrganizationLabels).includes(title))
 
     const managerRoles = [
@@ -269,6 +264,44 @@ class OrganizationInviteService {
      * Handle
      */
     await invite.merge({ status: OrganizationInviteStatus.DENIED }).save()
+  }
+
+  public async update({ id, payload, bouncer }: UpdateInviteRequest) {
+    const { labelIds, projectIds } = payload
+
+    const invite = await OrganizationInvite.find(id)
+
+    if (!invite) {
+      throw new Exception('Invite not found', 404)
+    }
+
+    await invite.load('organization')
+
+    const organization = invite.organization
+
+    await bouncer.authorize('OrganizationManager', organization)
+
+    if (labelIds?.length) {
+      await this._labelsExistsGuard(labelIds, organization.id)
+
+      await this._duplicatedRoleGuard(labelIds)
+
+      await this._ownerLabelGuard(labelIds)
+
+      await invite.related('labels').sync(labelIds)
+    }
+
+    if (projectIds?.length) {
+      await this._projectExistsGuard(projectIds, organization.id)
+
+      await invite.related('projects').sync(projectIds)
+    }
+
+    await invite.load('labels')
+
+    await invite.load('projects')
+
+    return invite.serialize()
   }
 
   public async listUserInvites({ auth }: ListUserInvitesRequest) {

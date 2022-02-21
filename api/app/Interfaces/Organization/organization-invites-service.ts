@@ -31,6 +31,12 @@ export type AttachMemberToProjectsProps = {
   labelTitles: OrganizationLabels[]
 }
 
+export interface UpdateInviteRequest {
+  id: string
+  payload: { labelIds?: string[]; projectIds?: string[] }
+  bouncer: ActionsAuthorizerContract<User>
+}
+
 export interface ListUserInvitesRequest {
   auth: AuthContract
 }

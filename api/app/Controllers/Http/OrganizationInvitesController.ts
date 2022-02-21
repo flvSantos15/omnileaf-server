@@ -3,6 +3,7 @@ import OrganizationInviteService from 'App/Services/Organization/OrganizationInv
 import UuidValidator from 'App/Validators/Global/UuidValidator'
 import InviteAnswerValidator from 'App/Validators/Organization/InviteAnswerValidator'
 import InviteUserValidator from 'App/Validators/Organization/InviteUserValidator'
+import UpdateInviteValidator from 'App/Validators/Organization/UpdateInviteValidator'
 import { OrganizationInviteStatus } from 'Contracts/enums/organization-invite-status'
 
 export default class OrganizationInvitesController {
@@ -11,11 +12,23 @@ export default class OrganizationInvitesController {
 
     const payload = await request.validate(InviteUserValidator)
 
-    await OrganizationInviteService.create({ id, payload, bouncer })
+    const invite = await OrganizationInviteService.create({ id, payload, bouncer })
 
-    logger.info('Succesfully sended user invite')
+    logger.info('Succesfully created invite')
 
-    response.noContent()
+    response.created(invite)
+  }
+
+  public async update({ request, response, bouncer, logger }: HttpContextContract) {
+    const id = UuidValidator.v4(request.param('inviteId'))
+
+    const payload = await request.validate(UpdateInviteValidator)
+
+    const invite = await OrganizationInviteService.update({ id, payload, bouncer })
+
+    logger.info('Succesfully updated invite')
+
+    response.send(invite)
   }
 
   public async userAnswer({ request, response, auth, logger }: HttpContextContract) {
