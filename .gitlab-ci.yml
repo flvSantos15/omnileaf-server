@@ -21,7 +21,7 @@ stages:
   - publish
   - release
 
-installation:
+install_dev:
   stage: install_dev
   environment:
     name: development
@@ -34,7 +34,7 @@ installation:
       - node_modules/
       - build/
 
-installation:
+install_prod:
   stage: install_prod
   environment:
     name: production
