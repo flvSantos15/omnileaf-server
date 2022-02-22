@@ -5,7 +5,6 @@
 
 # Official framework image. Look for the different tagged releases at:
 # https://hub.docker.com/r/library/node/tags/
-image: node:16.14-alpine
 
 variables:
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
@@ -22,8 +21,8 @@ stages:
   - release
 
 install_dev:
+  image: node:16.14-alpine
   stage: install_dev
-
   script:
     - cat $ENV_FILE > .env
     - yarn
@@ -35,6 +34,7 @@ install_dev:
       - build/
 
 install_prod:
+  image: node:16.14-alpine
   stage: install_prod
   environment:
     name: production
