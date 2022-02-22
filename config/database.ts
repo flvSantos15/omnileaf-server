@@ -9,30 +9,6 @@ import Env from '@ioc:Adonis/Core/Env'
 import { DatabaseConfig } from '@ioc:Adonis/Lucid/Database'
 import { ConnectionConfig } from '@ioc:Adonis/Lucid/Database'
 
-const devConnection = {
-  host: Env.get('DB_HOST'),
-  port: Env.get('DB_PORT'),
-  user: Env.get('DEV_DB_USER'),
-  password: Env.get('DEV_DB_PASSWORD', ''),
-  database: Env.get('DEV_DB'),
-}
-
-const stageConnection = {
-  host: Env.get('DB_HOST'),
-  port: Env.get('DB_PORT'),
-  user: Env.get('STAGE_DB_USER'),
-  password: Env.get('STAGE_DB_PASSWORD', ''),
-  database: Env.get('STAGE_DB'),
-}
-
-const prodConnection = {
-  host: Env.get('DB_HOST'),
-  port: Env.get('DB_PORT'),
-  user: Env.get('PROD_DB_USER'),
-  password: Env.get('PROD_DB_PASSWORD', ''),
-  database: Env.get('PROD_DB'),
-}
-
 interface CustomDatabaseConfig extends Omit<DatabaseConfig, 'connections'> {
   connections: {
     [key: string]: ConnectionConfig | any
@@ -66,10 +42,13 @@ const databaseConfig: CustomDatabaseConfig = {
     */
     pg: {
       client: Env.get('DB_CONNECTION'),
-      connection:
-        (Env.get('NODE_ENV') === 'development' && devConnection) ||
-        (Env.get('NODE_ENV') === 'staging' && stageConnection) ||
-        (Env.get('NODE_ENV') === 'production' && prodConnection),
+      connection: {
+        host: Env.get('DB_HOST'),
+        port: Env.get('DB_PORT'),
+        user: Env.get('DB_USER'),
+        password: Env.get('DB_PASSWORD', ''),
+        database: Env.get('DB_NAME'),
+      },
       migrations: {
         naturalSort: true,
         tableName: 'adonis_schema',

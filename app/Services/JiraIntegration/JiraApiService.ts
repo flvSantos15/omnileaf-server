@@ -104,10 +104,8 @@ class JiraApiService {
 
     const urlRoute = '/jira/webhook/issue'
 
-    const url =
-      Env.get('NODE_ENV') === 'production'
-        ? Env.get('PROD_API_URL') + urlRoute
-        : Env.get('DEV_API_URL') + urlRoute
+    const url = Env.get('API_URL') + urlRoute
+
     const body = {
       webhooks: [
         {

@@ -22,7 +22,5 @@ export default Env.rules({
   DRIVE_DISK: Env.schema.enum(['local'] as const),
   NODE_ENV: Env.schema.enum(['development', 'staging', 'production', 'testing'] as const),
   SESSION_DRIVER: Env.schema.string(),
-  MAILGUN_API_KEY: Env.schema.string(),
-  MAILGUN_DOMAIN: Env.schema.string(),
   FRONT_END_URL: Env.schema.string(),
 })
