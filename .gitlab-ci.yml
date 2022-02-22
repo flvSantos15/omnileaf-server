@@ -25,7 +25,7 @@ install_dev:
   stage: install_dev
 
   script:
-    - cp $ENV_FILE .env
+    - cat $ENV_FILE
     - yarn
     - yarn build
   artifacts:
