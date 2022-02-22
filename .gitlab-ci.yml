@@ -9,6 +9,7 @@
 variables:
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
   DOCKER_CONTAINER: backend_test
+  FOOBAR: $ENV_FILE
 
 cache:
   paths:
@@ -24,7 +25,7 @@ install_dev:
   image: node:16.14-alpine
   stage: install_dev
   script:
-    - cat ${ENV_FILE}
+    - cat $FOOBAR
     - yarn
     - yarn build
   artifacts:
