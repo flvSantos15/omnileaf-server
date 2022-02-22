@@ -8,10 +8,10 @@
 image: node:16.14-alpine
 
 stages:
-  - installation
+  - install_packages
   - build
 
-install:
+install_packages:
   script:
     - yarn
 
