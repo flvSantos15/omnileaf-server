@@ -23,8 +23,7 @@ stages:
 
 install_dev:
   stage: install_dev
-  environment:
-    name: development
+
   script:
     - cp $ENV_FILE .env
     - yarn
