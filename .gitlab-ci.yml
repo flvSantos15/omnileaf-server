@@ -1,59 +1,17 @@
-stages:
-  - publish-dev
-  - publish-prod
-  - deploy
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Nodejs.gitlab-ci.yml
 
-variables:
-  API_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
-  MICROSERVICE_IMAGE: $CI_REGISTRY_IMAGE/microservice/$CI_COMMIT_REF_NAME:latest
-  API_CONTAINER: backend_$CI_COMMIT_REF_NAME
-  MICROSERVICE_CONTAINER: microservice_$CI_COMMIT_REF_NAME
+# Official framework image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/node/tags/
+image: node:16.14-alpine
 
-publish-dev:
-  image: docker:latest
-  stage: publish-dev
-  services:
-    - docker:dind
+install:
   script:
-    - apk add --no-cache docker-compose
-    - docker-compose -f docker-compose.dev.yml build
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker-compose -f docker-compose.dev.yml push
+    - yarn
 
-  only:
-    - develop
-
-publish-prod:
-  image: docker:latest
-  stage: publish-prod
-  services:
-    - docker:dind
+build:
   script:
-    - apk add --no-cache docker-compose
-    - docker-compose -f docker-compose.prod.yml build
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker-compose -f docker-compose.prod.yml push
-  only:
-    - main
+    - yarn build
 
-deploy:
-  image: alpine:latest
-  stage: deploy
-  tags:
-    - deployment
-  script:
-    - chmod og= $ID_RSA
-    - apt-get update && apt-get install -y openssh-client
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "echo $API_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "echo $MICROSERVICE_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $API_IMAGE || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $MICROSERVICE_IMAGE || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $API_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $MICROSERVICE_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $API_CONTAINER $MICROSERVICE_CONTAINER || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $API_CONTAINER --memory="2g" --net backend-network -d $API_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $MICROSERVICE_CONTAINER --memory="2g" --net backend-network -d $MICROSERVICE_IMAGE"
-  only:
-    - develop
-    - main
