@@ -7,32 +7,62 @@
 # https://hub.docker.com/r/library/node/tags/
 image: node:16.14-alpine
 
+variables:
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  DOCKER_CONTAINER: backend_$CI_COMMIT_REF_NAME
+
 cache:
   paths:
     - node_modules/
 
 stages:
-  - install_packages
-  - build
+  - install
   - publish
+  - release
 
 installation:
-  stage: install_packages
+  stage: install
+  environment:
+    name: development
   script:
     - yarn
+    - yarn build
+    - cp $ENV_FILE ./build
   artifacts:
     paths:
       - node_modules/
-
-build:
-  stage: build
-  script:
-    - yarn build
-  artifacts:
-    paths:
       - build/
 
-deploy:
+installation:
+  stage: install
+  environment:
+    name: production
+  script:
+    - yarn
+    - yarn build
+    - cp $ENV_FILE ./build
+  artifacts:
+    paths:
+      - node_modules/
+      - build/
+  only:
+    - main
+
+publish:
   stage: publish
   script:
     - apk add --no-cache docker-compose
+    - docker-compose build
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+    - docker push $DOCKER_IMAGE
+
+release:
+  stage: release
+  script:
+    - chmod og= $ID_RSA
+    - apt-get update && apt-get install -y openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $DOCKER_IMAGE || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $DOCKER_IMAGE"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $DOCKER_CONTAINER || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $DOCKER_CONTAINER --memory="2g" --net backend-network -d $DOCKER_IMAGE"
