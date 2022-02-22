@@ -26,9 +26,9 @@ install_dev:
   environment:
     name: development
   script:
+    - cp $ENV_FILE .env
     - yarn
     - yarn build
-    - cp $ENV_FILE .env
   artifacts:
     paths:
       - node_modules/
