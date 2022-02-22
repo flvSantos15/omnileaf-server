@@ -64,6 +64,8 @@ publish:
 release:
   image: alpine:latest
   stage: release
+  tags:
+    - deployment
   script:
     - chmod og= $ID_RSA
     - apt-get update && apt-get install -y openssh-client
