@@ -1,10 +1,9 @@
 version: '3.8'
 services:
   api:
-    image: registry.gitlab.com/mlgroup/omni-leaf-backend/main
+    image: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
     build:
       context: .
-      dockerfile: Dockerfile.prod
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules

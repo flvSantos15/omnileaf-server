@@ -36,4 +36,3 @@ deploy:
   stage: publish
   script:
     - apk add --no-cache docker-compose
-

@@ -96,13 +96,11 @@ RUN apk update && apk add bash
 
 WORKDIR /usr/src/app
 
-COPY . .
+COPY build .
 
-RUN yarn
+COPY .env .
 
-RUN yarn build \
-    && yarn --cwd ./build install \
-    && cp .env.dev ./build/.env
+RUN yarn install --production
 
 EXPOSE 3333
 

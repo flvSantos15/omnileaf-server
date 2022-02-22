@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "node ace serve --watch",
     "start:dev": "node ace migration:run && node ace serve --watch",
-    "build": "node ace build",
-    "start": "node ./build/server.js",
+    "build": "node ace build --production",
+    "start": "node server.js",
     "lint": "eslint . --ext=.ts",
     "format": "prettier --write ."
   },
@@ -27,7 +27,6 @@
     "get-port": "5.1.1",
     "japa": "^4.0.0",
     "jsdom": "^19.0.0",
-    "pino-pretty": "^7.0.0",
     "prettier": "^2.4.0",
     "supertest": "^6.1.6",
     "typescript": "~4.2",
@@ -60,6 +59,7 @@
     "sharp": "^0.29.1",
     "socket.io": "^4.2.0",
     "source-map-support": "^0.5.20",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "pino-pretty": "^7.0.0"
   }
 }
