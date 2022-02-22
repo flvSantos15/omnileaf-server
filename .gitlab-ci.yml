@@ -31,6 +31,7 @@ install_dev:
   artifacts:
     paths:
       - node_modules/
+      - .env
       - build/
 
 install_prod:
@@ -38,12 +39,13 @@ install_prod:
   environment:
     name: production
   script:
+    - cat $ENV_FILE > .env
     - yarn
     - yarn build
-    - cp $ENV_FILE ./build
   artifacts:
     paths:
       - node_modules/
+      - .env
       - build/
   only:
     - main
