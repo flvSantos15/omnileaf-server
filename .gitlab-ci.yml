@@ -8,7 +8,7 @@
 
 variables:
   DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
-  DOCKER_CONTAINER: backend_$CI_COMMIT_REF_NAME
+  DOCKER_CONTAINER: backend_test
 
 cache:
   paths:
