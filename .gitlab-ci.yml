@@ -24,7 +24,8 @@ install_dev:
   image: node:16.14-alpine
   stage: install_dev
   script:
-    - cat $ENV_FILE > .env
+    - 'LOCAL_ENV="$ENV_FILE"'
+    - echo ${LOCAL_ENV}
     - yarn
     - yarn build
   artifacts:
