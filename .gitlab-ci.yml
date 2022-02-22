@@ -7,13 +7,33 @@
 # https://hub.docker.com/r/library/node/tags/
 image: node:16.14-alpine
 
-stages:
-  - build
+cache:
+  paths:
+    - node_modules/
 
+stages:
+  - install_packages
+  - build
+  - publish
+
+installation:
+  stage: install_packages
+  script:
+    - yarn
+  artifacts:
+    paths:
+      - node_modules/
 
 build:
   stage: build
   script:
-    - yarn
     - yarn build
+  artifacts:
+    paths:
+      - build/
+
+deploy:
+  stage: publish
+  script:
+    - apk add --no-cache docker-compose
 
