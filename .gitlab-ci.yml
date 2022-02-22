@@ -16,12 +16,13 @@ cache:
     - node_modules/
 
 stages:
-  - install
+  - install_dev
+  - install_prod
   - publish
   - release
 
 installation:
-  stage: install
+  stage: install_dev
   environment:
     name: development
   script:
@@ -34,7 +35,7 @@ installation:
       - build/
 
 installation:
-  stage: install
+  stage: install_prod
   environment:
     name: production
   script:
