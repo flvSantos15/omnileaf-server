@@ -12,10 +12,12 @@ stages:
   - build
 
 install_packages:
+  stage: install_packages
   script:
     - yarn
 
 build:
+  stage: build
   script:
     - yarn build
 
