@@ -1,9 +1,0 @@
-node_modules
-build
-coverage
-.vscode
-.DS_STORE
-tmp
-backup
-tmpLock
-sslCert

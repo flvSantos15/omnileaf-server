@@ -1,59 +1,84 @@
-stages:
-  - publish-dev
-  - publish-prod
-  - deploy
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Nodejs.gitlab-ci.yml
+
+# Official framework image. Look for the different tagged releases at:
+# https://hub.docker.com/r/library/node/tags/
 
 variables:
-  API_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
-  MICROSERVICE_IMAGE: $CI_REGISTRY_IMAGE/microservice/$CI_COMMIT_REF_NAME:latest
-  API_CONTAINER: backend_$CI_COMMIT_REF_NAME
-  MICROSERVICE_CONTAINER: microservice_$CI_COMMIT_REF_NAME
+  DOCKER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_NAME:latest
+  DOCKER_CONTAINER: backend_$CI_COMMIT_REF_NAME
 
-publish-dev:
-  image: docker:latest
-  stage: publish-dev
-  services:
-    - docker:dind
+cache:
+  paths:
+    - node_modules/
+
+stages:
+  - install_dev
+  - install_prod
+  - publish
+  - release
+
+install_dev:
+  image: node:16.14-alpine
+  stage: install_dev
   script:
-    - apk add --no-cache docker-compose
-    - docker-compose -f docker-compose.dev.yml build
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker-compose -f docker-compose.dev.yml push
-
+    - cp $ENV_FILE_DEV .env
+    - yarn
+    - yarn build
+  artifacts:
+    paths:
+      - node_modules/
+      - build/
+      - .env
   only:
     - develop
 
-publish-prod:
+install_prod:
+  image: node:16.14-alpine
+  stage: install_prod
+  environment:
+    name: production
+  script:
+    - cp $ENV_FILE_PROD .env
+    - yarn
+    - yarn build
+  artifacts:
+    paths:
+      - node_modules/
+      - build/
+      - .env
+  only:
+    - main
+
+publish:
   image: docker:latest
-  stage: publish-prod
+  stage: publish
   services:
     - docker:dind
   script:
     - apk add --no-cache docker-compose
-    - docker-compose -f docker-compose.prod.yml build
+    - docker-compose build
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
-    - docker-compose -f docker-compose.prod.yml push
+    - docker push $DOCKER_IMAGE
   only:
+    - develop
     - main
 
-deploy:
+release:
   image: alpine:latest
-  stage: deploy
+  stage: release
   tags:
     - deployment
   script:
     - chmod og= $ID_RSA
     - apt-get update && apt-get install -y openssh-client
     - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "echo $API_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "echo $MICROSERVICE_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $API_IMAGE || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $MICROSERVICE_IMAGE || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $API_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $MICROSERVICE_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $API_CONTAINER $MICROSERVICE_CONTAINER || true"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $API_CONTAINER --memory="2g" --net backend-network -d $API_IMAGE"
-    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $MICROSERVICE_CONTAINER --memory="2g" --net backend-network -d $MICROSERVICE_IMAGE"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker rmi -f $DOCKER_IMAGE || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $DOCKER_IMAGE"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f -v $DOCKER_CONTAINER || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run --name $DOCKER_CONTAINER --memory="2g" --net backend-network -d $DOCKER_IMAGE"
   only:
     - develop
     - main

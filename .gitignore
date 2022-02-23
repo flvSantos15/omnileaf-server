@@ -1,0 +1,12 @@
+.env
+.env.dev
+.env.prod
+node_modules
+build
+coverage
+.vscode
+.DS_STORE
+tmp
+backup
+tmpLock
+sslCert
