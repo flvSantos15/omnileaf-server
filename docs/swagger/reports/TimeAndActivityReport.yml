@@ -1,0 +1,270 @@
+/reports/time-and-activity/users-work-summary:
+  get:
+    tags:
+      - Reports
+    description: Users work summary
+    parameters:
+      - in: query
+        name: start
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: false
+      - in: query
+        name: organizationId
+        schema:
+          type: string
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                time_tracked:
+                  type: number
+                projects_worked:
+                  type: number
+                activity:
+                  type: string
+
+/reports/time-and-activity/hours-per-day:
+  get:
+    tags:
+      - Reports
+    description: Hours worked per day
+    parameters:
+      - in: query
+        name: start
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: false
+      - in: query
+        name: organizationId
+        schema:
+          type: string
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  tracking_time:
+                    type: number
+                  type:
+                    type: string
+                    enum:
+                      - 'SYSTEM'
+                      - 'MANUAL'
+
+/reports/time-and-activity/grouped:
+  get:
+    tags:
+      - Reports
+    description: Time And Activity report grouped
+    parameters:
+      - in: query
+        name: start
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: organizationId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: groupBy
+        schema:
+          type: string
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  avatarUrl:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        tracking_time:
+                          type: number
+                        activity_time:
+                          type: string
+                        task:
+                          type: string
+                        project:
+                          type: string
+                        client:
+                          type: string
+
+/reports/time-and-activity/user-weekly:
+  get:
+    tags:
+      - Reports
+    description: User weekly report
+    parameters:
+      - in: query
+        name: start
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: organizationId
+        schema:
+          type: string
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  project:
+                    type: string
+                  avatarUrl:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        tracked:
+                          type: number
+                        activity_time:
+                          type: string
+                        project:
+                          type: string
+                  totalTracked:
+                    type: integer
+                  averageActivity:
+                    type: integer
+
+/reports/time-and-activity/organization-weekly:
+  get:
+    tags:
+      - Reports
+    description: User weekly report
+    parameters:
+      - in: query
+        name: start
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: end
+        schema:
+          type: string
+          required: true
+      - in: query
+        name: userId
+        schema:
+          type: string
+          required: false
+      - in: query
+        name: organizationId
+        schema:
+          type: string
+          required: true
+    responses:
+      200:
+        description: Success response
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  user:
+                    type: string
+                  avatarUrl:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        date:
+                          type: string
+                          format: date
+                        tracked:
+                          type: number
+                        activity_time:
+                          type: string
+                        user:
+                          type: string
+                  totalTracked:
+                    type: integer
+                  averageActivity:
+                    type: integer

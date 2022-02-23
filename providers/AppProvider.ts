@@ -1,4 +1,5 @@
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import CustomHelpers from 'App/Bindings/CustomHelpers'
 import S3Service from 'App/Bindings/S3Service'
 
 export default class AppProvider {
@@ -7,16 +8,27 @@ export default class AppProvider {
   public register() {
     // Register your own bindings
     this.app.container.singleton('Omnileaf/S3Service', () => new S3Service())
+    this.app.container.singleton('Omnileaf/CustomHelpers', () => new CustomHelpers())
   }
 
   public async boot() {
     // IoC container is ready
+
+    // Register Sendgrid Mailer
+    const { SendgridDriver } = await import('./SendgridDriver')
+
+    const Mail = this.app.container.use('Adonis/Addons/Mail')
+
+    Mail.extend('sendgrid', (_mail, _mapping, config) => {
+      return new SendgridDriver(config)
+    })
   }
 
   public async ready() {
     // App is ready
-    const scheduler = this.app.container.use('Adonis/Addons/Scheduler')
-    scheduler.run()
+    // Enable next lines to run scheduled tasks
+    // const scheduler = this.app.container.use('Adonis/Addons/Scheduler')
+    // scheduler.run()
     if (this.app.environment === 'web') {
       await import('../start/socket')
     }

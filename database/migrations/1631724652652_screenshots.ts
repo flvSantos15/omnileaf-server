@@ -6,14 +6,21 @@ export default class Screenshots extends BaseSchema {
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
-      table.string('url').notNullable()
-      table.string('blurred_url').notNullable()
+      table.string('location')
+      table.string('blurred_location')
       table.boolean('deleted').notNullable().defaultTo(false)
       table
         .uuid('user_id')
         .unsigned()
         .references('id')
         .inTable('users')
+        .notNullable()
+        .onDelete('CASCADE')
+      table
+        .uuid('project_id')
+        .unsigned()
+        .references('id')
+        .inTable('projects')
         .notNullable()
         .onDelete('CASCADE')
       table

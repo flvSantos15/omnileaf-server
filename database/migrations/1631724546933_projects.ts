@@ -8,7 +8,10 @@ export default class Projects extends BaseSchema {
       table.uuid('id').primary().unique().defaultTo(this.raw('uuid_generate_v4()')).notNullable()
       table.string('name').notNullable()
       table.string('description')
+      table.string('avatar_url')
+      table.boolean('is_deleted').defaultTo(false)
       table.uuid('creator_id').unsigned().references('id').inTable('users')
+      table.uuid('client_id').unsigned().references('id').inTable('users')
       table
         .uuid('organization_id')
         .notNullable()
@@ -19,7 +22,8 @@ export default class Projects extends BaseSchema {
         .onDelete('CASCADE')
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')
-      table.string('gitlab_avatar_url')
+      table.string('jira_id')
+      table.string('jira_creator_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

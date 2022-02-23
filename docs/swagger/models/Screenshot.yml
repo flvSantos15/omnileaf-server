@@ -1,0 +1,44 @@
+definitions:
+  Screenshot:
+    properties:
+      id:
+        type: string
+        format: uuid
+      location:
+        type: string
+        format: uri
+      blurredLocation:
+        type: string
+        format: uri
+      isDeleted:
+        type: boolean
+      userId:
+        type: string
+        format: uuid
+      projectId:
+        type: string
+        format: uuid
+      taskId:
+        type: string
+        format: uuid
+      trackingSessionId:
+        type: string
+        format: uuid
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      user:
+        type: string
+        example: User{}
+      project:
+        type: string
+        example: Project{}
+      task:
+        type: string
+        example: Task{}
+      trackingSession:
+        type: string
+        example: TrackingSession[]

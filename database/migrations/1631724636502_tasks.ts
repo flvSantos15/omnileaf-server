@@ -1,4 +1,5 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
+import { TaskStatus } from 'Contracts/enums'
 
 export default class Tasks extends BaseSchema {
   protected tableName = 'tasks'
@@ -11,15 +12,26 @@ export default class Tasks extends BaseSchema {
       table.integer('time_estimated')
       table.uuid('creator_id').unsigned().references('id').inTable('users')
       table
+        .uuid('organization_id')
+        .unsigned()
+        .references('id')
+        .inTable('organizations')
+        .onDelete('CASCADE')
+      table
         .uuid('project_id')
         .unsigned()
         .references('id')
         .inTable('projects')
         .notNullable()
         .onDelete('CASCADE')
-      table.uuid('list_id').unsigned().references('id').inTable('lists')
+      table
+        .enum('status', Object.values(TaskStatus))
+        .notNullable()
+        .defaultTo(TaskStatus.IN_PROGRESS)
+      table.boolean('is_deleted').defaultTo(false)
       table.integer('gitlab_id')
       table.integer('gitlab_creator_id')
+      table.string('jira_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

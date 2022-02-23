@@ -42,5 +42,7 @@ Server.middleware.register([
 |
 */
 Server.middleware.registerNamed({
-  auth: () => import('App/Middleware/Auth'),
+  'auth': () => import('App/Middleware/Auth'),
+  'reports': () => import('App/Middleware/Report'),
+  'swagger-auth': 'Adonis/Addons/Swagger/AuthMiddleware',
 })

@@ -1,6 +1,9 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeCreate,
+  beforeFetch,
+  beforeFind,
   BelongsTo,
   belongsTo,
   column,
@@ -8,15 +11,19 @@ import {
   hasMany,
   ManyToMany,
   manyToMany,
+  ModelQueryBuilderContract,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Project from './Project'
-import List from './List'
 import Screenshot from './Screenshot'
 import Tag from './Tag'
 import TrackingSession from './TrackingSession'
+import { TaskStatus } from 'Contracts/enums'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Task extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
@@ -26,26 +33,36 @@ export default class Task extends BaseModel {
   @column()
   public body?: string
 
-  @column({ columnName: 'time_estimated' })
+  @column()
   public timeEstimated: number
 
   @column()
   public links?: string
 
-  @column({ columnName: 'creator_id' })
+  @column()
   public creatorId?: string
 
-  @column({ columnName: 'project_id' })
+  //This property is auto created on beforeCreate hook
+  @column()
+  public organizationId: string
+
+  @column()
   public projectId: string
 
-  @column({ columnName: 'list_id' })
-  public listId?: string
+  @column()
+  public status: TaskStatus
 
-  @column({ columnName: 'gitlab_id' })
+  @column()
+  public isDeleted: boolean
+
+  @column()
   public gitlabId?: number
 
-  @column({ columnName: 'gitlab_creator_id' })
+  @column()
   public gitlabCreatorId?: number
+
+  @column()
+  public jiraId: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -62,11 +79,6 @@ export default class Task extends BaseModel {
     foreignKey: 'projectId',
   })
   public project: BelongsTo<typeof Project>
-
-  @belongsTo(() => List, {
-    foreignKey: 'listId',
-  })
-  public list: BelongsTo<typeof List>
 
   @manyToMany(() => User, {
     pivotTable: 'task_user',
@@ -87,4 +99,21 @@ export default class Task extends BaseModel {
     foreignKey: 'taskId',
   })
   public trackingSessions: HasMany<typeof TrackingSession>
+
+  @beforeFind()
+  public static ignoreDeletedOnFind(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
+
+  @beforeFetch()
+  public static ignoreDeletedOnFetch(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
+
+  @beforeCreate()
+  public static async addOrganizationId(task: Task) {
+    const project = await Project.findOrFail(task.projectId)
+
+    task.merge({ organizationId: project.organizationId })
+  }
 }

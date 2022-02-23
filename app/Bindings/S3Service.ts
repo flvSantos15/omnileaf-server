@@ -1,7 +1,6 @@
 import AWS from 'aws-sdk'
 import Env from '@ioc:Adonis/Core/Env'
 import { PutObjectRequest } from 'aws-sdk/clients/s3'
-import { createString } from 'App/Utils/CreateRandomString'
 import S3ServiceInterface from 'Contracts/interfaces/S3Service.interface'
 
 export default class S3Service implements S3ServiceInterface {
@@ -25,20 +24,14 @@ export default class S3Service implements S3ServiceInterface {
     }
   }
 
-  public async uploadImage(buffer: Buffer) {
-    let filename = createString(60)
+  public async uploadImage(filePath: string, buffer: Buffer) {
     this.uploadImageParams.Body = buffer
-    this.uploadImageParams.Key = `images/${filename}`
+    this.uploadImageParams.Key = filePath
     await this.s3.upload(this.uploadImageParams).promise()
-
-    return `https://${this.uploadImageParams.Bucket}.${this.s3.endpoint.hostname}/images/${filename}`
   }
 
-  public async deleteImage(url: string) {
-    const Key = url.replace(
-      `https://${this.uploadImageParams.Bucket}.${this.s3.endpoint.hostname}/`,
-      ''
-    )
+  public async deleteImage(filePath: string) {
+    const Key = filePath
     const params = {
       Bucket: this.uploadImageParams.Bucket,
       Key,

@@ -1,17 +1,20 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Label from './Label'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class OrganizationUser extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   public static table = 'organization_user'
 
   @column({ isPrimary: true })
   public id: string
 
-  @column({ columnName: 'user_id' })
+  @column()
   public userId: string
 
-  @column({ columnName: 'organization_id' })
+  @column()
   public organizationId: string
 
   @column.dateTime({ autoCreate: true })

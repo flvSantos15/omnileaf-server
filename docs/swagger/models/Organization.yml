@@ -1,0 +1,42 @@
+definitions:
+  Organization:
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      avatarUrl:
+        type: string
+        format: uri
+      description:
+        type: string
+      creatorId:
+        type: string
+        format: uuid
+      gitlabId:
+        type: integer
+      jiraId:
+        type: string
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      userLabels:
+        type: array
+        items:
+          type: string
+      creator:
+        type: string
+        example: User{}
+      projects:
+        type: string
+        example: Project[]
+      members:
+        type: string
+        example: User[]
+      labels:
+        type: string
+        example: Label[]

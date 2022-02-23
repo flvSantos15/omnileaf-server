@@ -2,8 +2,11 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, HasOne, hasOne, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Project from './Project'
 import Task from './Task'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Tag extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
@@ -13,7 +16,7 @@ export default class Tag extends BaseModel {
   @column()
   public color: string
 
-  @column({ columnName: 'project_id' })
+  @column()
   public projectId: string
 
   @column.dateTime({ autoCreate: true })

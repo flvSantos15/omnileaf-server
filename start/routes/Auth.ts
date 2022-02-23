@@ -1,5 +1,5 @@
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.post('login', 'AuthController.login')
+Route.post('auth/login', 'AuthController.login')
 
-Route.get('logout', 'AuthController.logout')
+Route.get('auth/logout', 'AuthController.logout')

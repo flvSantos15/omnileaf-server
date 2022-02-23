@@ -1,0 +1,50 @@
+definitions:
+  Task:
+    properties:
+      id:
+        type: string
+        format: uuid
+      name:
+        type: string
+      body:
+        type: string
+      timeEstimated:
+        type: integer
+      status:
+        type: string
+      isDeleted:
+        type: boolean
+      creatorId:
+        type: string
+        format: uuid
+      projectId:
+        type: string
+        format: uuid
+      gitlabId:
+        type: integer
+      jiraId:
+        type: string
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date
+      creator:
+        type: string
+        example: User{}
+      project:
+        type: string
+        example: Project{}
+      usersAssigned:
+        type: string
+        example: User[]
+      screenshots:
+        type: string
+        example: Screenshot[]
+      tags:
+        type: string
+        example: Tag[]
+      trackingSessions:
+        type: string
+        example: TrackingSession[]

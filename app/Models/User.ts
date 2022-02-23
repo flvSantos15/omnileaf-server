@@ -13,23 +13,25 @@ import {
 import { UserRoles } from 'Contracts/enums'
 import TrackingSession from './TrackingSession'
 import Project from './Project'
-import Board from './Board'
-import List from './List'
 import Task from './Task'
 import Screenshot from './Screenshot'
 import Organization from './Organization'
 import Hash from '@ioc:Adonis/Core/Hash'
 import OrganizationUser from './OrganizationUser'
 import GitlabToken from './GitlabToken'
+import JiraToken from './JiraToken'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class User extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
   @column()
   public name: string
 
-  @column({ columnName: 'display_name' })
+  @column()
   public displayName: string
 
   @column()
@@ -38,7 +40,7 @@ export default class User extends BaseModel {
   @column({ serializeAs: null })
   public password: string
 
-  @column({ columnName: 'avatar_url' })
+  @column()
   public avatarUrl: string
 
   @column()
@@ -47,14 +49,17 @@ export default class User extends BaseModel {
   @column()
   public account_type: UserRoles
 
-  @column({ columnName: 'latest_tracking_session_id' })
+  @column()
   public latestTrackingSessionId: string
 
-  @column({ columnName: 'remember_me_token' })
+  @column({ serializeAs: null })
   public rememberMeToken: string
 
-  @column({ columnName: 'gitlab_id' })
+  @column()
   public gitlabId: number
+
+  @column()
+  public jiraId: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -74,21 +79,12 @@ export default class User extends BaseModel {
 
   @manyToMany(() => Project, {
     pivotTable: 'project_user',
+    pivotColumns: ['role'],
   })
   public assignedProjects: ManyToMany<typeof Project>
 
-  @hasMany(() => Board, {
-    foreignKey: 'creator_id',
-  })
-  public ownedBoards: HasMany<typeof Board>
-
-  @hasMany(() => List, {
-    foreignKey: 'creator_id',
-  })
-  public ownedLists: HasMany<typeof List>
-
   @hasMany(() => Task, {
-    foreignKey: 'creator_id',
+    foreignKey: 'creatorId',
   })
   public ownedTasks: HasMany<typeof Task>
 
@@ -103,7 +99,7 @@ export default class User extends BaseModel {
   public assignedTasks: ManyToMany<typeof Task>
 
   @hasMany(() => Screenshot, {
-    foreignKey: 'user_id',
+    foreignKey: 'userId',
   })
   public screenshots: HasMany<typeof Screenshot>
 
@@ -113,9 +109,14 @@ export default class User extends BaseModel {
   public organizations: ManyToMany<typeof Organization>
 
   @hasOne(() => GitlabToken, {
-    foreignKey: 'owner_id',
+    foreignKey: 'ownerId',
   })
   public gitlabToken: HasOne<typeof GitlabToken>
+
+  @hasOne(() => JiraToken, {
+    foreignKey: 'ownerId',
+  })
+  public jiraToken: HasOne<typeof JiraToken>
 
   @beforeSave()
   public static async hashPassword(user: User) {
@@ -126,7 +127,7 @@ export default class User extends BaseModel {
 
   public serializeExtras() {
     return {
-      projectRole: this.$extras.pivot_role,
+      role: this.$extras.pivot_role,
     }
   }
 }

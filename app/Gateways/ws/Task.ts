@@ -1,6 +1,5 @@
-import List from 'App/Models/List'
 import Task from 'App/Models/Task'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
 import { Socket } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 
@@ -17,21 +16,15 @@ export const registerTaskHandlers = (
     const { taskId, listId } = payload
 
     try {
-      validateIdParam(taskId)
-      validateIdParam(listId)
+      UuidValidator.v4(taskId)
+      UuidValidator.v4(listId)
       //Verify if list exists
-      const list = await List.find(listId)
-      if (!list) {
-        socket.emit('task:updateListError', { message: 'List not found.' })
-        return
-      }
+
       const task = await Task.find(taskId)
       if (!task) {
         socket.emit('task:updateListError', { message: 'Task not found.' })
         return
       }
-
-      await task.merge({ listId }).save()
     } catch {
       socket.emit('task:updateListError', { message: 'Failed to Update Task List' })
     }

@@ -1,4 +1,4 @@
 export default interface S3ServiceInterface {
-  uploadImage(buffer: Buffer): Promise<string>
-  deleteImage(url: string): Promise<void>
+  uploadImage(filePath: string, buffer: Buffer): Promise<void>
+  deleteImage(filePath: string): Promise<void>
 }

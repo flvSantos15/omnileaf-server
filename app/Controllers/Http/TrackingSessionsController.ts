@@ -1,57 +1,73 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { LogCreated, LogList, LogShow, LogUpdated } from 'App/Helpers/CustomLogs'
-import { LoadTrackingSessionRelations } from 'App/Helpers/RelationsLoaders/TrackingSessionLoaders'
-import TrackingSession from 'App/Models/TrackingSession'
-import { validateIdParam } from 'App/Validators/Global/IdParamValidator'
-import { ValidateCreateTrackingSession } from 'App/Validators/TrackingSession/CreateTrackingSessionValidator'
-import { TrackingSessionStatus } from 'Contracts/enums'
+import CreateTrackingSessionValidator from 'App/Validators/TrackingSession/CreateTrackingSessionValidator'
+import TrackingSessionService from 'App/Services/TrackingSession/TrackingSessionService'
+import UuidValidator from 'App/Validators/Global/UuidValidator'
+import UpdateTrackingTimeValidator from 'App/Validators/TrackingSession/UpdateTrackingTimeValidator'
+import CloseSessionValidator from 'App/Validators/TrackingSession/CloseSessionValidator'
+import CreateManySessionValidator from 'App/Validators/TrackingSession/CreateManySessionValidator'
 
 export default class TrackingSessionsController {
-  public async list({ response }: HttpContextContract) {
-    const trackingSessions = await TrackingSession.all()
+  public async list({ response, logger }: HttpContextContract) {
+    const trackingSessions = await TrackingSessionService.getAll()
 
-    LogList(trackingSessions)
+    logger.info('Succesfully retrieved Tracking Sessions list')
 
     response.send(trackingSessions)
   }
 
-  public async show({ request, response }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+  public async show({ request, response, logger }: HttpContextContract) {
+    const id = UuidValidator.v4(request.param('id'))
 
-    const trackingSession = await LoadTrackingSessionRelations(id)
+    const trackingSession = await TrackingSessionService.getOne(id)
 
-    LogShow(trackingSession)
+    logger.info('Succesfully retrieved Tracking Session')
 
     response.send(trackingSession)
   }
 
-  public async create({ request, response, auth, bouncer }: HttpContextContract) {
+  public async create({ request, response, auth, bouncer, logger }: HttpContextContract) {
     const user = auth.use('web').user!
 
-    const task = await ValidateCreateTrackingSession(request)
+    const payload = await request.validate(CreateTrackingSessionValidator)
 
-    //Authorize user assigned to project
-    await task.load('project')
-    await bouncer.authorize('AssignedToProject', task.project)
+    const trackingSession = await TrackingSessionService.register({ payload, user, bouncer })
 
-    const trackingSession = await TrackingSession.create({ taskId: task.id, userId: user.id })
-
-    LogCreated(trackingSession)
+    logger.info('Succesfully created Tracking Session')
 
     response.status(201).send(trackingSession)
   }
 
-  public async closeSession({ request, response, bouncer }: HttpContextContract) {
-    const id = validateIdParam(request.param('id'))
+  public async updateTrackingTime({ request, response, bouncer, logger }: HttpContextContract) {
+    const id = UuidValidator.v4(request.param('id'))
 
-    const trackingSession = await TrackingSession.findOrFail(id)
+    const payload = await request.validate(UpdateTrackingTimeValidator)
 
-    await bouncer.authorize('OwnUser', trackingSession.userId)
+    await TrackingSessionService.updateTrackingTime({ id, payload, bouncer })
 
-    await trackingSession.merge({ status: TrackingSessionStatus.FINISHED }).save()
+    logger.info('Succesfully updated Tracking Session Time')
 
-    LogUpdated(trackingSession)
+    response.status(204)
+  }
 
-    response.status(200)
+  public async closeSession({ request, response, bouncer, logger }: HttpContextContract) {
+    const id = UuidValidator.v4(request.param('id'))
+
+    const payload = await request.validate(CloseSessionValidator)
+
+    await TrackingSessionService.closeSession({ id, payload, bouncer })
+
+    logger.info('Succesfully closed Tracking Session')
+
+    response.status(204)
+  }
+
+  public async createMany({ request, response, bouncer, logger }: HttpContextContract) {
+    const payload = await request.validate(CreateManySessionValidator)
+
+    await TrackingSessionService.createMany({ payload, bouncer })
+
+    logger.info('Succesfully created many sessions at once')
+
+    response.status(201)
   }
 }

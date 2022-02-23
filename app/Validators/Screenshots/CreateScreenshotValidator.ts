@@ -4,8 +4,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 export default class CreateScreenshotValidator {
   constructor(protected ctx: HttpContextContract) {}
   public schema = schema.create({
-    url: schema.string(),
-    blurredUrl: schema.string(),
     trackingSessionId: schema.string({}, [rules.uuid({ version: 4 })]),
+    base64: schema.string(),
   })
 }

@@ -11,6 +11,7 @@ export default class Organizations extends BaseSchema {
       table.text('description')
       table.uuid('creator_id').unsigned().references('id').inTable('users').notNullable()
       table.integer('gitlab_id').unique()
+      table.uuid('jira_id')
 
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL

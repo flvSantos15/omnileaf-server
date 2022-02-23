@@ -1,0 +1,22 @@
+components:
+  schemas:
+    User:
+      $ref: '#/definitions/User'
+    Organization:
+      $ref: '#/definitions/Organization'
+    Label:
+      $ref: '#/definitions/Label'
+    Project:
+      $ref: '#/definitions/Project'
+    Tag:
+      $ref: '#/definitions/Tag'
+    Task:
+      $ref: '#/definitions/Task'
+    Tracking Session:
+      $ref: '#/definitions/TrackingSession'
+    Screenshot:
+      $ref: '#/definitions/Screenshot'
+    Manual Entry:
+      $ref: '#/definitions/ManualEntry'
+    Organization Invite:
+      $ref: '#/definitions/OrganizationInvite'

@@ -1,6 +1,9 @@
 import { DateTime } from 'luxon'
 import {
   BaseModel,
+  beforeFetch,
+  beforeFind,
+  beforeSave,
   BelongsTo,
   belongsTo,
   column,
@@ -8,14 +11,19 @@ import {
   hasMany,
   ManyToMany,
   manyToMany,
+  ModelQueryBuilderContract,
 } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
-import Board from './Board'
 import Task from './Task'
 import Tag from './Tag'
 import Organization from './Organization'
+import GitlabIntegrationService from 'App/Services/GitlabIntegration/GitlabIntegrationService'
+import JiraIntegrationService from 'App/Services/JiraIntegration/JiraIntegrationService'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class Project extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
@@ -23,22 +31,34 @@ export default class Project extends BaseModel {
   public name: string
 
   @column()
-  public description: string
+  public description?: string
 
-  @column({ columnName: 'creator_id' })
+  @column()
+  public isDeleted: boolean
+
+  @column()
   public creatorId?: string
 
-  @column({ columnName: 'organization_id' })
+  @column()
+  public clientId: string
+
+  @column()
+  public avatarUrl: string
+
+  @column()
   public organizationId: string
 
-  @column({ columnName: 'gitlab_id' })
+  @column()
   public gitlabId?: number
 
-  @column({ columnName: 'gitlab_creator_id' })
-  public gitlabCreatorId: number
+  @column()
+  public gitlabCreatorId?: number
 
-  @column({ columnName: 'gitlab_avatar_url' })
-  public gitlabAvatarUrl?: string
+  @column()
+  public jiraId?: string
+
+  @column()
+  public jiraCreatorId?: string
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -56,16 +76,16 @@ export default class Project extends BaseModel {
   })
   public organization: BelongsTo<typeof Organization>
 
+  @belongsTo(() => User, {
+    foreignKey: 'clientId',
+  })
+  public client: BelongsTo<typeof User>
+
   @manyToMany(() => User, {
     pivotTable: 'project_user',
     pivotColumns: ['role'],
   })
   public usersAssigned: ManyToMany<typeof User>
-
-  @hasMany(() => Board, {
-    foreignKey: 'projectId',
-  })
-  public boards: HasMany<typeof Board>
 
   @hasMany(() => Task, {
     foreignKey: 'projectId',
@@ -81,5 +101,29 @@ export default class Project extends BaseModel {
     return {
       role: this.$extras.pivot_role,
     }
+  }
+
+  @beforeFind()
+  public static ignoreDeletedOnFind(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
+
+  @beforeFetch()
+  public static ignoreDeletedOnFetch(query: ModelQueryBuilderContract<typeof User>) {
+    query.where('is_deleted', false)
+  }
+
+  @beforeSave()
+  public static async handleDeleteProject(project: Project) {
+    if (!project.$dirty.isDeleted) return
+    if (project.gitlabId) {
+      await GitlabIntegrationService.deleteProjectWebhooks(project)
+    }
+
+    if (project.jiraId) {
+      await JiraIntegrationService.deleteProjectWebhooks(project)
+    }
+
+    await Task.query().where('projectId', project.id).update({ isDeleted: true })
   }
 }

@@ -1,4 +1,5 @@
 import { BaseMailer, MessageContract } from '@ioc:Adonis/Addons/Mail'
+import Env from '@ioc:Adonis/Core/Env'
 import View from '@ioc:Adonis/Core/View'
 
 export default class ResetPasswordMail extends BaseMailer {
@@ -9,7 +10,7 @@ export default class ResetPasswordMail extends BaseMailer {
   public async prepare(message: MessageContract) {
     message
       .subject('OMNILEAF - Reset your password')
-      .from('no-reply@mg.omnileaf.tk')
+      .from(`Omnileaf<no-reply@${Env.get('APP_DOMAIN')}>`)
       .to(this.email)
       .html(await View.render('emails/reset-password', { url: this.url }))
   }

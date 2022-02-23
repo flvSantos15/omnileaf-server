@@ -5,10 +5,14 @@
  * file.
  */
 
-declare module '@ioc:Adonis/Addons/Mail' {
-  import { MailDrivers } from '@ioc:Adonis/Addons/Mail'
+import { SendgridConfig } from 'providers/SendgridDriver'
 
+declare module '@ioc:Adonis/Addons/Mail' {
   interface MailersList {
     mailgun: MailDrivers['mailgun']
+    sendgrid: {
+      config: SendgridConfig
+      implementation: MailDriverContract
+    }
   }
 }

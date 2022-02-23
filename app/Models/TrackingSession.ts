@@ -1,23 +1,51 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeUpdate, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import {
+  BaseModel,
+  beforeCreate,
+  BelongsTo,
+  belongsTo,
+  column,
+  HasMany,
+  hasMany,
+} from '@ioc:Adonis/Lucid/Orm'
 import { TrackingSessionStatus } from 'Contracts/enums'
 import User from './User'
 import Task from './Task'
+import Screenshot from './Screenshot'
+import Project from './Project'
+import { TrackingSessionType } from 'Contracts/enums/tracking-session-type'
+import { CamelCaseNamingStrategy } from 'App/Bindings/NamingStrategy'
 
 export default class TrackingSession extends BaseModel {
+  public static namingStrategy = new CamelCaseNamingStrategy()
+
   @column({ isPrimary: true })
   public id: string
 
   @column()
   public status: TrackingSessionStatus
 
-  @column({ columnName: 'tracking_time' })
+  @column()
+  public type: TrackingSessionType
+
+  @column()
   public trackingTime: number
 
-  @column({ columnName: 'user_id' })
+  @column()
+  public inactivityTime: number
+
+  @column()
   public userId: string
 
-  @column({ columnName: 'task_id' })
+  //This property is auto created on beforeCreate hook
+  @column()
+  public organizationId: string
+
+  //This property is auto created on beforeCreate hook
+  @column()
+  public projectId: string
+
+  @column()
   public taskId: string
 
   @column.dateTime({ autoCreate: true })
@@ -26,8 +54,8 @@ export default class TrackingSession extends BaseModel {
   @column.dateTime({ autoCreate: true, columnName: 'started_at' })
   public startedAt: DateTime
 
-  @column({ columnName: 'stopped_at' })
-  public stoppedAt: string
+  @column()
+  public stoppedAt: DateTime
 
   //Relations
   @belongsTo(() => User, {
@@ -35,21 +63,25 @@ export default class TrackingSession extends BaseModel {
   })
   public user: BelongsTo<typeof User>
 
+  @belongsTo(() => Project, {
+    foreignKey: 'projectId',
+  })
+  public project: BelongsTo<typeof Project>
+
   @belongsTo(() => Task, {
     foreignKey: 'taskId',
   })
   public task: BelongsTo<typeof Task>
 
-  //Hooks
-  @beforeUpdate()
-  public static calculateTrackingTime(trackingSession: TrackingSession) {
-    trackingSession.stoppedAt = new Date().toLocaleString('en-US', {
-      timeZone: 'America/Sao_Paulo',
-    })
+  @hasMany(() => Screenshot, {
+    foreignKey: 'trackingSessionId',
+  })
+  public screenshots: HasMany<typeof Screenshot>
 
-    const stoppedAtSeconds = new Date(trackingSession.stoppedAt).getTime() / 1000
-    const startedAtSeconds = trackingSession.startedAt.toSeconds()
+  @beforeCreate()
+  public static async addProjectAndOrganizationIds(trackingSession: TrackingSession) {
+    const task = await Task.findOrFail(trackingSession.taskId)
 
-    trackingSession.trackingTime = Math.floor(stoppedAtSeconds - startedAtSeconds)
+    trackingSession.merge({ projectId: task.projectId, organizationId: task.organizationId })
   }
 }

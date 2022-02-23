@@ -1,0 +1,17 @@
+definitions:
+  Label:
+    properties:
+      id:
+        type: string
+        format: uuid
+      title:
+        type: string
+      organizationId:
+        type: string
+        format: uuid
+      createdAt:
+        type: string
+        format: date
+      updatedAt:
+        type: string
+        format: date

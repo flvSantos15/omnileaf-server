@@ -1,25 +1,14 @@
-import { Exception } from '@adonisjs/core/build/standalone'
-import Application from '@ioc:Adonis/Core/Application'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import GitlabApiService from 'App/Services/GitlabIntegration/GitlabApiService'
 
 export default class TestsController {
-  public async test({ request, response, logger }: HttpContextContract) {
-    const screenshotMultiPart = request.file('screenshotMultiPart')
+  public async test({ request, response }: HttpContextContract) {
+    const { id, token } = request.only(['id', 'token'])
 
-    const filename = screenshotMultiPart?.fileName
-      ? screenshotMultiPart?.fileName
-      : screenshotMultiPart?.clientName
+    await GitlabApiService.registerProjectWebhook({ id, token })
 
-    if (!filename) {
-      throw new Exception('Could not get filename', 400)
-    }
+    // const data = await JiraApiService._getProjectRolesLinks({ id, cloudId, token })
 
-    await screenshotMultiPart!.move(Application.tmpPath('uploads/images/original'))
-
-    // await ScreenshotService.upload(imgPath)
-
-    logger.info('Image uploaded succesfully')
-
-    response.send('it worked ?')
+    response.send('w?')
   }
 }
