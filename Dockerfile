@@ -100,6 +100,8 @@ COPY build .
 
 COPY .env .
 
+COPY docs docs
+
 RUN yarn install --production
 
 EXPOSE 3333
