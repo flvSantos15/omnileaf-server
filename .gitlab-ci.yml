@@ -25,7 +25,7 @@ install_dev:
   image: node:16.14-alpine
   stage: install_dev
   script:
-    - echo $ENV_FILE
+    - cp $ENV_FILE .env
     - yarn
     - yarn build
   artifacts:
@@ -40,7 +40,7 @@ install_prod:
   environment:
     name: production
   script:
-    - cat $ENV_FILE > .env
+    - cp $ENV_FILE .env
     - yarn
     - yarn build
   artifacts:
