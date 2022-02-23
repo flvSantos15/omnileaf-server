@@ -23,6 +23,8 @@ stages:
 install_dev:
   image: node:16.14-alpine
   stage: install_dev
+  environment:
+    name: development
   script:
     - cp $ENV_FILE_DEV .env
     - yarn
