@@ -14,7 +14,7 @@ import './routes/ManualEntries'
 
 import Env from '@ioc:Adonis/Core/Env'
 
-const helloMessage = Env.get('NODE_ENV') === 'production' ? 'From Production' : 'From Development'
+const helloMessage = Env.get('NODE_ENV') === 'production' ? 'From Production enviroment' : 'From Development enviroment'
 
 Route.get('/', async () => {
   return { hello: helloMessage }
